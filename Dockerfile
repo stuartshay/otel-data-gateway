@@ -6,7 +6,7 @@ FROM node:24-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN HUSKY=0 npm ci
 
 COPY tsconfig.json ./
 COPY src/ ./src/
@@ -23,7 +23,9 @@ RUN apk add --no-cache tini
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm pkg delete scripts.prepare && \
+    npm ci --omit=dev && \
+    npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
 COPY VERSION ./
