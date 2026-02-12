@@ -107,6 +107,11 @@ const typeDefs = `#graphql
     total_distance: Float
     avg_pace: Float
     device_manufacturer: String
+    avg_temperature_c: Int
+    min_temperature_c: Int
+    max_temperature_c: Int
+    total_elapsed_time: Float
+    total_timer_time: Float
     created_at: String
     uploaded_at: String
     track_point_count: Int
