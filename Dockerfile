@@ -18,6 +18,7 @@ RUN npm run build
 # =============================================================================
 FROM node:24-alpine
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache tini
 
 WORKDIR /app
@@ -43,6 +44,7 @@ EXPOSE 4000
 USER node
 
 ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
 LABEL org.opencontainers.image.title="otel-data-gateway"
 LABEL org.opencontainers.image.description="Apollo Server GraphQL BFF gateway for otel-data-api"
 LABEL org.opencontainers.image.version="${APP_VERSION}"

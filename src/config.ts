@@ -12,11 +12,14 @@ interface AppConfig {
 }
 
 function readVersion(): string {
+  if (process.env.APP_VERSION) {
+    return process.env.APP_VERSION;
+  }
   try {
     const versionPath = resolve(__dirname, '..', 'VERSION');
     return readFileSync(versionPath, 'utf-8').trim();
   } catch {
-    return process.env.APP_VERSION ?? 'unknown';
+    return 'unknown';
   }
 }
 
