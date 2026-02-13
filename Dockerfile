@@ -18,6 +18,7 @@ RUN npm run build
 # =============================================================================
 FROM node:24-alpine
 
+# hadolint ignore=DL3018
 RUN apk add --no-cache tini
 
 WORKDIR /app
