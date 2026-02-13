@@ -108,7 +108,7 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "should_push=true" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.push_image }}" == "true" ]]; then
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ github.event.inputs.push_image }}" == "true" ]]; then
             echo "should_push=true" >> $GITHUB_OUTPUT
           else
             echo "should_push=false" >> $GITHUB_OUTPUT
@@ -122,14 +122,10 @@ jobs:
           push: ${{ steps.push.outputs.should_push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: |
-            type=gha
-            type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
+          cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             APP_VERSION=${{ steps.version.outputs.version }}
-            BUILD_DATE=${{ steps.build_info.outputs.date }}
-            BUILD_NUMBER=${{ github.run_number }}
 
       - name: Update Docker Hub description
         if: github.ref == 'refs/heads/master'

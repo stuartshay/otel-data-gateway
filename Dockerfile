@@ -44,6 +44,7 @@ EXPOSE 4000
 USER node
 
 ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION}
 LABEL org.opencontainers.image.title="otel-data-gateway"
 LABEL org.opencontainers.image.description="Apollo Server GraphQL BFF gateway for otel-data-api"
 LABEL org.opencontainers.image.version="${APP_VERSION}"
