@@ -35,9 +35,7 @@ ENV NODE_ENV=production
 ENV PORT=4000
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- --header='Content-Type: application/json' \
-  --post-data='{"query":"{health{status}}"}' \
-  http://localhost:4000/ || exit 1
+  CMD wget -qO- http://localhost:4000/health || exit 1
 
 EXPOSE 4000
 
