@@ -285,6 +285,7 @@ const typeDefs = `#graphql
       offset: Int
       sort: String
       order: SortOrder
+      simplify: Float
     ): GarminTrackPointConnection!
 
     garminSports: [SportInfo!]!
