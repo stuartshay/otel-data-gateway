@@ -132,7 +132,6 @@ When the Docker build completes, the CI workflow dispatches a
 2. Runs `update-version.sh <version>` to update VERSION, deployment.yaml
 3. Creates a PR to `master` with title "Update otel-data-gateway to v\<version\>"
 4. CI checks and Copilot review run automatically
-5. Auto-approve workflow provides the required review
 
 The agent should check for this auto-created PR rather than manually creating
 one. Use: `gh pr list --repo stuartshay/k8s-gitops --state open`
@@ -203,8 +202,7 @@ gh pr merge <PR_NUMBER> --squash --repo stuartshay/otel-data-gateway
 
 - Never commit directly to `master` — always use PRs
 - Use squash merge to maintain clean commit history
-- Branch protection requires 1 approving review (auto-approve workflow handles
-  PRs from `stuartshay`)
+- Branch protection requires 1 approving review
 
 #### Post-Merge: Rebase develop onto master
 
@@ -524,9 +522,8 @@ The `master` branch on `stuartshay/otel-data-gateway` enforces these protections
 | Allow force pushes               | No                    |
 | Allow deletions                  | No                    |
 
-The `auto-approve.yml` workflow auto-approves PRs from `stuartshay` using
-`GITOPS_PAT`. Since `enforce_admins` is enabled, the approval requirement
-applies to all users including admins.
+Since `enforce_admins` is enabled, the approval requirement
+applies to all users including admins. All PRs require manual review.
 
 To inspect current settings:
 
