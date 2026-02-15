@@ -34,6 +34,7 @@ export const garminResolvers = {
         offset?: number;
         sort?: string;
         order?: string;
+        simplify?: number;
       },
       { dataSources }: GatewayContext,
     ) => {

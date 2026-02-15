@@ -108,6 +108,7 @@ export class OtelDataAPI {
       offset?: number;
       sort?: string;
       order?: string;
+      simplify?: number;
     },
   ) {
     return this.fetch<{ items: unknown[]; total: number; limit: number; offset: number }>({
