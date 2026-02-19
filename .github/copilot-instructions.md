@@ -51,6 +51,13 @@ git checkout master && git fetch origin && git pull origin master
 git checkout -b feature/my-feature
 ```
 
+**ALWAYS rebase feature branches onto the latest protected branch before creating a PR:**
+
+```bash
+# For feature branches only (do NOT rebase the shared develop branch):
+git fetch origin master && git rebase origin/master
+```
+
 ### Daily Workflow
 
 1. **ALWAYS** start from `develop` or create a feature branch
@@ -59,8 +66,10 @@ git checkout -b feature/my-feature
 4. Run `npm run dev` for development server
 5. Run `npm run lint:all` before commit
 6. Commit and push to `develop` or `feature/*` branch
-7. Create PR to `master` when ready for deployment
-8. **NEVER**: `git push origin master` or commit directly to master
+7. **For feature branches**: rebase onto latest `master` before PR:
+   `git fetch origin master && git rebase origin/master`
+8. Create PR to `master` when ready for deployment
+9. **NEVER**: `git push origin master` or commit directly to master
 
 ## Writing Code
 
