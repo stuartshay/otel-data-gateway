@@ -37,7 +37,7 @@ jobs:
           # Extract version from tag (v1.0.8 → 1.0.8)
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           cd ${{ env.TYPES_PKG_DIR }}
-          npm version "$TAG_VERSION" --no-git-tag-version
+          npm version "$TAG_VERSION" --no-git-tag-version --allow-same-version
           echo "Package version: $TAG_VERSION"
 
       - name: Publish to npm
