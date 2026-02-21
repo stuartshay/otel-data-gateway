@@ -37,7 +37,7 @@
   "dependencies": {
     "@apollo/server": "^5.4.0",
     "@as-integrations/express5": "^1.1.2",
-    "@stuartshay/otel-data-types": "^1.0.61",
+    "@stuartshay/otel-data-types": "^1.0.69",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "graphql": "^16.12.0",
