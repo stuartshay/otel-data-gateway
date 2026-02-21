@@ -138,10 +138,10 @@ Follows the same pattern as `otel-data-api`'s publish-types workflow.
 - [x] **3.2** `NPM_TOKEN` secret must be configured as a repo secret
       (same token already used by otel-data-api)
 
-- [ ] **3.3** Verify Phase 3 (after first release)
-  - Create a GitHub Release with tag `v1.0.0`
-  - Workflow triggers and publishes to npm
-  - Package appears: `npm view @stuartshay/otel-graphql-types`
+- [x] **3.3** Verify Phase 3 (after first release)
+  - Created GitHub Release `v1.0.0` targeting master
+  - Workflow triggered and published to npm successfully
+  - Package live: `@stuartshay/otel-graphql-types@1.0.0` (4 files, 20.7 kB)
 
 **Files modified**:
 
