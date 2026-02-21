@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN HUSKY=0 npm ci
 
-COPY tsconfig.json ./
+COPY codegen.ts tsconfig.json ./
 COPY src/ ./src/
 
 RUN npm run build

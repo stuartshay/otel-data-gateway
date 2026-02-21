@@ -1,34 +1,18 @@
-import type { GatewayContext } from './types.js';
+import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 
-export const spatialResolvers = {
+export const spatialResolvers: {
+  Query: Pick<QueryResolvers, 'nearbyPoints' | 'calculateDistance' | 'withinReference'>;
+} = {
   Query: {
-    nearbyPoints: async (
-      _: unknown,
-      args: {
-        lat: number;
-        lon: number;
-        radius_meters?: number;
-        source?: string;
-        limit?: number;
-      },
-      { dataSources }: GatewayContext,
-    ) => {
+    nearbyPoints: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getNearbyPoints(args);
     },
 
-    calculateDistance: async (
-      _: unknown,
-      args: { from_lat: number; from_lon: number; to_lat: number; to_lon: number },
-      { dataSources }: GatewayContext,
-    ) => {
+    calculateDistance: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getDistance(args);
     },
 
-    withinReference: async (
-      _: unknown,
-      args: { name: string; source?: string; limit?: number },
-      { dataSources }: GatewayContext,
-    ) => {
+    withinReference: async (_parent, args, { dataSources }) => {
       const { name, ...params } = args;
       return dataSources.otelAPI.getWithinReference(name, params);
     },

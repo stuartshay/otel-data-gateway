@@ -1,27 +1,14 @@
-import type { GatewayContext } from './types.js';
+import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 
-export const gpsResolvers = {
+export const gpsResolvers: {
+  Query: Pick<QueryResolvers, 'unifiedGps' | 'dailySummary'>;
+} = {
   Query: {
-    unifiedGps: async (
-      _: unknown,
-      args: {
-        source?: string;
-        date_from?: string;
-        date_to?: string;
-        limit?: number;
-        offset?: number;
-        order?: string;
-      },
-      { dataSources }: GatewayContext,
-    ) => {
+    unifiedGps: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getUnifiedGps(args);
     },
 
-    dailySummary: async (
-      _: unknown,
-      args: { date_from?: string; date_to?: string; limit?: number },
-      { dataSources }: GatewayContext,
-    ) => {
+    dailySummary: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getDailySummary(args);
     },
   },

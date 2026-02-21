@@ -1,0 +1,37 @@
+{
+  "name": "@stuartshay/otel-graphql-types",
+  "version": "1.0.0",
+  "description": "TypeScript types for otel-data-gateway — Auto-generated from GraphQL schema",
+  "types": "index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts"
+    }
+  },
+  "files": [
+    "index.d.ts",
+    "schema.graphql",
+    "README.md"
+  ],
+  "scripts": {
+    "prepublishOnly": "echo 'Types should be generated before publishing'"
+  },
+  "keywords": [
+    "otel-data-gateway",
+    "graphql",
+    "typescript",
+    "types",
+    "apollo-server"
+  ],
+  "author": "Stuart Shay",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stuartshay/otel-data-gateway.git",
+    "directory": "packages/graphql-types"
+  },
+  "homepage": "https://github.com/stuartshay/otel-data-gateway/tree/master/packages/graphql-types",
+  "publishConfig": {
+    "access": "public"
+  }
+}
