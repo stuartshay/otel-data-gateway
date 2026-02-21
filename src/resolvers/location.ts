@@ -1,36 +1,22 @@
-import type { GatewayContext } from './types.js';
+import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 
-export const locationResolvers = {
+export const locationResolvers: {
+  Query: Pick<QueryResolvers, 'locations' | 'location' | 'devices' | 'locationCount'>;
+} = {
   Query: {
-    locations: async (
-      _: unknown,
-      args: {
-        device_id?: string;
-        date_from?: string;
-        date_to?: string;
-        limit?: number;
-        offset?: number;
-        sort?: string;
-        order?: string;
-      },
-      { dataSources }: GatewayContext,
-    ) => {
+    locations: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getLocations(args);
     },
 
-    location: async (_: unknown, args: { id: number }, { dataSources }: GatewayContext) => {
+    location: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getLocation(args.id);
     },
 
-    devices: async (_: unknown, __: unknown, { dataSources }: GatewayContext) => {
+    devices: async (_parent, _args, { dataSources }) => {
       return dataSources.otelAPI.getDevices();
     },
 
-    locationCount: async (
-      _: unknown,
-      args: { date?: string; device_id?: string },
-      { dataSources }: GatewayContext,
-    ) => {
+    locationCount: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getLocationCount(args);
     },
   },

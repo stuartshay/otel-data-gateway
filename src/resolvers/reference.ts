@@ -1,16 +1,14 @@
-import type { GatewayContext } from './types.js';
+import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 
-export const referenceResolvers = {
+export const referenceResolvers: {
+  Query: Pick<QueryResolvers, 'referenceLocations' | 'referenceLocation'>;
+} = {
   Query: {
-    referenceLocations: async (_: unknown, __: unknown, { dataSources }: GatewayContext) => {
+    referenceLocations: async (_parent, _args, { dataSources }) => {
       return dataSources.otelAPI.getReferenceLocations();
     },
 
-    referenceLocation: async (
-      _: unknown,
-      args: { id: number },
-      { dataSources }: GatewayContext,
-    ) => {
+    referenceLocation: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getReferenceLocation(args.id);
     },
   },

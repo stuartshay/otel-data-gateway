@@ -1,9 +1,9 @@
+import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 import { config } from '../config.js';
-import type { GatewayContext } from './types.js';
 
-export const healthResolvers = {
+export const healthResolvers: { Query: Pick<QueryResolvers, 'health' | 'ready'> } = {
   Query: {
-    health: async (_: unknown, __: unknown, { dataSources }: GatewayContext) => {
+    health: async (_parent, _args, { dataSources }) => {
       try {
         return await dataSources.otelAPI.getHealth();
       } catch {
@@ -11,7 +11,7 @@ export const healthResolvers = {
       }
     },
 
-    ready: async (_: unknown, __: unknown, { dataSources }: GatewayContext) => {
+    ready: async (_parent, _args, { dataSources }) => {
       try {
         return await dataSources.otelAPI.getReady();
       } catch (error) {
