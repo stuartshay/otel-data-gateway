@@ -135,6 +135,12 @@ export class OtelDataAPI {
     });
   }
 
+  async getGarminChartData(activityId: string) {
+    return this.fetch<Schemas['GarminChartPoint'][]>({
+      path: `/api/v1/garmin/activities/${activityId}/chart-data`,
+    });
+  }
+
   // ── Unified GPS ─────────────────────────────────────
 
   async getUnifiedGps(

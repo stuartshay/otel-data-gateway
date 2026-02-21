@@ -88,6 +88,19 @@ export type GarminActivityConnection = {
   total: Scalars['Int']['output'];
 };
 
+export type GarminChartPoint = {
+  __typename?: 'GarminChartPoint';
+  altitude?: Maybe<Scalars['Float']['output']>;
+  cadence?: Maybe<Scalars['Int']['output']>;
+  distance_from_start_km?: Maybe<Scalars['Float']['output']>;
+  heart_rate?: Maybe<Scalars['Int']['output']>;
+  latitude: Scalars['Float']['output'];
+  longitude: Scalars['Float']['output'];
+  speed_kmh?: Maybe<Scalars['Float']['output']>;
+  temperature_c?: Maybe<Scalars['Float']['output']>;
+  timestamp: Scalars['DateTime']['output'];
+};
+
 export type GarminTrackPoint = {
   __typename?: 'GarminTrackPoint';
   activity_id: Scalars['String']['output'];
@@ -194,6 +207,7 @@ export type Query = {
   devices: Array<DeviceInfo>;
   garminActivities: GarminActivityConnection;
   garminActivity?: Maybe<GarminActivity>;
+  garminChartData: Array<GarminChartPoint>;
   garminSports: Array<SportInfo>;
   garminTrackPoints: GarminTrackPointConnection;
   health: HealthStatus;
@@ -236,6 +250,11 @@ export type QueryGarminActivitiesArgs = {
 
 
 export type QueryGarminActivityArgs = {
+  activity_id: Scalars['String']['input'];
+};
+
+
+export type QueryGarminChartDataArgs = {
   activity_id: Scalars['String']['input'];
 };
 
@@ -444,6 +463,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GarminActivity: ResolverTypeWrapper<GarminActivity>;
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
+  GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
   HealthStatus: ResolverTypeWrapper<HealthStatus>;
@@ -476,6 +496,7 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float']['output'];
   GarminActivity: GarminActivity;
   GarminActivityConnection: GarminActivityConnection;
+  GarminChartPoint: GarminChartPoint;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
   HealthStatus: HealthStatus;
@@ -563,6 +584,18 @@ export type GarminActivityConnectionResolvers<ContextType = GatewayContext, Pare
   limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   offset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+}>;
+
+export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminChartPoint'] = ResolversParentTypes['GarminChartPoint']> = ResolversObject<{
+  altitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  distance_from_start_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 }>;
 
 export type GarminTrackPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminTrackPoint'] = ResolversParentTypes['GarminTrackPoint']> = ResolversObject<{
@@ -665,6 +698,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   devices?: Resolver<Array<ResolversTypes['DeviceInfo']>, ParentType, ContextType>;
   garminActivities?: Resolver<ResolversTypes['GarminActivityConnection'], ParentType, ContextType, Partial<QueryGarminActivitiesArgs>>;
   garminActivity?: Resolver<Maybe<ResolversTypes['GarminActivity']>, ParentType, ContextType, RequireFields<QueryGarminActivityArgs, 'activity_id'>>;
+  garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
   garminTrackPoints?: Resolver<ResolversTypes['GarminTrackPointConnection'], ParentType, ContextType, RequireFields<QueryGarminTrackPointsArgs, 'activity_id'>>;
   health?: Resolver<ResolversTypes['HealthStatus'], ParentType, ContextType>;
@@ -735,6 +769,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   DistanceResult?: DistanceResultResolvers<ContextType>;
   GarminActivity?: GarminActivityResolvers<ContextType>;
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
+  GarminChartPoint?: GarminChartPointResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;
   HealthStatus?: HealthStatusResolvers<ContextType>;
