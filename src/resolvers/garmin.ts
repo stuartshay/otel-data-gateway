@@ -3,7 +3,7 @@ import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 export const garminResolvers: {
   Query: Pick<
     QueryResolvers,
-    'garminActivities' | 'garminActivity' | 'garminTrackPoints' | 'garminSports'
+    'garminActivities' | 'garminActivity' | 'garminTrackPoints' | 'garminSports' | 'garminChartData'
   >;
 } = {
   Query: {
@@ -22,6 +22,10 @@ export const garminResolvers: {
 
     garminSports: async (_parent, _args, { dataSources }) => {
       return dataSources.otelAPI.getGarminSports();
+    },
+
+    garminChartData: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminChartData(args.activity_id);
     },
   },
 };

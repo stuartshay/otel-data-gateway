@@ -89,6 +89,19 @@ export interface GarminActivityConnection {
   total: Scalars['Int']['output'];
 }
 
+export interface GarminChartPoint {
+  __typename?: 'GarminChartPoint';
+  altitude?: Maybe<Scalars['Float']['output']>;
+  cadence?: Maybe<Scalars['Int']['output']>;
+  distance_from_start_km?: Maybe<Scalars['Float']['output']>;
+  heart_rate?: Maybe<Scalars['Int']['output']>;
+  latitude: Scalars['Float']['output'];
+  longitude: Scalars['Float']['output'];
+  speed_kmh?: Maybe<Scalars['Float']['output']>;
+  temperature_c?: Maybe<Scalars['Float']['output']>;
+  timestamp: Scalars['DateTime']['output'];
+}
+
 export interface GarminTrackPoint {
   __typename?: 'GarminTrackPoint';
   activity_id: Scalars['String']['output'];
@@ -195,6 +208,7 @@ export interface Query {
   devices: Array<DeviceInfo>;
   garminActivities: GarminActivityConnection;
   garminActivity?: Maybe<GarminActivity>;
+  garminChartData: Array<GarminChartPoint>;
   garminSports: Array<SportInfo>;
   garminTrackPoints: GarminTrackPointConnection;
   health: HealthStatus;
@@ -233,6 +247,10 @@ export interface QueryGarminActivitiesArgs {
 }
 
 export interface QueryGarminActivityArgs {
+  activity_id: Scalars['String']['input'];
+}
+
+export interface QueryGarminChartDataArgs {
   activity_id: Scalars['String']['input'];
 }
 

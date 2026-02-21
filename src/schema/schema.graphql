@@ -150,6 +150,18 @@ type SportInfo {
   activity_count: Int!
 }
 
+type GarminChartPoint {
+  timestamp: DateTime!
+  altitude: Float
+  distance_from_start_km: Float
+  speed_kmh: Float
+  heart_rate: Int
+  cadence: Int
+  temperature_c: Float
+  latitude: Float!
+  longitude: Float!
+}
+
 # -------------------------------------------------------
 # Unified GPS
 # -------------------------------------------------------
@@ -285,6 +297,8 @@ type Query {
   ): GarminTrackPointConnection!
 
   garminSports: [SportInfo!]!
+
+  garminChartData(activity_id: String!): [GarminChartPoint!]!
 
   # Unified GPS
   unifiedGps(

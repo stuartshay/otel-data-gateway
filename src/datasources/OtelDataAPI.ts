@@ -135,6 +135,24 @@ export class OtelDataAPI {
     });
   }
 
+  async getGarminChartData(activityId: string) {
+    return this.fetch<
+      {
+        timestamp: string;
+        altitude: number | null;
+        distance_from_start_km: number | null;
+        speed_kmh: number | null;
+        heart_rate: number | null;
+        cadence: number | null;
+        temperature_c: number | null;
+        latitude: number;
+        longitude: number;
+      }[]
+    >({
+      path: `/api/v1/garmin/activities/${activityId}/chart-data`,
+    });
+  }
+
   // ── Unified GPS ─────────────────────────────────────
 
   async getUnifiedGps(
