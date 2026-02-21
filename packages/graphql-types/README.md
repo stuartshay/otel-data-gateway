@@ -13,7 +13,7 @@ npm install @stuartshay/otel-graphql-types
 ### Import Types
 
 ```typescript
-import type { Location, GarminActivity, PaginatedLocations } from '@stuartshay/otel-graphql-types';
+import type { Location, GarminActivity, LocationConnection } from '@stuartshay/otel-graphql-types';
 ```
 
 ### Use Schema for Client Codegen

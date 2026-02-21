@@ -145,9 +145,9 @@ Follows the same pattern as `otel-data-api`'s publish-types workflow.
 
 **Files modified**:
 
-| File                           | Action                         |
-| ------------------------------ | ------------------------------ |
-| `.github/workflows/docker.yml` | Modify — add publish-types job |
+| File                                  | Action |
+| ------------------------------------- | ------ |
+| `.github/workflows/publish-types.yml` | New    |
 
 ---
 
