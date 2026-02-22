@@ -1,49 +1,31 @@
-import type { GatewayContext } from './types.js';
+import type { QueryResolvers } from '../__generated__/resolvers-types.js';
 
-export const garminResolvers = {
+export const garminResolvers: {
+  Query: Pick<
+    QueryResolvers,
+    'garminActivities' | 'garminActivity' | 'garminTrackPoints' | 'garminSports' | 'garminChartData'
+  >;
+} = {
   Query: {
-    garminActivities: async (
-      _: unknown,
-      args: {
-        sport?: string;
-        date_from?: string;
-        date_to?: string;
-        limit?: number;
-        offset?: number;
-        sort?: string;
-        order?: string;
-      },
-      { dataSources }: GatewayContext,
-    ) => {
+    garminActivities: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminActivities(args);
     },
 
-    garminActivity: async (
-      _: unknown,
-      args: { activity_id: string },
-      { dataSources }: GatewayContext,
-    ) => {
+    garminActivity: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminActivity(args.activity_id);
     },
 
-    garminTrackPoints: async (
-      _: unknown,
-      args: {
-        activity_id: string;
-        limit?: number;
-        offset?: number;
-        sort?: string;
-        order?: string;
-        simplify?: number;
-      },
-      { dataSources }: GatewayContext,
-    ) => {
+    garminTrackPoints: async (_parent, args, { dataSources }) => {
       const { activity_id, ...params } = args;
       return dataSources.otelAPI.getGarminTrackPoints(activity_id, params);
     },
 
-    garminSports: async (_: unknown, __: unknown, { dataSources }: GatewayContext) => {
+    garminSports: async (_parent, _args, { dataSources }) => {
       return dataSources.otelAPI.getGarminSports();
+    },
+
+    garminChartData: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminChartData(args.activity_id);
     },
   },
 };

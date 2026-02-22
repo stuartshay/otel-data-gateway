@@ -51,12 +51,24 @@ git checkout master && git fetch origin && git pull origin master
 git checkout -b feature/my-feature
 ```
 
-**ALWAYS rebase feature branches onto the latest protected branch before creating a PR:**
+**ALWAYS rebase onto the latest protected branch before creating a PR:**
 
 ```bash
-# For feature branches only (do NOT rebase the shared develop branch):
 git fetch origin master && git rebase origin/master
 ```
+
+### Before Creating a PR
+
+⚠️ **ALWAYS check for and resolve conflicts before creating a PR:**
+
+1. Rebase onto the latest protected branch:
+   `git fetch origin master && git rebase origin/master`
+2. Resolve any conflicts during rebase
+3. Force-push the rebased branch: `git push origin <branch> --force-with-lease`
+4. Verify the PR shows no conflicts on GitHub before requesting review
+
+This is especially important after squash merges, which cause develop to
+diverge from master.
 
 ### Daily Workflow
 
@@ -93,6 +105,23 @@ git fetch origin master && git rebase origin/master
 - Uses native `fetch` for HTTP requests
 - Pass query parameters as-is from GraphQL args to REST API
 - Handle errors with descriptive messages
+
+## Local Development Services
+
+⚠️ **ALWAYS start local services in hot-reload mode.** Never use `make start`
+or production mode for local development.
+
+- **Start command**: `make dev` (runs `tsx watch` with file watching)
+- **Port**: 4000
+- **Health check**: GraphQL query `{ health { status } }` at localhost:4000
+- **Hot reload**: Automatically restarts on TypeScript file changes
+- Do NOT use `make start` for development — it runs compiled JS without watching
+
+When starting the full local stack, start services in this order:
+
+1. `otel-data-api` — `make dev` (port 8080)
+2. `otel-data-gateway` — `make dev` (port 4000)
+3. `otel-data-ui` — `make dev` (port 5173)
 
 ## Safety Rules (Do Not)
 

@@ -1,5 +1,13 @@
 # otel-data-gateway
 
+[![Lint](https://github.com/stuartshay/otel-data-gateway/actions/workflows/lint.yml/badge.svg)](https://github.com/stuartshay/otel-data-gateway/actions/workflows/lint.yml)
+[![Docker](https://github.com/stuartshay/otel-data-gateway/actions/workflows/docker.yml/badge.svg)](https://github.com/stuartshay/otel-data-gateway/actions/workflows/docker.yml)
+[![Publish Types](https://github.com/stuartshay/otel-data-gateway/actions/workflows/publish-types.yml/badge.svg)](https://github.com/stuartshay/otel-data-gateway/actions/workflows/publish-types.yml)
+[![Docker Hub](https://img.shields.io/badge/Docker%20Hub-stuartshay%2Fotel--data--gateway-blue?logo=docker)](https://hub.docker.com/repository/docker/stuartshay/otel-data-gateway)
+[![npm](https://img.shields.io/npm/v/@stuartshay/otel-graphql-types?logo=npm&label=otel-graphql-types)](https://www.npmjs.com/package/@stuartshay/otel-graphql-types)
+[![Node](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
 Apollo Server GraphQL BFF (Backend-for-Frontend) gateway that maps REST
 endpoints from [otel-data-api](https://github.com/stuartshay/otel-data-api) to
 a unified GraphQL API.
@@ -35,6 +43,7 @@ open http://localhost:4000
 | `garminActivity`     | `/api/v1/garmin/activities/:id`    | Activity by ID      |
 | `garminTrackPoints`  | `/api/v1/garmin/.../tracks`        | Track points        |
 | `garminSports`       | `/api/v1/garmin/sports`            | Sport types         |
+| `garminChartData`    | `/api/v1/garmin/.../chart-data`    | Chart data points   |
 | `unifiedGps`         | `/api/v1/gps/unified`              | Unified GPS points  |
 | `dailySummary`       | `/api/v1/gps/daily-summary`        | Daily summary       |
 | `referenceLocations` | `/api/v1/reference-locations`      | Reference locations |

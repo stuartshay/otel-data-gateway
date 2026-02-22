@@ -202,7 +202,10 @@ gh pr merge <PR_NUMBER> --squash --repo stuartshay/otel-data-gateway
 
 - Never commit directly to `master` — always use PRs
 - Use squash merge to maintain clean commit history
-- Branch protection requires 1 approving review
+- Branch protection requires CI checks to pass (ESLint and TypeScript Check,
+  Build Check, Build and Push)
+- Auto-approve workflow satisfies the 1-review requirement for owner PRs
+- All review conversations must be resolved before merge
 
 #### Post-Merge: Rebase develop onto master
 
@@ -512,18 +515,24 @@ kubectl get configmap otel-data-gateway-config -n otel-data-gateway -o yaml
 
 The `master` branch on `stuartshay/otel-data-gateway` enforces these protections:
 
-| Rule                             | Setting               |
-| -------------------------------- | --------------------- |
-| Required status checks           | None (not configured) |
-| Required approving reviews       | 1                     |
-| Dismiss stale reviews            | Yes                   |
-| Required conversation resolution | Yes                   |
-| Enforce admins                   | Yes                   |
-| Allow force pushes               | No                    |
-| Allow deletions                  | No                    |
+| Rule                             | Setting                                                  |
+| -------------------------------- | -------------------------------------------------------- |
+| Required status checks           | ESLint and TypeScript Check, Build Check, Build and Push |
+| Strict status checks             | Yes (branch must be up-to-date)                          |
+| Required approving reviews       | 1                                                        |
+| Dismiss stale reviews            | Yes                                                      |
+| Auto-approve workflow            | Yes (owner, Renovate, Dependabot)                        |
+| GitHub Copilot code review       | Yes — automatic review on every PR                       |
+| Required conversation resolution | Yes — all comments must be resolved                      |
+| Enforce admins                   | Yes                                                      |
+| Auto-merge                       | Enabled                                                  |
+| Allow force pushes               | No                                                       |
+| Allow deletions                  | No                                                       |
 
-Since `enforce_admins` is enabled, the approval requirement
-applies to all users including admins. All PRs require manual review.
+**PR merge flow**: When a PR is opened by the repo owner (or Renovate/Dependabot),
+the `auto-approve.yml` workflow automatically approves it to satisfy the 1-review
+requirement. GitHub Copilot review runs automatically. All CI checks must pass,
+and all review conversations must be resolved before merge is allowed.
 
 To inspect current settings:
 
