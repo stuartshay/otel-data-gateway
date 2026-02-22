@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "davidanson.vscode-markdownlint",
+    "timonwong.shellcheck",
+    "eamodio.gitlens",
+    "ms-azuretools.vscode-docker",
+    "apollographql.vscode-apollo",
+    "orta.vscode-jest"
+  ]
+}
