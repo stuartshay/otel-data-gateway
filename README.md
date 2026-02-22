@@ -14,8 +14,13 @@ a unified GraphQL API.
 
 ## Architecture
 
-```text
-otel-ui (React) → otel-data-gateway (GraphQL) → otel-data-api (REST/FastAPI)
+```mermaid
+%%{init: {"theme": "neutral", "flowchart": {"curve": "linear"}}}%%
+flowchart LR
+    ui["otel-data-ui<br/>(React)"] --> gateway["otel-data-gateway<br/>(Apollo GraphQL BFF)"]
+    gateway -->|REST| api["otel-data-api<br/>(FastAPI)"]
+    api --> pool["PgBouncer<br/>:6432"]
+    pool --> db["PostgreSQL<br/>+ PostGIS"]
 ```
 
 ## Quick Start

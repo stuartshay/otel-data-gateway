@@ -1,0 +1,36 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "buildx",
+    "codegen",
+    "dockerhub",
+    "elif",
+    "geofence",
+    "gitops",
+    "homelab",
+    "informationcart",
+    "kilometre",
+    "kilometres",
+    "markdownlint",
+    "mqtt",
+    "opencontainers",
+    "optimised",
+    "owntracks",
+    "shellcheck",
+    "stuartshay",
+    "tini"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    ".git",
+    "coverage",
+    "src/__generated__/",
+    "packages/",
+    "*.lock",
+    "package-lock.json",
+    ".secrets.baseline"
+  ],
+  "enabledLanguageIds": ["markdown", "typescript", "shellscript", "yaml", "json", "dockerfile"]
+}

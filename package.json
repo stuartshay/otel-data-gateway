@@ -16,7 +16,8 @@
     "lint:md": "markdownlint-cli2 \"**/*.md\" \"#node_modules\"",
     "lint:md:fix": "markdownlint-cli2 --fix \"**/*.md\" \"#node_modules\"",
     "lint:sh": "if [ \"$CI\" = \"true\" ]; then shellcheck *.sh; else shellcheck *.sh || echo '⚠️  Warning: shellcheck reported issues'; fi",
-    "lint:all": "npm run lint && npm run lint:md && npm run lint:sh",
+    "lint:spell": "cspell --no-progress --no-summary --gitignore \"src/**/*.ts\" \"src/schema/**/*.graphql\" \"*.md\" \"package.json\" \"tsconfig*.json\" \"Dockerfile\" \"Makefile\" \".github/**/*.yml\"",
+    "lint:all": "npm run lint && npm run lint:md && npm run lint:sh && npm run lint:spell",
     "format": "prettier --write \"src/**/*.ts\" \"**/*.md\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"**/*.md\"",
     "type-check": "tsc --noEmit",
@@ -44,6 +45,7 @@
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
+    "cspell": "^9.6.4",
     "@eslint/js": "^9.39.1",
     "@graphql-codegen/cli": "^6.1.1",
     "@graphql-codegen/typescript": "^5.0.8",

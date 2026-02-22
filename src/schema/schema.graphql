@@ -6,246 +6,774 @@ scalar DateTime
 # -------------------------------------------------------
 # Common Types
 # -------------------------------------------------------
+"""
+Pagination metadata for paginated list responses.
+"""
 type PaginationInfo {
+  """
+  Total number of items matching the query
+  """
   total: Int!
+  """
+  Maximum number of items per page
+  """
   limit: Int!
+  """
+  Number of items skipped from the start
+  """
   offset: Int!
 }
 
 # -------------------------------------------------------
 # Health
 # -------------------------------------------------------
+"""
+Service health status.
+"""
 type HealthStatus {
+  """
+  Service health status (healthy or unhealthy)
+  """
   status: String!
+  """
+  Application version from VERSION file
+  """
   version: String!
 }
 
+"""
+Service readiness status including database connectivity.
+"""
 type ReadyStatus {
+  """
+  Service readiness status
+  """
   status: String!
+  """
+  Database connection status
+  """
   database: String
+  """
+  Application version from VERSION file
+  """
   version: String
 }
 
 # -------------------------------------------------------
 # Locations (OwnTracks)
 # -------------------------------------------------------
+"""
+GPS location recorded by the OwnTracks mobile app.
+"""
 type Location {
+  """
+  Unique location record identifier
+  """
   id: Int!
+  """
+  OwnTracks device identifier (e.g. iphone_stuart)
+  """
   device_id: String!
+  """
+  Two-character tracker ID set in the OwnTracks app
+  """
   tid: String
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
+  """
+  Horizontal accuracy of the GPS fix in meters
+  """
   accuracy: Float
+  """
+  Altitude above sea level in meters
+  """
   altitude: Float
+  """
+  Device velocity in km/h at time of report
+  """
   velocity: Float
+  """
+  Device battery level as a percentage (0-100)
+  """
   battery: Int
+  """
+  Battery charging state (0=unknown, 1=unplugged, 2=charging, 3=full)
+  """
   battery_status: Int
+  """
+  Network connection type (w=WiFi, m=mobile)
+  """
   connection_type: String
+  """
+  What triggered this location report (p=ping, c=circular, t=timer)
+  """
   trigger: String
+  """
+  UTC timestamp when the device recorded the location
+  """
   timestamp: DateTime!
+  """
+  UTC timestamp when the record was inserted into the database
+  """
   created_at: String
 }
 
+"""
+Full location detail including the original OwnTracks JSON payload.
+"""
 type LocationDetail {
+  """
+  Unique location record identifier
+  """
   id: Int!
+  """
+  OwnTracks device identifier (e.g. iphone_stuart)
+  """
   device_id: String!
+  """
+  Two-character tracker ID set in the OwnTracks app
+  """
   tid: String
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
+  """
+  Horizontal accuracy of the GPS fix in meters
+  """
   accuracy: Float
+  """
+  Altitude above sea level in meters
+  """
   altitude: Float
+  """
+  Device velocity in km/h at time of report
+  """
   velocity: Float
+  """
+  Device battery level as a percentage (0-100)
+  """
   battery: Int
+  """
+  Battery charging state (0=unknown, 1=unplugged, 2=charging, 3=full)
+  """
   battery_status: Int
+  """
+  Network connection type (w=WiFi, m=mobile)
+  """
   connection_type: String
+  """
+  What triggered this location report (p=ping, c=circular, t=timer)
+  """
   trigger: String
+  """
+  UTC timestamp when the device recorded the location
+  """
   timestamp: DateTime!
+  """
+  UTC timestamp when the record was inserted into the database
+  """
   created_at: String
+  """
+  Original OwnTracks JSON payload as received from the MQTT broker
+  """
   raw_payload: JSON
 }
 
 scalar JSON
 
+"""
+Paginated list of OwnTracks location records.
+"""
 type LocationConnection {
+  """
+  List of location items in the current page
+  """
   items: [Location!]!
+  """
+  Total number of items matching the query
+  """
   total: Int!
+  """
+  Maximum number of items per page
+  """
   limit: Int!
+  """
+  Number of items skipped from the start
+  """
   offset: Int!
 }
 
+"""
+Distinct OwnTracks device identifier.
+"""
 type DeviceInfo {
+  """
+  OwnTracks device identifier
+  """
   device_id: String!
 }
 
+"""
+Aggregate location count with optional filter context.
+"""
 type LocationCount {
+  """
+  Total number of location records matching the filter
+  """
   count: Int!
+  """
+  Date filter applied (YYYY-MM-DD), if any
+  """
   date: String
+  """
+  Device ID filter applied, if any
+  """
   device_id: String
 }
 
 # -------------------------------------------------------
 # Garmin
 # -------------------------------------------------------
+"""
+Summary of a Garmin Connect activity parsed from a FIT file.
+"""
 type GarminActivity {
+  """
+  Garmin Connect activity identifier
+  """
   activity_id: String!
+  """
+  Primary sport type (e.g. cycling, running)
+  """
   sport: String!
+  """
+  Sub-sport classification (e.g. road, trail)
+  """
   sub_sport: String
+  """
+  Activity start time in UTC
+  """
   start_time: String
+  """
+  Activity end time in UTC
+  """
   end_time: String
+  """
+  Total distance in kilometres
+  """
   distance_km: Float
+  """
+  Active duration in seconds (excludes pauses)
+  """
   duration_seconds: Float
+  """
+  Average heart rate in beats per minute
+  """
   avg_heart_rate: Int
+  """
+  Maximum heart rate in beats per minute
+  """
   max_heart_rate: Int
+  """
+  Average cadence in RPM
+  """
   avg_cadence: Int
+  """
+  Maximum cadence in RPM
+  """
   max_cadence: Int
+  """
+  Total calories burned
+  """
   calories: Int
+  """
+  Average speed in km/h
+  """
   avg_speed_kmh: Float
+  """
+  Maximum speed in km/h
+  """
   max_speed_kmh: Float
+  """
+  Total elevation gain in meters
+  """
   total_ascent_m: Float
+  """
+  Total elevation loss in meters
+  """
   total_descent_m: Float
+  """
+  Raw total distance in meters from FIT file
+  """
   total_distance: Float
+  """
+  Average pace in minutes per kilometre
+  """
   avg_pace: Float
+  """
+  Device manufacturer (e.g. garmin)
+  """
   device_manufacturer: String
+  """
+  Average ambient temperature in degrees C
+  """
   avg_temperature_c: Int
+  """
+  Minimum ambient temperature in degrees C
+  """
   min_temperature_c: Int
+  """
+  Maximum ambient temperature in degrees C
+  """
   max_temperature_c: Int
+  """
+  Total elapsed time in seconds (includes pauses)
+  """
   total_elapsed_time: Float
+  """
+  Total timer time in seconds (active recording)
+  """
   total_timer_time: Float
+  """
+  UTC timestamp when the record was inserted
+  """
   created_at: String
+  """
+  UTC timestamp when the FIT file was uploaded
+  """
   uploaded_at: String
+  """
+  Number of GPS track points in this activity
+  """
   track_point_count: Int
 }
 
+"""
+Paginated list of Garmin activities.
+"""
 type GarminActivityConnection {
+  """
+  List of Garmin activity items in the current page
+  """
   items: [GarminActivity!]!
+  """
+  Total number of items matching the query
+  """
   total: Int!
+  """
+  Maximum number of items per page
+  """
   limit: Int!
+  """
+  Number of items skipped from the start
+  """
   offset: Int!
 }
 
+"""
+Individual GPS track point within a Garmin activity.
+"""
 type GarminTrackPoint {
+  """
+  Unique track point record identifier
+  """
   id: Int!
+  """
+  Parent Garmin activity identifier
+  """
   activity_id: String!
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
+  """
+  UTC timestamp of the track point recording
+  """
   timestamp: DateTime!
+  """
+  Elevation above sea level in meters
+  """
   altitude: Float
+  """
+  Cumulative distance from activity start in km
+  """
   distance_from_start_km: Float
+  """
+  Instantaneous speed in km/h
+  """
   speed_kmh: Float
+  """
+  Heart rate in beats per minute
+  """
   heart_rate: Int
+  """
+  Pedal/step cadence in RPM
+  """
   cadence: Int
+  """
+  Ambient temperature in degrees C
+  """
   temperature_c: Float
+  """
+  UTC timestamp when the record was inserted
+  """
   created_at: String
 }
 
+"""
+Paginated list of Garmin track points.
+"""
 type GarminTrackPointConnection {
+  """
+  List of track point items in the current page
+  """
   items: [GarminTrackPoint!]!
+  """
+  Total number of items matching the query
+  """
   total: Int!
+  """
+  Maximum number of items per page
+  """
   limit: Int!
+  """
+  Number of items skipped from the start
+  """
   offset: Int!
 }
 
+"""
+Sport type with its activity count.
+"""
 type SportInfo {
+  """
+  Sport type name (e.g. cycling, running)
+  """
   sport: String!
+  """
+  Number of activities for this sport
+  """
   activity_count: Int!
 }
 
+"""
+Lightweight track point optimised for time-series chart rendering.
+"""
 type GarminChartPoint {
+  """
+  UTC timestamp of the data point
+  """
   timestamp: DateTime!
+  """
+  Elevation above sea level in meters
+  """
   altitude: Float
+  """
+  Cumulative distance from activity start in km
+  """
   distance_from_start_km: Float
+  """
+  Instantaneous speed in km/h
+  """
   speed_kmh: Float
+  """
+  Heart rate in beats per minute
+  """
   heart_rate: Int
+  """
+  Pedal/step cadence in RPM
+  """
   cadence: Int
+  """
+  Ambient temperature in degrees C
+  """
   temperature_c: Float
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
 }
 
 # -------------------------------------------------------
 # Unified GPS
 # -------------------------------------------------------
+"""
+Single GPS data point from the unified view combining OwnTracks and Garmin sources.
+"""
 type UnifiedGpsPoint {
+  """
+  Data source: 'owntracks' or 'garmin'
+  """
   source: String!
+  """
+  Device or activity identifier from the source
+  """
   identifier: String!
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
+  """
+  UTC timestamp of the GPS recording
+  """
   timestamp: DateTime!
+  """
+  Horizontal GPS accuracy in meters (OwnTracks only)
+  """
   accuracy: Float
+  """
+  Device battery percentage (OwnTracks only)
+  """
   battery: Int
+  """
+  Instantaneous speed in km/h (Garmin only)
+  """
   speed_kmh: Float
+  """
+  Heart rate in BPM (Garmin only)
+  """
   heart_rate: Int
+  """
+  UTC timestamp when the record was inserted
+  """
   created_at: String
 }
 
+"""
+Paginated list of unified GPS data points.
+"""
 type UnifiedGpsConnection {
+  """
+  List of unified GPS items in the current page
+  """
   items: [UnifiedGpsPoint!]!
+  """
+  Total number of items matching the query
+  """
   total: Int!
+  """
+  Maximum number of items per page
+  """
   limit: Int!
+  """
+  Number of items skipped from the start
+  """
   offset: Int!
 }
 
+"""
+Per-day aggregate combining OwnTracks location stats and Garmin activity metrics.
+"""
 type DailyActivitySummary {
+  """
+  Calendar date in YYYY-MM-DD format
+  """
   activity_date: String
+  """
+  OwnTracks device that reported data for this day
+  """
   owntracks_device: String
+  """
+  Number of OwnTracks GPS points recorded
+  """
   owntracks_points: Int
+  """
+  Lowest device battery percentage observed
+  """
   min_battery: Int
+  """
+  Highest device battery percentage observed
+  """
   max_battery: Int
+  """
+  Mean horizontal GPS accuracy in meters
+  """
   avg_accuracy: Float
+  """
+  Garmin sport type for activities on this day
+  """
   garmin_sport: String
+  """
+  Number of Garmin activities recorded
+  """
   garmin_activities: Int
+  """
+  Combined Garmin activity distance in km
+  """
   total_distance_km: Float
+  """
+  Combined Garmin activity duration in seconds
+  """
   total_duration_seconds: Float
+  """
+  Mean heart rate across Garmin activities in BPM
+  """
   avg_heart_rate: Int
+  """
+  Total calories burned across Garmin activities
+  """
   total_calories: Int
 }
 
 # -------------------------------------------------------
 # Reference Locations
 # -------------------------------------------------------
+"""
+Named geographic reference point used for spatial queries (e.g. home, office).
+"""
 type ReferenceLocation {
+  """
+  Unique reference location identifier
+  """
   id: Int!
+  """
+  Short, unique name for the location (e.g. home, office)
+  """
   name: String!
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
+  """
+  Geofence radius in meters for proximity queries
+  """
   radius_meters: Float!
+  """
+  Optional human-readable description of the location
+  """
   description: String
+  """
+  UTC timestamp when the record was created
+  """
   created_at: String
+  """
+  UTC timestamp when the record was last updated
+  """
   updated_at: String
 }
 
 # -------------------------------------------------------
 # Spatial
 # -------------------------------------------------------
+"""
+GPS point found within a spatial proximity search.
+"""
 type NearbyPoint {
+  """
+  Data source: 'owntracks' or 'garmin'
+  """
   source: String!
+  """
+  Record identifier in the source table
+  """
   id: Int!
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
   latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
   longitude: Float!
+  """
+  Distance from the search center point in meters
+  """
   distance_meters: Float!
+  """
+  UTC timestamp of the GPS recording
+  """
   timestamp: DateTime!
 }
 
+"""
+Geodesic distance calculation result between two geographic points.
+"""
 type DistanceResult {
+  """
+  Geodesic distance between the two points in meters
+  """
   distance_meters: Float!
+  """
+  Origin latitude in decimal degrees
+  """
   from_lat: Float!
+  """
+  Origin longitude in decimal degrees
+  """
   from_lon: Float!
+  """
+  Destination latitude in decimal degrees
+  """
   to_lat: Float!
+  """
+  Destination longitude in decimal degrees
+  """
   to_lon: Float!
 }
 
+"""
+GPS points found within a named reference location's geofence radius.
+"""
 type WithinReferenceResult {
+  """
+  Name of the reference location searched
+  """
   reference_name: String!
+  """
+  Geofence radius used for the search in meters
+  """
   radius_meters: Float!
+  """
+  Number of GPS points found within the radius
+  """
   total_points: Int!
+  """
+  GPS points within the radius, sorted by distance
+  """
   points: [NearbyPoint!]!
 }
 
 # -------------------------------------------------------
 # Enums
 # -------------------------------------------------------
+"""
+Sort direction for query results.
+"""
 enum SortOrder {
+  """
+  Ascending order (oldest first, A-Z)
+  """
   asc
+  """
+  Descending order (newest first, Z-A)
+  """
   desc
 }
 
@@ -254,91 +782,297 @@ enum SortOrder {
 # -------------------------------------------------------
 type Query {
   # Health
+  """
+  Get service health status.
+  """
   health: HealthStatus!
+  """
+  Get service readiness status including database connectivity.
+  """
   ready: ReadyStatus!
 
   # Locations
+  """
+  Retrieve a paginated list of OwnTracks location records.
+  """
   locations(
+    """
+    Filter by OwnTracks device identifier
+    """
     device_id: String
+    """
+    Start date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_from: String
+    """
+    End date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_to: String
+    """
+    Maximum number of items to return per page
+    """
     limit: Int
+    """
+    Number of items to skip for pagination
+    """
     offset: Int
+    """
+    Field name to sort by
+    """
     sort: String
+    """
+    Sort direction
+    """
     order: SortOrder
   ): LocationConnection!
 
-  location(id: Int!): LocationDetail
+  """
+  Retrieve a single location by its ID, including raw payload.
+  """
+  location(
+    """
+    Unique location record identifier
+    """
+    id: Int!
+  ): LocationDetail
 
+  """
+  List all distinct OwnTracks device identifiers.
+  """
   devices: [DeviceInfo!]!
 
-  locationCount(date: String, device_id: String): LocationCount!
+  """
+  Get aggregate count of location records with optional filters.
+  """
+  locationCount(
+    """
+    Filter by date (YYYY-MM-DD)
+    """
+    date: String
+    """
+    Filter by device identifier
+    """
+    device_id: String
+  ): LocationCount!
 
   # Garmin
+  """
+  Retrieve a paginated list of Garmin activities.
+  """
   garminActivities(
+    """
+    Filter by sport type (e.g. cycling, running)
+    """
     sport: String
+    """
+    Start date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_from: String
+    """
+    End date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_to: String
+    """
+    Maximum number of items to return per page
+    """
     limit: Int
+    """
+    Number of items to skip for pagination
+    """
     offset: Int
+    """
+    Field name to sort by
+    """
     sort: String
+    """
+    Sort direction
+    """
     order: SortOrder
   ): GarminActivityConnection!
 
-  garminActivity(activity_id: String!): GarminActivity
-
-  garminTrackPoints(
+  """
+  Retrieve a single Garmin activity by its ID.
+  """
+  garminActivity(
+    """
+    Garmin Connect activity identifier
+    """
     activity_id: String!
+  ): GarminActivity
+
+  """
+  Retrieve paginated GPS track points for a Garmin activity.
+  """
+  garminTrackPoints(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+    """
+    Maximum number of items to return per page
+    """
     limit: Int
+    """
+    Number of items to skip for pagination
+    """
     offset: Int
+    """
+    Field name to sort by
+    """
     sort: String
+    """
+    Sort direction
+    """
     order: SortOrder
+    """
+    Simplification tolerance for track point reduction
+    """
     simplify: Float
   ): GarminTrackPointConnection!
 
+  """
+  List all distinct sport types with activity counts.
+  """
   garminSports: [SportInfo!]!
 
-  garminChartData(activity_id: String!): [GarminChartPoint!]!
+  """
+  Retrieve chart-optimised track points for a Garmin activity.
+  """
+  garminChartData(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): [GarminChartPoint!]!
 
   # Unified GPS
+  """
+  Retrieve a paginated list of unified GPS points from all sources.
+  """
   unifiedGps(
+    """
+    Filter by data source: 'owntracks' or 'garmin'
+    """
     source: String
+    """
+    Start date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_from: String
+    """
+    End date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_to: String
+    """
+    Maximum number of items to return per page
+    """
     limit: Int
+    """
+    Number of items to skip for pagination
+    """
     offset: Int
+    """
+    Sort direction
+    """
     order: SortOrder
   ): UnifiedGpsConnection!
 
+  """
+  Retrieve daily activity summaries combining OwnTracks and Garmin data.
+  """
   dailySummary(
+    """
+    Start date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_from: String
+    """
+    End date filter (YYYY-MM-DD or ISO 8601)
+    """
     date_to: String
+    """
+    Maximum number of days to return
+    """
     limit: Int
   ): [DailyActivitySummary!]!
 
   # Reference Locations
+  """
+  List all named reference locations.
+  """
   referenceLocations: [ReferenceLocation!]!
-  referenceLocation(id: Int!): ReferenceLocation
+  """
+  Retrieve a single reference location by its ID.
+  """
+  referenceLocation(
+    """
+    Unique reference location identifier
+    """
+    id: Int!
+  ): ReferenceLocation
 
   # Spatial
+  """
+  Find GPS points within a radius of a geographic coordinate.
+  """
   nearbyPoints(
+    """
+    Center point latitude in decimal degrees
+    """
     lat: Float!
+    """
+    Center point longitude in decimal degrees
+    """
     lon: Float!
+    """
+    Search radius in meters
+    """
     radius_meters: Float
+    """
+    Filter by data source: 'owntracks' or 'garmin'
+    """
     source: String
+    """
+    Maximum number of points to return
+    """
     limit: Int
   ): [NearbyPoint!]!
 
+  """
+  Calculate the geodesic distance between two geographic points.
+  """
   calculateDistance(
+    """
+    Origin latitude in decimal degrees
+    """
     from_lat: Float!
+    """
+    Origin longitude in decimal degrees
+    """
     from_lon: Float!
+    """
+    Destination latitude in decimal degrees
+    """
     to_lat: Float!
+    """
+    Destination longitude in decimal degrees
+    """
     to_lon: Float!
   ): DistanceResult!
 
+  """
+  Find GPS points within a named reference location's geofence.
+  """
   withinReference(
+    """
+    Name of the reference location to search within
+    """
     name: String!
+    """
+    Filter by data source: 'owntracks' or 'garmin'
+    """
     source: String
+    """
+    Maximum number of points to return
+    """
     limit: Int
   ): WithinReferenceResult!
 }
