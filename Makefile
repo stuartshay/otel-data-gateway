@@ -140,6 +140,12 @@ check: lint type-check test ## Run all checks
 
 pre-commit: lint type-check ## Run pre-commit checks locally
 
+dependencies: ## Check for outdated node packages
+	@echo "$(YELLOW)Checking for outdated packages...$(NC)"
+	@npm outdated || true
+	@echo ""
+	@echo "$(GREEN)✓ Dependency check complete$(NC)"
+
 verify: ## Verify environment and dependencies
 	@echo "$(YELLOW)Verifying environment...$(NC)"
 	@echo "Node.js: $$(node --version)"
