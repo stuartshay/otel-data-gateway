@@ -6,11 +6,16 @@
     "codegen",
     "dockerhub",
     "elif",
+    "geofence",
     "gitops",
     "homelab",
     "informationcart",
+    "kilometre",
+    "kilometres",
     "markdownlint",
+    "mqtt",
     "opencontainers",
+    "optimised",
     "owntracks",
     "shellcheck",
     "stuartshay",
@@ -23,7 +28,9 @@
     "coverage",
     "src/__generated__/",
     "packages/",
-    "*.lock"
+    "*.lock",
+    "package-lock.json",
+    ".secrets.baseline"
   ],
   "enabledLanguageIds": ["markdown", "typescript", "shellscript", "yaml", "json", "dockerfile"]
 }

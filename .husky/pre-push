@@ -1,8 +1,7 @@
 #!/bin/sh
 
 echo "🔍 Running cspell spell check..."
-npx cspell --no-progress --no-summary --gitignore \
-  "src/**/*.ts" "*.md" "*.json" "Dockerfile" "Makefile" ".github/**/*.yml"
+npm run lint:spell
 CSPELL_EXIT=$?
 
 echo "🔐 Running detect-secrets scan..."
