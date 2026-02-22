@@ -49,6 +49,9 @@ describe('config', () => {
     expect(config.version).toBe('9.9.9');
   });
 
+  // unstable_mockModule is the standard ESM mock API in Jest 30.
+  // The mock is registered BEFORE loadConfig() triggers the dynamic import,
+  // so config.ts sees the mocked readFileSync when it loads.
   it('falls back to "unknown" when the VERSION file cannot be read', async () => {
     await jest.unstable_mockModule('node:fs', () => ({
       readFileSync: jest.fn(() => {

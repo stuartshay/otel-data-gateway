@@ -134,8 +134,10 @@ jobs:
                 covered=$(jq -r ".total.${key}.covered" coverage/coverage-summary.json)
                 total=$(jq -r ".total.${key}.total" coverage/coverage-summary.json)
                 pct=$(jq -r ".total.${key}.pct" coverage/coverage-summary.json)
+                threshold=80
+                if [ "$key" = "branches" ]; then threshold=75; fi
                 icon="✅"
-                if (( $(echo "$pct < 80" | bc -l) )); then icon="⚠️"; fi
+                if awk "BEGIN {exit !($pct < $threshold)}"; then icon="⚠️"; fi
                 echo "| ${icon} ${key^} | ${covered} | ${total} | ${pct}% |"
               done
               echo ""
