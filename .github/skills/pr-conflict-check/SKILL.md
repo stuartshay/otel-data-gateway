@@ -181,6 +181,44 @@ git rebase --abort
 
 This safely returns the branch to its pre-rebase state.
 
+## Resolving PR Review Comments
+
+When addressing PR review comments, **always reply to each comment** on the PR
+thread — do not silently fix issues without responding.
+
+### For Actionable Comments (Real Issues)
+
+1. Fix the issue in code
+2. Commit and push the fix
+3. Reply to the comment explaining what was changed and referencing the commit:
+
+   > Fixed in commit `abc1234` — [brief description of the fix].
+
+### For False Positives
+
+When a review comment is incorrect or does not apply, **always reply explaining
+why it is a false positive**. Never ignore or silently dismiss review comments.
+
+1. Reply to the comment with a clear, technical explanation of why the flagged
+   code is correct
+2. Reference documentation, framework APIs, or language specifications to
+   support the explanation
+3. If a clarifying code comment was added, mention the commit
+
+Example reply format:
+
+> False positive — `[API/pattern]` is the [correct/only/standard] way to
+> [achieve X] in [framework/version]. [Brief technical justification].
+>
+> Added a clarifying comment in commit `abc1234`.
+
+### Comment Resolution Checklist
+
+- [ ] Every review comment has a reply (no silent fixes or dismissals)
+- [ ] Actionable fixes reference the commit SHA
+- [ ] False positives include a technical explanation
+- [ ] Code comments added where the logic is non-obvious
+
 ## Checklist
 
 Before creating any PR, verify:
