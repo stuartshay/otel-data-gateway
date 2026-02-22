@@ -1,0 +1,86 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits"
+  ],
+  "labels": ["dependencies", "renovate"],
+  "timezone": "America/New_York",
+  "schedule": ["before 6am on Monday"],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 5,
+  "enabledManagers": ["npm", "dockerfile", "github-actions"],
+  "packageRules": [
+    {
+      "description": "Auto-merge patch updates for npm dependencies",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Group Apollo Server ecosystem",
+      "matchPackageNames": [
+        "@apollo/server",
+        "@as-integrations/express5",
+        "graphql",
+        "graphql-tag"
+      ],
+      "groupName": "apollo-server",
+      "groupSlug": "apollo-server"
+    },
+    {
+      "description": "Group GraphQL Codegen",
+      "matchPackageNames": [
+        "@graphql-codegen/cli",
+        "@graphql-codegen/typescript",
+        "@graphql-codegen/typescript-resolvers"
+      ],
+      "groupName": "graphql-codegen",
+      "groupSlug": "graphql-codegen"
+    },
+    {
+      "description": "Group ESLint ecosystem",
+      "matchPackageNames": [
+        "eslint",
+        "@eslint/js",
+        "typescript-eslint"
+      ],
+      "groupName": "eslint",
+      "groupSlug": "eslint"
+    },
+    {
+      "description": "Group Jest testing",
+      "matchPackageNames": [
+        "jest",
+        "@jest/globals",
+        "ts-jest"
+      ],
+      "groupName": "jest",
+      "groupSlug": "jest"
+    },
+    {
+      "description": "Group formatting tools",
+      "matchPackageNames": [
+        "prettier",
+        "markdownlint-cli2",
+        "husky",
+        "lint-staged"
+      ],
+      "groupName": "formatting-tools",
+      "groupSlug": "formatting-tools"
+    },
+    {
+      "description": "Docker base image updates",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "groupSlug": "github-actions"
+    }
+  ]
+}
