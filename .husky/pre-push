@@ -6,8 +6,12 @@ CSPELL_EXIT=$?
 
 echo "🔐 Running detect-secrets scan..."
 if command -v detect-secrets >/dev/null 2>&1; then
-  detect-secrets scan --baseline .secrets.baseline
+  # Use a temp copy to avoid mutating .secrets.baseline (generated_at timestamp)
+  TMPBASELINE=$(mktemp)
+  cp .secrets.baseline "$TMPBASELINE"
+  detect-secrets scan --baseline "$TMPBASELINE"
   SECRETS_EXIT=$?
+  rm -f "$TMPBASELINE"
 else
   echo "⚠️  detect-secrets not installed, skipping (pip install detect-secrets)"
   SECRETS_EXIT=0
