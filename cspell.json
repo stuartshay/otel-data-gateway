@@ -1,0 +1,29 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "buildx",
+    "codegen",
+    "dockerhub",
+    "elif",
+    "gitops",
+    "homelab",
+    "informationcart",
+    "markdownlint",
+    "opencontainers",
+    "owntracks",
+    "shellcheck",
+    "stuartshay",
+    "tini"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    ".git",
+    "coverage",
+    "src/__generated__/",
+    "packages/",
+    "*.lock"
+  ],
+  "enabledLanguageIds": ["markdown", "typescript", "shellscript", "yaml", "json", "dockerfile"]
+}

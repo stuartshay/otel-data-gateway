@@ -1,0 +1,29 @@
+#!/bin/sh
+
+echo "🔍 Running cspell spell check..."
+npx cspell --no-progress --no-summary --gitignore \
+  "src/**/*.ts" "*.md" "*.json" "Dockerfile" "Makefile" ".github/**/*.yml"
+CSPELL_EXIT=$?
+
+echo "🔐 Running detect-secrets scan..."
+if command -v detect-secrets >/dev/null 2>&1; then
+  detect-secrets scan --baseline .secrets.baseline
+  SECRETS_EXIT=$?
+else
+  echo "⚠️  detect-secrets not installed, skipping (pip install detect-secrets)"
+  SECRETS_EXIT=0
+fi
+
+if [ $CSPELL_EXIT -ne 0 ]; then
+  echo ""
+  echo "❌ cspell found spelling issues. Fix them or add words to cspell.json"
+  exit 1
+fi
+
+if [ $SECRETS_EXIT -ne 0 ]; then
+  echo ""
+  echo "❌ detect-secrets found potential secrets. Review .secrets.baseline"
+  exit 1
+fi
+
+echo "✅ Pre-push checks passed"
