@@ -98,6 +98,16 @@ test: ## Run tests
 test-watch: ## Run tests in watch mode
 	@npm run test:watch
 
+test-verbose: ## Run tests with verbose output
+	@echo "$(YELLOW)Running tests (verbose)...$(NC)"
+	@npm run test -- --verbose
+	@echo "$(GREEN)✓ Tests complete$(NC)"
+
+test-cov: ## Run tests with HTML coverage report
+	@echo "$(YELLOW)Running tests with coverage report...$(NC)"
+	@npm run test -- --coverageReporters=html --coverageReporters=text
+	@echo "$(GREEN)✓ Coverage report: coverage/index.html$(NC)"
+
 # =============================================================================
 # Docker
 # =============================================================================
