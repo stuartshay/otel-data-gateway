@@ -27,4 +27,6 @@ coverage/
 
 # Temp
 tmp/
-results/*-stress-test.txt
+
+# Load test results
+results/
