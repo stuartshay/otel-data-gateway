@@ -76,8 +76,7 @@ function graphql(query, variables = {}, operationName = '') {
   let hasErrors = false;
 
   try {
-    const contentType =
-      res.headers['Content-Type'] || res.headers['content-type'] || '';
+    const contentType = res.headers['Content-Type'] || res.headers['content-type'] || '';
     if (contentType && contentType.indexOf('application/json') === -1) {
       throw new Error(`Unexpected content type: ${contentType}`);
     }
@@ -142,25 +141,13 @@ function dashboardFlow() {
 
 // ── Flow: Location browsing ─────────────────────────────
 function locationFlow() {
-  graphql(
-    LOCATIONS,
-    { limit: 25, offset: 0, order: 'desc' },
-    'Locations',
-  );
+  graphql(LOCATIONS, { limit: 25, offset: 0, order: 'desc' }, 'Locations');
   sleep(0.5);
 
-  graphql(
-    LOCATIONS,
-    { limit: 25, offset: 25, order: 'desc' },
-    'Locations',
-  );
+  graphql(LOCATIONS, { limit: 25, offset: 25, order: 'desc' }, 'Locations');
   sleep(0.5);
 
-  graphql(
-    DAILY_SUMMARY,
-    { date_from: daysAgo(30), date_to: today, limit: 30 },
-    'DailySummary',
-  );
+  graphql(DAILY_SUMMARY, { date_from: daysAgo(30), date_to: today, limit: 30 }, 'DailySummary');
   sleep(Math.random() * 2 + 1);
 }
 
@@ -174,9 +161,7 @@ function garminFlow() {
   sleep(0.5);
 
   const items =
-    result && result.data && result.data.garminActivities
-      ? result.data.garminActivities.items
-      : [];
+    result && result.data && result.data.garminActivities ? result.data.garminActivities.items : [];
 
   if (items.length > 0) {
     const idx = Math.floor(Math.random() * Math.min(items.length, 5));

@@ -1,3 +1,5 @@
+import http from 'node:http';
+import https from 'node:https';
 import type { components } from '@stuartshay/otel-data-types';
 import { config } from '../config.js';
 
@@ -9,7 +11,27 @@ type Nullable<T> = { [K in keyof T]: T[K] | null };
 interface FetchParams {
   path: string;
   query?: Record<string, string | number | undefined | null>;
+  /** TTL in milliseconds. When set, responses are cached and deduplicated. */
+  cacheTtlMs?: number;
 }
+
+interface CacheEntry<T> {
+  data: T;
+  expiry: number;
+}
+
+// ── Shared keep-alive agents (one per protocol, shared across instances) ──
+const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 50 });
+const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 50 });
+
+/** Pick the right agent for the URL protocol. */
+function agentForUrl(url: string) {
+  return url.startsWith('https') ? httpsAgent : httpAgent;
+}
+
+// ── Shared response cache & in-flight dedup maps ──
+const cache = new Map<string, CacheEntry<unknown>>();
+const inflight = new Map<string, Promise<unknown>>();
 
 export class OtelDataAPI {
   private baseUrl: string;
@@ -30,10 +52,39 @@ export class OtelDataAPI {
     return url;
   }
 
-  private async fetch<T>({ path, query }: FetchParams): Promise<T> {
+  private async fetch<T>({ path, query, cacheTtlMs }: FetchParams): Promise<T> {
     const url = this.buildUrl(path, query);
-    const response = await fetch(url.toString(), {
+    const cacheKey = url.toString();
+
+    // Check cache first (only when TTL is set)
+    if (cacheTtlMs) {
+      const cached = cache.get(cacheKey) as CacheEntry<T> | undefined;
+      if (cached && cached.expiry > Date.now()) {
+        return cached.data;
+      }
+
+      // Deduplicate concurrent identical requests
+      const pending = inflight.get(cacheKey) as Promise<T> | undefined;
+      if (pending) {
+        return pending;
+      }
+    }
+
+    const request = this.doFetch<T>(cacheKey, cacheTtlMs);
+
+    if (cacheTtlMs) {
+      inflight.set(cacheKey, request);
+      request.finally(() => inflight.delete(cacheKey));
+    }
+
+    return request;
+  }
+
+  private async doFetch<T>(urlString: string, cacheTtlMs?: number): Promise<T> {
+    const response = await fetch(urlString, {
       headers: { Accept: 'application/json' },
+      // @ts-expect-error Node.js fetch supports the agent option
+      agent: agentForUrl(urlString),
     });
 
     if (!response.ok) {
@@ -41,13 +92,22 @@ export class OtelDataAPI {
       throw new Error(`REST API error ${response.status}: ${response.statusText} - ${body}`);
     }
 
-    return (await response.json()) as T;
+    const data = (await response.json()) as T;
+
+    if (cacheTtlMs) {
+      cache.set(urlString, { data, expiry: Date.now() + cacheTtlMs });
+    }
+
+    return data;
   }
 
   // ── Health ──────────────────────────────────────────
 
   async getHealth() {
-    return this.fetch<{ status: string; version: string }>({ path: '/health' });
+    return this.fetch<{ status: string; version: string }>({
+      path: '/health',
+      cacheTtlMs: 15_000,
+    });
   }
 
   async getReady() {
@@ -78,13 +138,17 @@ export class OtelDataAPI {
   }
 
   async getDevices() {
-    return this.fetch<Schemas['DeviceInfo'][]>({ path: '/api/v1/locations/devices' });
+    return this.fetch<Schemas['DeviceInfo'][]>({
+      path: '/api/v1/locations/devices',
+      cacheTtlMs: 60_000,
+    });
   }
 
   async getLocationCount(params?: Nullable<{ date?: string; device_id?: string }>) {
     return this.fetch<Schemas['LocationCount']>({
       path: '/api/v1/locations/count',
       query: params,
+      cacheTtlMs: 15_000,
     });
   }
 
@@ -132,6 +196,7 @@ export class OtelDataAPI {
   async getGarminSports() {
     return this.fetch<Schemas['SportInfo'][]>({
       path: '/api/v1/garmin/sports',
+      cacheTtlMs: 60_000,
     });
   }
 
@@ -171,7 +236,10 @@ export class OtelDataAPI {
   // ── Reference Locations ─────────────────────────────
 
   async getReferenceLocations() {
-    return this.fetch<Schemas['ReferenceLocation'][]>({ path: '/api/v1/reference-locations' });
+    return this.fetch<Schemas['ReferenceLocation'][]>({
+      path: '/api/v1/reference-locations',
+      cacheTtlMs: 60_000,
+    });
   }
 
   async getReferenceLocation(id: number) {

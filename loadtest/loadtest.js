@@ -170,9 +170,7 @@ export function garminFlow() {
 
   // Drill into first activity if available
   const items =
-    result && result.data && result.data.garminActivities
-      ? result.data.garminActivities.items
-      : [];
+    result && result.data && result.data.garminActivities ? result.data.garminActivities.items : [];
 
   if (items.length > 0) {
     const activityId = items[0].activity_id;

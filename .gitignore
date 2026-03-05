@@ -27,3 +27,4 @@ coverage/
 
 # Temp
 tmp/
+results/*-stress-test.txt
