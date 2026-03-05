@@ -4,6 +4,7 @@
   "words": [
     "buildx",
     "codegen",
+    "dedup",
     "dockerhub",
     "elif",
     "geofence",

@@ -27,3 +27,6 @@ coverage/
 
 # Temp
 tmp/
+
+# Load test results
+results/

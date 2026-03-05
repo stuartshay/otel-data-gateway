@@ -20,7 +20,7 @@ app.get('/health', (_req, res) => {
 app.get('/ready', async (_req, res) => {
   try {
     const api = new OtelDataAPI();
-    const result = await api.getHealth();
+    const result = await api.getReady();
     res.json({ status: 'ready', backend: result.status, version: config.version });
   } catch {
     res.status(503).json({ status: 'not_ready', version: config.version });
