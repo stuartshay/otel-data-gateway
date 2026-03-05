@@ -29,6 +29,7 @@ RUN npm pkg delete scripts.prepare && \
     npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
+COPY newrelic.cjs ./
 COPY VERSION ./
 
 ENV NODE_ENV=production
@@ -49,4 +50,4 @@ LABEL org.opencontainers.image.version="${APP_VERSION}"
 LABEL org.opencontainers.image.vendor="homelab"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "dist/index.js"]
+CMD ["node", "--require", "./newrelic.cjs", "dist/index.js"]

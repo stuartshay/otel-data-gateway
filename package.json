@@ -41,6 +41,7 @@
     "@stuartshay/otel-data-types": "^1.0.114",
     "cors": "^2.8.6",
     "express": "^5.2.1",
+    "newrelic": "^12.25.0",
     "graphql": "^16.12.0",
     "graphql-tag": "^2.12.6"
   },
