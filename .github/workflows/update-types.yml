@@ -1,0 +1,104 @@
+name: Update otel-data-types Version
+
+on:
+  repository_dispatch:
+    types: [otel-data-types-release]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to update to (e.g., 1.0.158)"
+        required: true
+        type: string
+
+jobs:
+  update-types:
+    name: Update @stuartshay/otel-data-types
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            VERSION="${{ github.event.client_payload.version }}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Updating @stuartshay/otel-data-types to version: ${VERSION}"
+
+      - name: Get current version
+        id: current
+        run: |
+          CURRENT=$(jq -r '.dependencies["@stuartshay/otel-data-types"]' package.json)
+          echo "version=${CURRENT}" >> "$GITHUB_OUTPUT"
+          echo "Current version: ${CURRENT}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Update types package version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          npm pkg set "dependencies.@stuartshay/otel-data-types=${VERSION}"
+          npm install --package-lock-only
+          echo "Updated @stuartshay/otel-data-types to ${VERSION}"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITOPS_PAT || secrets.GITHUB_TOKEN }}
+          commit-message: "chore: Update @stuartshay/otel-data-types to v${{ steps.version.outputs.version }}"
+          title: "📦 Update @stuartshay/otel-data-types to v${{ steps.version.outputs.version }}"
+          body: |
+            ## Automated Types Update
+
+            This PR was automatically created when a new version of `@stuartshay/otel-data-types` was published to npm.
+
+            | Property | Value |
+            |----------|-------|
+            | Package | `@stuartshay/otel-data-types` |
+            | Previous | `${{ steps.current.outputs.version }}` |
+            | Updated | `${{ steps.version.outputs.version }}` |
+            | npm | [npmjs.com](https://www.npmjs.com/package/@stuartshay/otel-data-types) |
+
+            ### Changes
+            - Updated `package.json` dependency version
+            - Updated `package-lock.json`
+
+            ### Next Steps
+            1. Review the changes
+            2. Merge when ready
+            3. Docker build will trigger automatically
+
+            ---
+            *Triggered by:* `${{ github.event_name }}` from otel-data-api
+          branch: update-otel-data-types
+          delete-branch: true
+          labels: |
+            automated
+            types-update
+            otel-data-types
+
+      - name: Summary
+        run: |
+          {
+            echo "## @stuartshay/otel-data-types Version Update"
+            echo ""
+            echo "| Property | Value |"
+            echo "|----------|-------|"
+            echo "| Package | \`@stuartshay/otel-data-types\` |"
+            echo "| Previous | \`${{ steps.current.outputs.version }}\` |"
+            echo "| Updated | \`${{ steps.version.outputs.version }}\` |"
+            echo "| Trigger | \`${{ github.event_name }}\` |"
+            echo "| Status | PR Created/Updated ✅ |"
+          } >> "$GITHUB_STEP_SUMMARY"
