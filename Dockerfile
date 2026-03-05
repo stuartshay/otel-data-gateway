@@ -34,6 +34,7 @@ COPY VERSION ./
 
 ENV NODE_ENV=production
 ENV PORT=4000
+ENV NEW_RELIC_CONFIG_FILE=./newrelic.cjs
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:4000/health || exit 1
@@ -50,4 +51,4 @@ LABEL org.opencontainers.image.version="${APP_VERSION}"
 LABEL org.opencontainers.image.vendor="homelab"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "--require", "./newrelic.cjs", "dist/index.js"]
+CMD ["node", "--require", "newrelic", "dist/index.js"]

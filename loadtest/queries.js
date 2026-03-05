@@ -24,7 +24,6 @@ export const DEVICES = `
   query Devices {
     devices {
       device_id
-      location_count
     }
   }
 `;
@@ -32,7 +31,9 @@ export const DEVICES = `
 export const LOCATION_COUNT = `
   query LocationCount {
     locationCount {
-      total
+      count
+      date
+      device_id
     }
   }
 `;
@@ -41,7 +42,7 @@ export const GARMIN_SPORTS = `
   query GarminSports {
     garminSports {
       sport
-      count
+      activity_count
     }
   }
 `;
@@ -77,11 +78,11 @@ export const GARMIN_ACTIVITIES = `
         sport
         sub_sport
         start_time
-        total_distance_km
-        total_timer_time_seconds
+        distance_km
+        duration_seconds
         avg_heart_rate
         max_heart_rate
-        total_calories
+        calories
         avg_speed_kmh
         max_speed_kmh
       }
@@ -145,7 +146,7 @@ export const LOCATION_DETAIL = `
       altitude
       battery
       velocity
-      conn
+      connection_type
       trigger
       timestamp
       created_at
@@ -161,19 +162,18 @@ export const GARMIN_ACTIVITY = `
       sport
       sub_sport
       start_time
-      total_distance_km
-      total_timer_time_seconds
+      distance_km
+      duration_seconds
       avg_heart_rate
       max_heart_rate
-      total_calories
+      calories
       avg_speed_kmh
       max_speed_kmh
-      total_ascent
-      total_descent
+      total_ascent_m
+      total_descent_m
       avg_cadence
       max_cadence
-      avg_power
-      max_power
+      total_timer_time
       track_point_count
     }
   }
@@ -189,7 +189,7 @@ export const GARMIN_TRACK_POINTS = `
         altitude
         heart_rate
         speed_kmh
-        distance_km
+        distance_from_start_km
       }
       total
       limit
@@ -201,8 +201,8 @@ export const GARMIN_TRACK_POINTS = `
 export const GARMIN_CHART_DATA = `
   query GarminChartData($activity_id: String!) {
     garminChartData(activity_id: $activity_id) {
-      elapsed_seconds
-      distance_km
+      timestamp
+      distance_from_start_km
       altitude
       heart_rate
       speed_kmh

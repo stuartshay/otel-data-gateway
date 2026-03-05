@@ -40,23 +40,27 @@ const graphqlErrors = new Rate('graphql_errors');
 const queryDuration = new Trend('graphql_query_duration', true);
 
 // ── k6 options ──────────────────────────────────────────
+const dashboardVus = Math.floor(USERS * 0.4);
+const locationVus = Math.floor(USERS * 0.3);
+const garminVus = Math.max(1, USERS - dashboardVus - locationVus);
+
 export const options = {
   scenarios: {
     dashboard_users: {
       executor: 'constant-vus',
-      vus: Math.ceil(USERS * 0.4),
+      vus: dashboardVus,
       duration: DURATION,
       exec: 'dashboardFlow',
     },
     location_browsers: {
       executor: 'constant-vus',
-      vus: Math.ceil(USERS * 0.3),
+      vus: locationVus,
       duration: DURATION,
       exec: 'locationFlow',
     },
     garmin_explorers: {
       executor: 'constant-vus',
-      vus: Math.ceil(USERS * 0.3),
+      vus: garminVus,
       duration: DURATION,
       exec: 'garminFlow',
     },
@@ -78,8 +82,15 @@ function graphql(query, variables = {}, operationName = '') {
   const res = http.post(BASE_URL, payload, params);
   queryDuration.add(res.timings.duration, { query: operationName });
 
-  const body = res.json();
-  const hasErrors = body && body.errors && body.errors.length > 0;
+  let body;
+  let hasErrors = false;
+  try {
+    body = res.json();
+    hasErrors = !!(body && body.errors && body.errors.length > 0);
+  } catch (e) {
+    // Treat JSON parsing failure as a GraphQL error for metrics purposes
+    hasErrors = true;
+  }
   graphqlErrors.add(hasErrors ? 1 : 0);
 
   check(res, {

@@ -72,8 +72,22 @@ function graphql(query, variables = {}, operationName = '') {
   totalRequests.add(1);
   queryDuration.add(res.timings.duration, { query: operationName });
 
-  const body = res.json();
-  const hasErrors = body && body.errors && body.errors.length > 0;
+  let body = null;
+  let hasErrors = false;
+
+  try {
+    const contentType =
+      res.headers['Content-Type'] || res.headers['content-type'] || '';
+    if (contentType && contentType.indexOf('application/json') === -1) {
+      throw new Error(`Unexpected content type: ${contentType}`);
+    }
+
+    body = res.json();
+    hasErrors = !!(body && body.errors && body.errors.length > 0);
+  } catch (e) {
+    // JSON parse failure or non-JSON content type — count as a GraphQL error.
+    hasErrors = true;
+  }
   graphqlErrors.add(hasErrors ? 1 : 0);
 
   check(res, {

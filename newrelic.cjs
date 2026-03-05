@@ -3,7 +3,8 @@
 /**
  * New Relic agent configuration (CJS format for ESM compatibility).
  *
- * Loaded via: node --require ./newrelic.cjs dist/index.js
+ * Usage (recommended):
+ *   NEW_RELIC_CONFIG_FILE=./newrelic.cjs node --require newrelic dist/index.js
  *
  * All sensitive values (NEW_RELIC_LICENSE_KEY) come from environment
  * variables injected by Kubernetes secrets.
@@ -24,5 +25,6 @@ exports.config = {
       enabled: true,
     },
   },
-  allow_all_headers: true,
+  // Disable blanket header capture to avoid sending sensitive headers (e.g. Authorization, cookies) to New Relic.
+  allow_all_headers: false,
 };
