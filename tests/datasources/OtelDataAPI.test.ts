@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { OtelDataAPI } from '../../src/datasources/OtelDataAPI.js';
+import { OtelDataAPI, __resetCacheForTests } from '../../src/datasources/OtelDataAPI.js';
 
 const jsonResponse = (data: unknown, status = 200): Promise<Response> =>
   Promise.resolve(
@@ -22,6 +22,7 @@ describe('OtelDataAPI', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+    __resetCacheForTests();
     if (originalFetch) {
       globalThis.fetch = originalFetch;
     } else {
@@ -133,5 +134,38 @@ describe('OtelDataAPI', () => {
       '/api/v1/spatial/distance',
       '/api/v1/spatial/within-reference/Home',
     ]);
+  });
+
+  it('returns cached data on second call within TTL', async () => {
+    fetchMock.mockImplementation(() => jsonResponse({ devices: ['a'] }));
+    const api = new OtelDataAPI('https://example.test');
+
+    const first = await api.getDevices();
+    const second = await api.getDevices();
+
+    expect(first).toEqual(second);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('deduplicates concurrent identical requests', async () => {
+    fetchMock.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve(jsonResponse({ n: 1 })), 50)),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    const [r1, r2] = await Promise.all([api.getDevices(), api.getDevices()]);
+
+    expect(r1).toEqual(r2);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not cache endpoints without cacheTtlMs', async () => {
+    fetchMock.mockImplementation(() => jsonResponse({ status: 'healthy', version: '1.0.0' }));
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.getHealth();
+    await api.getHealth();
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

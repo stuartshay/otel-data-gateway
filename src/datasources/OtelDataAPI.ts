@@ -1,5 +1,3 @@
-import http from 'node:http';
-import https from 'node:https';
 import type { components } from '@stuartshay/otel-data-types';
 import { config } from '../config.js';
 
@@ -20,18 +18,42 @@ interface CacheEntry<T> {
   expiry: number;
 }
 
-// ── Shared keep-alive agents (one per protocol, shared across instances) ──
-const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 50 });
-const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 50 });
+/** Map that evicts expired entries on access, preventing unbounded growth. */
+class ExpiringCache<K, V extends { expiry: number }> extends Map<K, V> {
+  override get(key: K): V | undefined {
+    const value = super.get(key);
+    if (!value) return undefined;
+    if (Date.now() > value.expiry) {
+      super.delete(key);
+      return undefined;
+    }
+    return value;
+  }
 
-/** Pick the right agent for the URL protocol. */
-function agentForUrl(url: string) {
-  return url.startsWith('https') ? httpsAgent : httpAgent;
+  override has(key: K): boolean {
+    const value = super.get(key);
+    if (!value) return false;
+    if (Date.now() > value.expiry) {
+      super.delete(key);
+      return false;
+    }
+    return true;
+  }
 }
 
 // ── Shared response cache & in-flight dedup maps ──
-const cache = new Map<string, CacheEntry<unknown>>();
+// Note: Node.js native fetch (undici) uses keep-alive by default.
+const cache = new ExpiringCache<string, CacheEntry<unknown>>();
 const inflight = new Map<string, Promise<unknown>>();
+
+/**
+ * Test-only utility to clear shared cache and in-flight maps.
+ * Prevents cross-test pollution when modules are cached between tests.
+ */
+export function __resetCacheForTests(): void {
+  cache.clear();
+  inflight.clear();
+}
 
 export class OtelDataAPI {
   private baseUrl: string;
@@ -83,8 +105,6 @@ export class OtelDataAPI {
   private async doFetch<T>(urlString: string, cacheTtlMs?: number): Promise<T> {
     const response = await fetch(urlString, {
       headers: { Accept: 'application/json' },
-      // @ts-expect-error Node.js fetch supports the agent option
-      agent: agentForUrl(urlString),
     });
 
     if (!response.ok) {
@@ -104,10 +124,7 @@ export class OtelDataAPI {
   // ── Health ──────────────────────────────────────────
 
   async getHealth() {
-    return this.fetch<{ status: string; version: string }>({
-      path: '/health',
-      cacheTtlMs: 15_000,
-    });
+    return this.fetch<{ status: string; version: string }>({ path: '/health' });
   }
 
   async getReady() {
