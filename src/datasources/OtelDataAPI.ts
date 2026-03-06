@@ -96,7 +96,9 @@ export class OtelDataAPI {
 
     if (cacheTtlMs) {
       inflight.set(cacheKey, request);
-      request.finally(() => inflight.delete(cacheKey));
+      // Swallow rejection on the cleanup chain to prevent unhandled-rejection crashes.
+      // The caller still receives the original rejection from `request`.
+      request.finally(() => inflight.delete(cacheKey)).catch(() => {});
     }
 
     return request;
@@ -104,6 +106,7 @@ export class OtelDataAPI {
 
   private async doFetch<T>(urlString: string, cacheTtlMs?: number): Promise<T> {
     const response = await fetch(urlString, {
+      signal: AbortSignal.timeout(30_000),
       headers: { Accept: 'application/json' },
     });
 
