@@ -9,6 +9,11 @@ import { OtelDataAPI } from './datasources/OtelDataAPI.js';
 import { config } from './config.js';
 import type { GatewayContext } from './resolvers/types.js';
 
+// Safety net: log and survive unhandled rejections instead of crashing
+process.on('unhandledRejection', (reason) => {
+  console.error('Unhandled rejection:', reason);
+});
+
 const app = express();
 const httpServer = http.createServer(app);
 
