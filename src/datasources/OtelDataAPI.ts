@@ -188,12 +188,14 @@ export class OtelDataAPI {
     return this.fetch<Schemas['PaginatedResponse_GarminActivity_']>({
       path: '/api/v1/garmin/activities',
       query: params,
+      cacheTtlMs: 30_000,
     });
   }
 
   async getGarminActivity(activityId: string) {
     return this.fetch<Schemas['GarminActivity']>({
       path: `/api/v1/garmin/activities/${activityId}`,
+      cacheTtlMs: 30_000,
     });
   }
 
@@ -223,6 +225,7 @@ export class OtelDataAPI {
   async getGarminChartData(activityId: string) {
     return this.fetch<Schemas['GarminChartPoint'][]>({
       path: `/api/v1/garmin/activities/${activityId}/chart-data`,
+      cacheTtlMs: 30_000,
     });
   }
 
@@ -250,6 +253,7 @@ export class OtelDataAPI {
     return this.fetch<Schemas['DailyActivitySummary'][]>({
       path: '/api/v1/gps/daily-summary',
       query: params,
+      cacheTtlMs: 60_000,
     });
   }
 
