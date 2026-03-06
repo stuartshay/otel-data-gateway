@@ -172,40 +172,68 @@ describe('OtelDataAPI', () => {
   it('caches garminActivities responses for 30s', async () => {
     fetchMock.mockImplementation(() => jsonResponse({ items: [], total: 0 }));
     const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
 
+    nowSpy.mockReturnValue(0);
     await api.getGarminActivities({ sport: 'cycling' });
     await api.getGarminActivities({ sport: 'cycling' });
-
     expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(31_000);
+    await api.getGarminActivities({ sport: 'cycling' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
   });
 
   it('caches garminActivity responses for 30s', async () => {
     fetchMock.mockImplementation(() => jsonResponse({ activity_id: 'ga-1' }));
     const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
 
+    nowSpy.mockReturnValue(0);
     await api.getGarminActivity('ga-1');
     await api.getGarminActivity('ga-1');
-
     expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(31_000);
+    await api.getGarminActivity('ga-1');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
   });
 
   it('caches garminChartData responses for 30s', async () => {
     fetchMock.mockImplementation(() => jsonResponse([{ hr: 120 }]));
     const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
 
+    nowSpy.mockReturnValue(0);
     await api.getGarminChartData('ga-1');
     await api.getGarminChartData('ga-1');
-
     expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(31_000);
+    await api.getGarminChartData('ga-1');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
   });
 
   it('caches dailySummary responses for 60s', async () => {
     fetchMock.mockImplementation(() => jsonResponse([{ date: '2026-01-01' }]));
     const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
 
+    nowSpy.mockReturnValue(0);
     await api.getDailySummary({ limit: 7 });
     await api.getDailySummary({ limit: 7 });
-
     expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(61_000);
+    await api.getDailySummary({ limit: 7 });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
   });
 });
