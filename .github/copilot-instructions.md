@@ -144,6 +144,21 @@ npm run type-check    # TypeScript check
 npm run test          # Run tests
 ```
 
+## Issue Templates
+
+Issue templates live in `.github/ISSUE_TEMPLATE/` and are a **living document**
+— update them as the project evolves.
+
+| Template        | File                  | Purpose                                                      |
+| --------------- | --------------------- | ------------------------------------------------------------ |
+| Bug Report      | `bug_report.yml`      | GraphQL query/resolver bugs — query, response, error source  |
+| Feature Request | `feature_request.yml` | New queries/mutations — schema design, REST mapping, caching |
+| Performance     | `performance.yml`     | Latency, pod restarts, cache issues — k6 metrics, resources  |
+
+When filing issues, use the appropriate template. Blank issues are disabled to
+enforce structured intake. When adding new resolvers, queries, or changing the
+schema, update the templates to reflect the changes.
+
 ## Related Repositories
 
 - [otel-data-api](https://github.com/stuartshay/otel-data-api) — REST API backend

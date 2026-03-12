@@ -1,0 +1,87 @@
+---
+name: Performance Issue
+description: Report a performance problem (high latency, pod restarts, cache issues)
+title: "perf: "
+labels: ["performance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report performance issues with latency, throughput, caching, or pod stability.
+
+  - type: input
+    id: query
+    attributes:
+      label: Affected Query / Resolver
+      description: Which GraphQL query or resolver is affected?
+      placeholder: "e.g., garminActivities, locationsByDevice, all queries"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the performance issue.
+    validations:
+      required: true
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Performance Metrics
+      description: |
+        Include measured data: response times, error rates, pod restarts,
+        k6 results, or resource usage.
+      render: text
+      placeholder: |
+        k6 stress test (200 VUs, 14 min):
+        - HTTP failure rate: 49.33%
+        - p95 latency: 14.13s
+        - Pod restarts: 1
+
+        kubectl top pod:
+        - CPU: 480m / 500m limit
+        - Memory: 210Mi / 512Mi limit
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What type of performance issue?
+      options:
+        - High latency
+        - High error rate under load
+        - Pod restarts / OOMKilled
+        - Cache inefficiency
+        - Upstream API bottleneck
+        - Resource limits
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where was this observed?
+      options:
+        - Production (gateway.lab.informationcart.com)
+        - Local development
+        - k6 load test
+    validations:
+      required: true
+
+  - type: textarea
+    id: investigation
+    attributes:
+      label: Investigation Notes
+      description: |
+        Any root cause analysis: pod describe output, k6 detailed results,
+        cache hit rates, upstream API errors, resource utilization.
+      render: text
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Fix
+      description: If you have a proposed solution, describe it here.

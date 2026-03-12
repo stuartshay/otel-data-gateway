@@ -1,0 +1,91 @@
+---
+name: Feature Request
+description: Propose a new GraphQL query, mutation, or schema change
+title: "feat: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the feature you'd like to see added to the GraphQL gateway.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the feature.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature needed? Which frontend page or component will use it?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What area does this feature affect?
+      options:
+        - New query
+        - New mutation
+        - Schema / type change
+        - Resolver enhancement
+        - Caching
+        - Performance
+        - Documentation
+        - Infrastructure / deployment
+    validations:
+      required: true
+
+  - type: textarea
+    id: schema_design
+    attributes:
+      label: Proposed Schema
+      description: If applicable, provide the GraphQL type definitions and query signature.
+      render: graphql
+      placeholder: |
+        type DailySummary {
+          date: String!
+          totalDistance: Float
+          pointCount: Int!
+        }
+
+        extend type Query {
+          dailySummary(deviceId: String!, date: String!): DailySummary
+        }
+
+  - type: textarea
+    id: rest_mapping
+    attributes:
+      label: REST API Mapping
+      description: |
+        Which otel-data-api endpoint(s) does this map to? If the endpoint
+        doesn't exist yet, note that an upstream change is needed first.
+      placeholder: "GET /api/v1/locations/daily-summary?device_id=xxx&date=2026-01-01"
+
+  - type: textarea
+    id: caching
+    attributes:
+      label: Caching Strategy
+      description: Should this query be cached? If so, what TTL?
+      placeholder: "e.g., Cache with 30s TTL (data changes infrequently)"
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative approaches you've considered.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have checked the existing issues for duplicates
+          required: true
+        - label: I have verified the upstream REST endpoint exists (or filed an issue for it)
