@@ -6,18 +6,23 @@ type Schemas = components['schemas'];
 /** Accept null from GraphQL InputMaybe<T> args. buildUrl already skips null/undefined. */
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
-export interface GarminSyncTriggerResult {
-  status: string;
-  message: string;
-  accepted: boolean;
-  triggered_at?: string | null;
-  started_at?: string | null;
-  window_hours?: number | null;
-  window_start?: string | null;
-  lookback?: number | null;
-}
+type GarminSyncSchema = Schemas extends { GarminSyncResponse: infer T }
+  ? T
+  : {
+      status: string;
+      message: string;
+      triggered_at?: string | null;
+      started_at?: string | null;
+      window_hours?: number | null;
+      window_start?: string | null;
+      lookback?: number | null;
+    };
 
-type GarminSyncUpstreamResponse = Omit<GarminSyncTriggerResult, 'accepted'> & {
+type GarminSyncTriggerResult = GarminSyncSchema & {
+  accepted: boolean;
+};
+
+type GarminSyncUpstreamResponse = GarminSyncSchema & {
   accepted?: boolean | null;
 };
 
