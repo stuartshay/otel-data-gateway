@@ -59,9 +59,9 @@ open http://localhost:4000
 
 ## GraphQL Mutations
 
-| Mutation             | REST Endpoint           | Description                         |
-| -------------------- | ----------------------- | ----------------------------------- |
-| `triggerGarminSync`  | `/api/v1/garmin/sync`   | Trigger on-demand Garmin data sync  |
+| Mutation            | REST Endpoint         | Description                        |
+| ------------------- | --------------------- | ---------------------------------- |
+| `triggerGarminSync` | `/api/v1/garmin/sync` | Trigger on-demand Garmin data sync |
 
 ## Example Query
 
