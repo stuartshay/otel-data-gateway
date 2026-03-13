@@ -21,6 +21,8 @@ All automation, assistants, and developers must follow
 - **Build**: `npm run build`
 - **Run dev**: `npm run dev`
 - **GraphQL Playground**: <http://localhost:4000>
+- **Types PR check**: when `@stuartshay/otel-data-types` is published, verify
+  the auto-created dependency PR exists and required CI checks pass
 
 ## Development Workflow
 
@@ -32,6 +34,8 @@ All automation, assistants, and developers must follow
 6. Test locally: `npm run dev`
 7. Commit and push to `develop` or `feature/*` branch
 8. Create PR to `master` when ready for production
+9. For auto-generated types dependency PRs, confirm the package version matches
+   npm and rerun/fix failed checks before merge
 
 ## Project Structure
 

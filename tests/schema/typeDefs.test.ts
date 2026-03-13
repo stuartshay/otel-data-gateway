@@ -4,7 +4,9 @@ import typeDefs from '../../src/schema/typeDefs.js';
 describe('typeDefs', () => {
   it('exposes gateway schema SDL', () => {
     expect(typeDefs).toContain('type Query');
+    expect(typeDefs).toContain('type Mutation');
     expect(typeDefs).toContain('health');
     expect(typeDefs).toContain('garminActivities');
+    expect(typeDefs).toContain('triggerGarminSync');
   });
 });

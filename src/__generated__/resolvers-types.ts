@@ -165,6 +165,27 @@ export type GarminChartPoint = {
   timestamp: Scalars['DateTime']['output'];
 };
 
+/** Result payload returned when triggering an on-demand Garmin sync. */
+export type GarminSyncTriggerResult = {
+  __typename?: 'GarminSyncTriggerResult';
+  /** True when a new sync run was accepted and triggered */
+  accepted: Scalars['Boolean']['output'];
+  /** Effective lookback value, when provided */
+  lookback?: Maybe<Scalars['Int']['output']>;
+  /** Human-readable status message from upstream sync service */
+  message: Scalars['String']['output'];
+  /** UTC timestamp when an already-running sync started */
+  started_at?: Maybe<Scalars['String']['output']>;
+  /** Sync trigger status (e.g. accepted, conflict, bad_request, error) */
+  status: Scalars['String']['output'];
+  /** UTC timestamp when sync was triggered */
+  triggered_at?: Maybe<Scalars['String']['output']>;
+  /** Effective sync window in hours */
+  window_hours?: Maybe<Scalars['Int']['output']>;
+  /** Window start timestamp computed by upstream service, when available */
+  window_start?: Maybe<Scalars['String']['output']>;
+};
+
 /** Individual GPS track point within a Garmin activity. */
 export type GarminTrackPoint = {
   __typename?: 'GarminTrackPoint';
@@ -306,6 +327,18 @@ export type LocationDetail = {
   trigger?: Maybe<Scalars['String']['output']>;
   /** Device velocity in km/h at time of report */
   velocity?: Maybe<Scalars['Float']['output']>;
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  /** Trigger an on-demand Garmin sync in the upstream API. */
+  triggerGarminSync: GarminSyncTriggerResult;
+};
+
+
+export type MutationTriggerGarminSyncArgs = {
+  lookback?: InputMaybe<Scalars['Int']['input']>;
+  window_hours?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** GPS point found within a spatial proximity search. */
@@ -658,6 +691,7 @@ export type ResolversTypes = ResolversObject<{
   GarminActivity: ResolverTypeWrapper<GarminActivity>;
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
+  GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
   HealthStatus: ResolverTypeWrapper<HealthStatus>;
@@ -667,6 +701,7 @@ export type ResolversTypes = ResolversObject<{
   LocationConnection: ResolverTypeWrapper<LocationConnection>;
   LocationCount: ResolverTypeWrapper<LocationCount>;
   LocationDetail: ResolverTypeWrapper<LocationDetail>;
+  Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   NearbyPoint: ResolverTypeWrapper<NearbyPoint>;
   PaginationInfo: ResolverTypeWrapper<PaginationInfo>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
@@ -691,6 +726,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminActivity: GarminActivity;
   GarminActivityConnection: GarminActivityConnection;
   GarminChartPoint: GarminChartPoint;
+  GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
   HealthStatus: HealthStatus;
@@ -700,6 +736,7 @@ export type ResolversParentTypes = ResolversObject<{
   LocationConnection: LocationConnection;
   LocationCount: LocationCount;
   LocationDetail: LocationDetail;
+  Mutation: Record<PropertyKey, never>;
   NearbyPoint: NearbyPoint;
   PaginationInfo: PaginationInfo;
   Query: Record<PropertyKey, never>;
@@ -792,6 +829,17 @@ export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType e
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 }>;
 
+export type GarminSyncTriggerResultResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSyncTriggerResult'] = ResolversParentTypes['GarminSyncTriggerResult']> = ResolversObject<{
+  accepted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  lookback?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  started_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  triggered_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  window_hours?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  window_start?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
 export type GarminTrackPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminTrackPoint'] = ResolversParentTypes['GarminTrackPoint']> = ResolversObject<{
   activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   altitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -869,6 +917,10 @@ export type LocationDetailResolvers<ContextType = GatewayContext, ParentType ext
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   trigger?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   velocity?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+}>;
+
+export type MutationResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  triggerGarminSync?: Resolver<ResolversTypes['GarminSyncTriggerResult'], ParentType, ContextType, Partial<MutationTriggerGarminSyncArgs>>;
 }>;
 
 export type NearbyPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['NearbyPoint'] = ResolversParentTypes['NearbyPoint']> = ResolversObject<{
@@ -964,6 +1016,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminActivity?: GarminActivityResolvers<ContextType>;
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
+  GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;
   HealthStatus?: HealthStatusResolvers<ContextType>;
@@ -972,6 +1025,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   LocationConnection?: LocationConnectionResolvers<ContextType>;
   LocationCount?: LocationCountResolvers<ContextType>;
   LocationDetail?: LocationDetailResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
   NearbyPoint?: NearbyPointResolvers<ContextType>;
   PaginationInfo?: PaginationInfoResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

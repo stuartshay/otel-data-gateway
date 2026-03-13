@@ -760,6 +760,44 @@ type WithinReferenceResult {
   points: [NearbyPoint!]!
 }
 
+"""
+Result payload returned when triggering an on-demand Garmin sync.
+"""
+type GarminSyncTriggerResult {
+  """
+  Sync trigger status (e.g. accepted, conflict, bad_request, error)
+  """
+  status: String!
+  """
+  Human-readable status message from upstream sync service
+  """
+  message: String!
+  """
+  True when a new sync run was accepted and triggered
+  """
+  accepted: Boolean!
+  """
+  UTC timestamp when sync was triggered
+  """
+  triggered_at: String
+  """
+  UTC timestamp when an already-running sync started
+  """
+  started_at: String
+  """
+  Effective sync window in hours
+  """
+  window_hours: Int
+  """
+  Window start timestamp computed by upstream service, when available
+  """
+  window_start: String
+  """
+  Effective lookback value, when provided
+  """
+  lookback: Int
+}
+
 # -------------------------------------------------------
 # Enums
 # -------------------------------------------------------
@@ -1075,4 +1113,23 @@ type Query {
     """
     limit: Int
   ): WithinReferenceResult!
+}
+
+# -------------------------------------------------------
+# Mutations
+# -------------------------------------------------------
+type Mutation {
+  """
+  Trigger an on-demand Garmin sync in the upstream API.
+  """
+  triggerGarminSync(
+    """
+    Optional sync window in hours. Preferred over lookback.
+    """
+    window_hours: Int
+    """
+    Optional legacy lookback value.
+    """
+    lookback: Int
+  ): GarminSyncTriggerResult!
 }
