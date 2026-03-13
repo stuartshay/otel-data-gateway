@@ -58,7 +58,7 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           npm pkg set "dependencies.@stuartshay/otel-data-types=${VERSION}"
-          npm install --package-lock-only
+          npm install --package-lock-only --ignore-scripts
           echo "Updated @stuartshay/otel-data-types to ${VERSION}"
 
       - name: Create Pull Request
