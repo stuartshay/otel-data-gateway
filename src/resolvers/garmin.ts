@@ -1,10 +1,11 @@
-import type { QueryResolvers } from '../__generated__/resolvers-types.js';
+import type { MutationResolvers, QueryResolvers } from '../__generated__/resolvers-types.js';
 
 export const garminResolvers: {
   Query: Pick<
     QueryResolvers,
     'garminActivities' | 'garminActivity' | 'garminTrackPoints' | 'garminSports' | 'garminChartData'
   >;
+  Mutation: Pick<MutationResolvers, 'triggerGarminSync'>;
 } = {
   Query: {
     garminActivities: async (_parent, args, { dataSources }) => {
@@ -26,6 +27,11 @@ export const garminResolvers: {
 
     garminChartData: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminChartData(args.activity_id);
+    },
+  },
+  Mutation: {
+    triggerGarminSync: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.triggerGarminSync(args);
     },
   },
 };

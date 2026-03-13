@@ -57,6 +57,12 @@ open http://localhost:4000
 | `calculateDistance`  | `/api/v1/spatial/distance`         | Calculate distance  |
 | `withinReference`    | `/api/v1/spatial/within-ref/:name` | Within reference    |
 
+## GraphQL Mutations
+
+| Mutation             | REST Endpoint           | Description                         |
+| -------------------- | ----------------------- | ----------------------------------- |
+| `triggerGarminSync`  | `/api/v1/garmin/sync`   | Trigger on-demand Garmin data sync  |
+
 ## Example Query
 
 ```graphql
@@ -72,6 +78,63 @@ query {
     total
     limit
     offset
+  }
+}
+```
+
+## Example Mutation
+
+```graphql
+mutation TriggerGarminSync($window_hours: Int, $lookback: Int) {
+  triggerGarminSync(window_hours: $window_hours, lookback: $lookback) {
+    status
+    message
+    accepted
+    triggered_at
+    started_at
+    window_hours
+    window_start
+    lookback
+  }
+}
+```
+
+```json
+{
+  "window_hours": 48
+}
+```
+
+```json
+{
+  "data": {
+    "triggerGarminSync": {
+      "status": "accepted",
+      "message": "Sync started",
+      "accepted": true,
+      "triggered_at": "2026-03-12T01:25:14.586353+00:00",
+      "started_at": null,
+      "window_hours": 48,
+      "window_start": null,
+      "lookback": null
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "triggerGarminSync": {
+      "status": "conflict",
+      "message": "Sync already in progress",
+      "accepted": false,
+      "triggered_at": null,
+      "started_at": "2026-03-12T01:24:58.102924+00:00",
+      "window_hours": null,
+      "window_start": null,
+      "lookback": null
+    }
   }
 }
 ```

@@ -6,11 +6,29 @@ type Schemas = components['schemas'];
 /** Accept null from GraphQL InputMaybe<T> args. buildUrl already skips null/undefined. */
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
+export interface GarminSyncTriggerResult {
+  status: string;
+  message: string;
+  accepted: boolean;
+  triggered_at?: string | null;
+  started_at?: string | null;
+  window_hours?: number | null;
+  window_start?: string | null;
+  lookback?: number | null;
+}
+
+type GarminSyncUpstreamResponse = Omit<GarminSyncTriggerResult, 'accepted'> & {
+  accepted?: boolean | null;
+};
+
 interface FetchParams {
   path: string;
   query?: Record<string, string | number | undefined | null>;
+  method?: 'GET' | 'POST';
   /** TTL in milliseconds. When set, responses are cached and deduplicated. */
   cacheTtlMs?: number;
+  /** Non-2xx statuses to handle as structured responses instead of throwing. */
+  acceptStatusCodes?: number[];
 }
 
 interface CacheEntry<T> {
@@ -74,12 +92,20 @@ export class OtelDataAPI {
     return url;
   }
 
-  private async fetch<T>({ path, query, cacheTtlMs }: FetchParams): Promise<T> {
+  private async fetch<T>({
+    path,
+    query,
+    method = 'GET',
+    cacheTtlMs,
+    acceptStatusCodes,
+  }: FetchParams): Promise<T> {
     const url = this.buildUrl(path, query);
-    const cacheKey = url.toString();
+    const urlString = url.toString();
+    const cacheKey = `${method}:${urlString}`;
+    const isCacheable = method === 'GET' && Boolean(cacheTtlMs);
 
     // Check cache first (only when TTL is set)
-    if (cacheTtlMs) {
+    if (isCacheable) {
       const cached = cache.get(cacheKey) as CacheEntry<T> | undefined;
       if (cached && cached.expiry > Date.now()) {
         return cached.data;
@@ -92,9 +118,14 @@ export class OtelDataAPI {
       }
     }
 
-    const request = this.doFetch<T>(cacheKey, cacheTtlMs);
+    const request = this.doFetch<T>(urlString, {
+      method,
+      cacheKey,
+      cacheTtlMs,
+      acceptStatusCodes,
+    });
 
-    if (cacheTtlMs) {
+    if (isCacheable) {
       inflight.set(cacheKey, request);
       // Swallow rejection on the cleanup chain to prevent unhandled-rejection crashes.
       // The caller still receives the original rejection from `request`.
@@ -104,21 +135,31 @@ export class OtelDataAPI {
     return request;
   }
 
-  private async doFetch<T>(urlString: string, cacheTtlMs?: number): Promise<T> {
+  private async doFetch<T>(
+    urlString: string,
+    options: {
+      method: 'GET' | 'POST';
+      cacheKey: string;
+      cacheTtlMs?: number;
+      acceptStatusCodes?: number[];
+    },
+  ): Promise<T> {
+    const { method, cacheKey, cacheTtlMs, acceptStatusCodes } = options;
     const response = await fetch(urlString, {
+      method,
       signal: AbortSignal.timeout(30_000),
       headers: { Accept: 'application/json' },
     });
 
-    if (!response.ok) {
+    if (!response.ok && !(acceptStatusCodes ?? []).includes(response.status)) {
       const body = await response.text().catch(() => '');
       throw new Error(`REST API error ${response.status}: ${response.statusText} - ${body}`);
     }
 
     const data = (await response.json()) as T;
 
-    if (cacheTtlMs) {
-      cache.set(urlString, { data, expiry: Date.now() + cacheTtlMs });
+    if (method === 'GET' && cacheTtlMs) {
+      cache.set(cacheKey, { data, expiry: Date.now() + cacheTtlMs });
     }
 
     return data;
@@ -227,6 +268,25 @@ export class OtelDataAPI {
       path: `/api/v1/garmin/activities/${activityId}/chart-data`,
       cacheTtlMs: 30_000,
     });
+  }
+
+  async triggerGarminSync(
+    params?: Nullable<{
+      window_hours?: number;
+      lookback?: number;
+    }>,
+  ): Promise<GarminSyncTriggerResult> {
+    const response = await this.fetch<GarminSyncUpstreamResponse>({
+      path: '/api/v1/garmin/sync',
+      method: 'POST',
+      query: params,
+      acceptStatusCodes: [400, 409],
+    });
+
+    return {
+      ...response,
+      accepted: response.accepted ?? response.status === 'accepted',
+    };
   }
 
   // ── Unified GPS ─────────────────────────────────────

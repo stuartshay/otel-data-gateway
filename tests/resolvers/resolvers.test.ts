@@ -163,6 +163,22 @@ describe('garmin resolvers', () => {
     expect(ctx.dataSources.otelAPI.getGarminSports).toHaveBeenCalled();
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
   });
+
+  it('delegates triggerGarminSync mutation with passthrough args', async () => {
+    const args = { window_hours: 48, lookback: null };
+    const result = {
+      status: 'accepted',
+      message: 'Sync started',
+      accepted: true,
+      window_hours: 48,
+    };
+    const ctx = contextWith({ triggerGarminSync: mockAsync(result) });
+
+    const response = await runResolver(garminResolvers.Mutation.triggerGarminSync, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.triggerGarminSync).toHaveBeenCalledWith(args);
+    expect(response).toEqual(result);
+  });
 });
 
 describe('gps resolvers', () => {
@@ -263,5 +279,10 @@ describe('resolver index', () => {
         'withinReference',
       ]),
     );
+  });
+
+  it('merges mutation resolver fields', () => {
+    const keys = Object.keys(resolvers.Mutation);
+    expect(keys).toEqual(expect.arrayContaining(['triggerGarminSync']));
   });
 });

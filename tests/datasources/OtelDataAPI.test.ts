@@ -90,6 +90,82 @@ describe('OtelDataAPI', () => {
     );
   });
 
+  it('posts garmin sync trigger with optional params', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          status: 'accepted',
+          message: 'Sync started',
+          window_hours: 48,
+        }),
+        {
+          status: 202,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    const response = await api.triggerGarminSync({ window_hours: 48, lookback: null });
+
+    expect(response).toEqual({
+      status: 'accepted',
+      message: 'Sync started',
+      window_hours: 48,
+      accepted: true,
+    });
+
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://example.test/api/v1/garmin/sync?window_hours=48');
+    expect(options.method).toBe('POST');
+  });
+
+  it('returns structured response for 409 garmin sync conflicts', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          status: 'conflict',
+          message: 'Sync already in progress',
+          started_at: '2026-03-12T01:24:58.102924+00:00',
+        }),
+        {
+          status: 409,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await expect(api.triggerGarminSync({ lookback: 7 })).resolves.toEqual({
+      status: 'conflict',
+      message: 'Sync already in progress',
+      started_at: '2026-03-12T01:24:58.102924+00:00',
+      accepted: false,
+    });
+  });
+
+  it('returns structured response for 400 garmin sync validation errors', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          status: 'bad_request',
+          message: 'lookback and window_hours cannot be combined',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await expect(api.triggerGarminSync({ lookback: 7, window_hours: 24 })).resolves.toEqual({
+      status: 'bad_request',
+      message: 'lookback and window_hours cannot be combined',
+      accepted: false,
+    });
+  });
+
   it('routes every gateway method to the expected endpoint', async () => {
     const api = new OtelDataAPI('https://example.test');
 
@@ -104,6 +180,7 @@ describe('OtelDataAPI', () => {
     await api.getGarminTrackPoints('ga-1', { limit: 2 });
     await api.getGarminSports();
     await api.getGarminChartData('ga-1');
+    await api.triggerGarminSync({ window_hours: 24 });
     await api.getUnifiedGps({ source: 'gps' });
     await api.getDailySummary({ limit: 3 });
     await api.getReferenceLocations();
@@ -126,6 +203,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/activities/ga-1/tracks',
       '/api/v1/garmin/sports',
       '/api/v1/garmin/activities/ga-1/chart-data',
+      '/api/v1/garmin/sync',
       '/api/v1/gps/unified',
       '/api/v1/gps/daily-summary',
       '/api/v1/reference-locations',

@@ -15,6 +15,9 @@ const resolvers = {
     ...referenceResolvers.Query,
     ...spatialResolvers.Query,
   },
+  Mutation: {
+    ...garminResolvers.Mutation,
+  },
 };
 
 export default resolvers;
