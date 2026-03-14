@@ -83,6 +83,21 @@ diverge from master.
 5. Post a completion comment on the linked issue/PR confirming the types bump
    PR link, version, and merge status.
 
+### After Types Publish (Required)
+
+⚠️ **ALWAYS verify the downstream dependency PR after publishing
+`@stuartshay/otel-graphql-types`.**
+
+1. Confirm `.github/workflows/publish-types.yml` completed successfully.
+2. Verify a new dependency-update PR is created in `otel-data-ui` (title
+   pattern: `📦 Update @stuartshay/otel-graphql-types to vX.Y.Z`).
+3. Confirm the PR version bump matches the published npm version and CI checks
+   are green.
+4. Link that downstream PR in the originating issue/PR before marking work
+   complete.
+5. If no PR is created or checks fail, open/fix the workflow issue and rerun
+   until a valid PR exists.
+
 ### Release Hygiene Completion (Required)
 
 ⚠️ **ALWAYS complete issue/project hygiene before setting work to Done.**
