@@ -23,6 +23,11 @@ All automation, assistants, and developers must follow
 - **GraphQL Playground**: <http://localhost:4000>
 - **Types PR check**: when `@stuartshay/otel-data-types` is published, verify
   the auto-created dependency PR exists and required CI checks pass
+- **Issue closure hygiene**: if any prior validation comment reported a blocker,
+  post a final superseding validation comment after resolution before marking
+  work done
+- **Release hygiene skill**:
+  `.github/skills/release-hygiene-check/SKILL.md`
 
 ## Development Workflow
 
@@ -36,6 +41,8 @@ All automation, assistants, and developers must follow
 8. Create PR to `master` when ready for production
 9. For auto-generated types dependency PRs, confirm the package version matches
    npm and rerun/fix failed checks before merge
+10. Before moving any linked issue/project item to Done, post final acceptance
+    validation evidence and explicitly supersede earlier blocked status
 
 ## Project Structure
 

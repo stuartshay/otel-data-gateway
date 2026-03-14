@@ -332,7 +332,6 @@ export interface Mutation {
   triggerGarminSync: GarminSyncTriggerResult;
 }
 
-
 export interface MutationTriggerGarminSyncArgs {
   lookback?: InputMaybe<Scalars['Int']['input']>;
   window_hours?: InputMaybe<Scalars['Int']['input']>;

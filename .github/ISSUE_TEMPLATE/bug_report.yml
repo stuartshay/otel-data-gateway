@@ -1,8 +1,8 @@
 ---
 name: Bug Report
 description: Report a bug in otel-data-gateway
-title: "bug: "
-labels: ["bug"]
+title: 'bug: '
+labels: ['bug']
 body:
   - type: markdown
     attributes:
@@ -14,7 +14,7 @@ body:
     attributes:
       label: Affected GraphQL Query / Resolver
       description: Which GraphQL query or resolver is affected?
-      placeholder: "e.g., garminActivities, locationCount, health"
+      placeholder: 'e.g., garminActivities, locationCount, health'
     validations:
       required: true
 
@@ -82,7 +82,7 @@ body:
     attributes:
       label: Version
       description: Gateway version from health query
-      placeholder: "e.g., 1.0.71"
+      placeholder: 'e.g., 1.0.71'
 
   - type: textarea
     id: logs

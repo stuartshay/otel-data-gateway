@@ -80,6 +80,37 @@ diverge from master.
 3. Ensure required checks are green; if they fail, fix workflow/repo issues and
    rerun before merging.
 4. Merge promptly once checks pass so gateway stays aligned with API types.
+5. Post a completion comment on the linked issue/PR confirming the types bump
+   PR link, version, and merge status.
+
+### Release Hygiene Completion (Required)
+
+⚠️ **ALWAYS complete issue/project hygiene before setting work to Done.**
+
+1. Validate acceptance criteria against deployed behavior, not only local
+   tests/CI.
+2. If any earlier comment says validation is blocked, add a new superseding
+   comment after resolution that explicitly states criteria are now met.
+3. Ensure acceptance criteria are explicitly marked complete by either:
+   - updating issue checkboxes, or
+   - posting a final checklist comment mapping each criterion to evidence.
+4. Include links in the final comment to code PR, deployment PR, and upstream
+   types PR context when relevant.
+5. Move the project item to `Done` only after the final validation evidence is
+   posted.
+6. Use `.github/skills/release-hygiene-check/SKILL.md` for this repeatable
+   workflow.
+
+Suggested final comment format:
+
+```text
+Final acceptance validation (YYYY-MM-DD):
+- Criterion 1: PASS — <evidence link/command output>
+- Criterion 2: PASS — <evidence link/command output>
+- Deployment PR: <link>
+- Types PR context (if applicable): <link>
+- Prior blocker status: Resolved (<link>)
+```
 
 ### Daily Workflow
 

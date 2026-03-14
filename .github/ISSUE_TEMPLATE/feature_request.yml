@@ -1,8 +1,8 @@
 ---
 name: Feature Request
 description: Propose a new GraphQL query, mutation, or schema change
-title: "feat: "
-labels: ["feature"]
+title: 'feat: '
+labels: ['feature']
 body:
   - type: markdown
     attributes:
@@ -66,14 +66,14 @@ body:
       description: |
         Which otel-data-api endpoint(s) does this map to? If the endpoint
         doesn't exist yet, note that an upstream change is needed first.
-      placeholder: "GET /api/v1/locations/daily-summary?device_id=xxx&date=2026-01-01"
+      placeholder: 'GET /api/v1/locations/daily-summary?device_id=xxx&date=2026-01-01'
 
   - type: textarea
     id: caching
     attributes:
       label: Caching Strategy
       description: Should this query be cached? If so, what TTL?
-      placeholder: "e.g., Cache with 30s TTL (data changes infrequently)"
+      placeholder: 'e.g., Cache with 30s TTL (data changes infrequently)'
 
   - type: textarea
     id: alternatives
