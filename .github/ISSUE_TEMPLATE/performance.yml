@@ -1,8 +1,8 @@
 ---
 name: Performance Issue
 description: Report a performance problem (high latency, pod restarts, cache issues)
-title: "perf: "
-labels: ["performance"]
+title: 'perf: '
+labels: ['performance']
 body:
   - type: markdown
     attributes:
@@ -14,7 +14,7 @@ body:
     attributes:
       label: Affected Query / Resolver
       description: Which GraphQL query or resolver is affected?
-      placeholder: "e.g., garminActivities, locationsByDevice, all queries"
+      placeholder: 'e.g., garminActivities, locationsByDevice, all queries'
     validations:
       required: true
 
