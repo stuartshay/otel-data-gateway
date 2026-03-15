@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":semanticCommits"
-  ],
+  "extends": ["config:recommended", "docker:enableMajor", ":semanticCommits"],
   "labels": ["dependencies", "renovate"],
   "timezone": "America/New_York",
   "schedule": ["before 6am on Monday"],
@@ -11,6 +8,11 @@
   "prConcurrentLimit": 5,
   "enabledManagers": ["npm", "dockerfile", "github-actions"],
   "packageRules": [
+    {
+      "description": "Exclude stuartshay packages (managed by update-types workflow)",
+      "matchPackageNames": ["@stuartshay/**"],
+      "enabled": false
+    },
     {
       "description": "Auto-merge patch updates for npm dependencies",
       "matchManagers": ["npm"],
@@ -41,32 +43,19 @@
     },
     {
       "description": "Group ESLint ecosystem",
-      "matchPackageNames": [
-        "eslint",
-        "@eslint/js",
-        "typescript-eslint"
-      ],
+      "matchPackageNames": ["eslint", "@eslint/js", "typescript-eslint"],
       "groupName": "eslint",
       "groupSlug": "eslint"
     },
     {
       "description": "Group Jest testing",
-      "matchPackageNames": [
-        "jest",
-        "@jest/globals",
-        "ts-jest"
-      ],
+      "matchPackageNames": ["jest", "@jest/globals", "ts-jest"],
       "groupName": "jest",
       "groupSlug": "jest"
     },
     {
       "description": "Group formatting tools",
-      "matchPackageNames": [
-        "prettier",
-        "markdownlint-cli2",
-        "husky",
-        "lint-staged"
-      ],
+      "matchPackageNames": ["cspell", "prettier", "markdownlint-cli2", "husky", "lint-staged"],
       "groupName": "formatting-tools",
       "groupSlug": "formatting-tools"
     },
@@ -77,10 +66,20 @@
       "automerge": true
     },
     {
-      "description": "GitHub Actions updates",
+      "description": "GitHub Actions minor/patch updates (auto-merge)",
       "matchManagers": ["github-actions"],
-      "groupName": "github-actions",
-      "groupSlug": "github-actions"
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "github-actions-minor",
+      "groupSlug": "github-actions-minor",
+      "automerge": true
+    },
+    {
+      "description": "GitHub Actions major updates (manual review)",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["major"],
+      "groupName": "github-actions-major",
+      "groupSlug": "github-actions-major",
+      "automerge": false
     }
   ]
 }
