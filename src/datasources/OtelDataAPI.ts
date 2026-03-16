@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+import { createRequire } from 'node:module';
 import type { components } from '@stuartshay/otel-data-types';
 import { config } from '../config.js';
 
@@ -22,6 +24,8 @@ interface FetchParams {
   cacheTtlMs?: number;
   /** Non-2xx statuses to handle as structured responses instead of throwing. */
   acceptStatusCodes?: number[];
+  /** Extra HTTP headers to include in the request. */
+  headers?: Record<string, string>;
 }
 
 interface CacheEntry<T> {
@@ -91,6 +95,7 @@ export class OtelDataAPI {
     method = 'GET',
     cacheTtlMs,
     acceptStatusCodes,
+    headers,
   }: FetchParams): Promise<T> {
     const url = this.buildUrl(path, query);
     const urlString = url.toString();
@@ -116,6 +121,7 @@ export class OtelDataAPI {
       cacheKey,
       cacheTtlMs,
       acceptStatusCodes,
+      headers,
     });
 
     if (isCacheable) {
@@ -135,13 +141,14 @@ export class OtelDataAPI {
       cacheKey: string;
       cacheTtlMs?: number;
       acceptStatusCodes?: number[];
+      headers?: Record<string, string>;
     },
   ): Promise<T> {
-    const { method, cacheKey, cacheTtlMs, acceptStatusCodes } = options;
+    const { method, cacheKey, cacheTtlMs, acceptStatusCodes, headers: extraHeaders } = options;
     const response = await fetch(urlString, {
       method,
       signal: AbortSignal.timeout(30_000),
-      headers: { Accept: 'application/json' },
+      headers: { ...extraHeaders, Accept: 'application/json' },
     });
 
     if (!response.ok && !(acceptStatusCodes ?? []).includes(response.status)) {
@@ -269,11 +276,26 @@ export class OtelDataAPI {
       lookback?: number;
     }>,
   ): Promise<GarminSyncTriggerResult> {
+    const syncId = randomUUID();
+
+    // Add NR custom attributes for cross-service correlation
+    try {
+      const require = createRequire(import.meta.url);
+      const newrelic = require('newrelic') as typeof import('newrelic');
+      newrelic.addCustomAttributes({
+        'garmin.sync_id': syncId,
+        'garmin.flow': true,
+      });
+    } catch {
+      // NR agent not available — ignore
+    }
+
     const response = await this.fetch<GarminSyncUpstreamResponse>({
       path: '/api/v1/garmin/sync',
       method: 'POST',
       query: params,
       acceptStatusCodes: [400, 409],
+      headers: { 'X-Garmin-Sync-Id': syncId },
     });
 
     return {
