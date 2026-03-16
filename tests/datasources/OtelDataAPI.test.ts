@@ -166,6 +166,44 @@ describe('OtelDataAPI', () => {
     });
   });
 
+  it('forwards X-Garmin-Sync-Id header with a valid UUID on garmin sync', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ status: 'accepted', message: 'ok' }), {
+        status: 202,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.triggerGarminSync();
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const headers = options.headers as Record<string, string>;
+    expect(headers['X-Garmin-Sync-Id']).toBeDefined();
+    expect(headers['X-Garmin-Sync-Id']).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+    );
+  });
+
+  it('generates a unique sync_id for each garmin sync call', async () => {
+    fetchMock.mockImplementation(() => jsonResponse({ status: 'accepted', message: 'ok' }));
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.triggerGarminSync();
+    await api.triggerGarminSync();
+
+    const firstHeaders = (fetchMock.mock.calls[0] as [string, RequestInit])[1].headers as Record<
+      string,
+      string
+    >;
+    const secondHeaders = (fetchMock.mock.calls[1] as [string, RequestInit])[1].headers as Record<
+      string,
+      string
+    >;
+
+    expect(firstHeaders['X-Garmin-Sync-Id']).not.toBe(secondHeaders['X-Garmin-Sync-Id']);
+  });
+
   it('routes every gateway method to the expected endpoint', async () => {
     const api = new OtelDataAPI('https://example.test');
 

@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { createRequire } from 'node:module';
 import type { components } from '@stuartshay/otel-data-types';
 import { config } from '../config.js';
 
@@ -147,7 +148,7 @@ export class OtelDataAPI {
     const response = await fetch(urlString, {
       method,
       signal: AbortSignal.timeout(30_000),
-      headers: { Accept: 'application/json', ...extraHeaders },
+      headers: { ...extraHeaders, Accept: 'application/json' },
     });
 
     if (!response.ok && !(acceptStatusCodes ?? []).includes(response.status)) {
@@ -279,7 +280,7 @@ export class OtelDataAPI {
 
     // Add NR custom attributes for cross-service correlation
     try {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      const require = createRequire(import.meta.url);
       const newrelic = require('newrelic') as typeof import('newrelic');
       newrelic.addCustomAttributes({
         'garmin.sync_id': syncId,
