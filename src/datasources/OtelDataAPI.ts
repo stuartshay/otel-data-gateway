@@ -394,7 +394,7 @@ export class OtelDataAPI {
     }>({ path: '/api/v1/geocoding/status', cacheTtlMs: 15_000 });
   }
 
-  async triggerGeocoding(params: Nullable<{ batch_size?: number; retry_failed?: boolean }>) {
+  async triggerGeocoding(params?: Nullable<{ batch_size?: number; retry_failed?: boolean }>) {
     const query: Record<string, string | number | undefined | null> = {};
     if (params?.batch_size != null) query.batch_size = params.batch_size;
     if (params?.retry_failed != null) query.retry_failed = String(params.retry_failed);

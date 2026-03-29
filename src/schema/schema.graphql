@@ -1261,7 +1261,7 @@ type Mutation {
     """
     batch_size: Int
     """
-    Re-process records with status no_coverage
+    Re-process previously failed location records (for example, those with status `no_coverage`)
     """
     retry_failed: Boolean
   ): GeocodingTriggerResult!

@@ -204,6 +204,58 @@ describe('OtelDataAPI', () => {
     expect(firstHeaders['X-Garmin-Sync-Id']).not.toBe(secondHeaders['X-Garmin-Sync-Id']);
   });
 
+  it('posts geocoding trigger with batch_size and retry_failed params', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ processed: 50, remaining: 25, skipped_dedup: 5 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    const response = await api.triggerGeocoding({ batch_size: 50, retry_failed: true });
+
+    expect(response).toEqual({ processed: 50, remaining: 25, skipped_dedup: 5 });
+
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://example.test/api/v1/geocoding/trigger?batch_size=50&retry_failed=true',
+    );
+    expect(options.method).toBe('POST');
+  });
+
+  it('calls triggerGeocoding without params when invoked with no args', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ processed: 100, remaining: 0, skipped_dedup: 10 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.triggerGeocoding();
+
+    const [url] = fetchMock.mock.calls[0] as [string];
+    expect(url).toBe('https://example.test/api/v1/geocoding/trigger');
+  });
+
+  it('caches getGeocodingStatus within TTL', async () => {
+    fetchMock.mockImplementation(() =>
+      jsonResponse({ total_locations: 100, geocoded: 50, coverage_percent: 50.0 }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
+
+    nowSpy.mockReturnValue(0);
+    await api.getGeocodingStatus();
+    await api.getGeocodingStatus();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(16_000);
+    await api.getGeocodingStatus();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('routes every gateway method to the expected endpoint', async () => {
     const api = new OtelDataAPI('https://example.test');
 
@@ -226,6 +278,8 @@ describe('OtelDataAPI', () => {
     await api.getNearbyPoints({ lat: 1, lon: 2, radius_meters: 50, limit: 1, source: 'gps' });
     await api.getDistance({ from_lat: 1, from_lon: 2, to_lat: 3, to_lon: 4 });
     await api.getWithinReference('Home', { source: 'gps', limit: 2 });
+    await api.getGeocodingStatus();
+    await api.triggerGeocoding({ batch_size: 100 });
 
     const paths = fetchMock.mock.calls.map(([url]) => new URL(url as string).pathname);
 
@@ -249,6 +303,8 @@ describe('OtelDataAPI', () => {
       '/api/v1/spatial/nearby',
       '/api/v1/spatial/distance',
       '/api/v1/spatial/within-reference/Home',
+      '/api/v1/geocoding/status',
+      '/api/v1/geocoding/trigger',
     ]);
   });
 
