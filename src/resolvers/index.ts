@@ -4,6 +4,7 @@ import { garminResolvers } from './garmin.js';
 import { gpsResolvers } from './gps.js';
 import { referenceResolvers } from './reference.js';
 import { spatialResolvers } from './spatial.js';
+import { geocodingResolvers } from './geocoding.js';
 
 // Merge all resolver Query fields into a single resolvers object
 const resolvers = {
@@ -14,9 +15,11 @@ const resolvers = {
     ...gpsResolvers.Query,
     ...referenceResolvers.Query,
     ...spatialResolvers.Query,
+    ...geocodingResolvers.Query,
   },
   Mutation: {
     ...garminResolvers.Mutation,
+    ...geocodingResolvers.Mutation,
   },
 };
 

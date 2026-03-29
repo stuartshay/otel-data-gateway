@@ -229,6 +229,63 @@ export interface GarminTrackPointConnection {
   total: Scalars['Int']['output'];
 }
 
+/** Reverse-geocoded address components from Pelias. */
+export interface GeocodedAddress {
+  __typename?: 'GeocodedAddress';
+  /** Pelias confidence score (0-1) */
+  confidence?: Maybe<Scalars['Float']['output']>;
+  /** Country name */
+  country?: Maybe<Scalars['String']['output']>;
+  /** Full formatted address label from Pelias */
+  display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number */
+  housenumber?: Maybe<Scalars['String']['output']>;
+  /** City or town */
+  locality?: Maybe<Scalars['String']['output']>;
+  /** Neighbourhood name */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code */
+  postalcode?: Maybe<Scalars['String']['output']>;
+  /** State or province */
+  region?: Maybe<Scalars['String']['output']>;
+  /** Geocoding status: success, no_coverage, error, pending */
+  status: Scalars['String']['output'];
+  /** Street name */
+  street?: Maybe<Scalars['String']['output']>;
+}
+
+/** Coverage statistics for geocoded location records. */
+export interface GeocodingStatus {
+  __typename?: 'GeocodingStatus';
+  /** Percentage of locations with a geocoded address */
+  coverage_percent: Scalars['Float']['output'];
+  /** Number of locations that failed geocoding */
+  errors: Scalars['Int']['output'];
+  /** Number of locations with a geocoded address (any status) */
+  geocoded: Scalars['Int']['output'];
+  /** Number of locations outside Pelias coverage area */
+  no_coverage: Scalars['Int']['output'];
+  /** Number of locations awaiting geocoding */
+  pending: Scalars['Int']['output'];
+  /** Number of successfully geocoded locations */
+  success: Scalars['Int']['output'];
+  /** Total number of OwnTracks location records */
+  total_locations: Scalars['Int']['output'];
+}
+
+/** Result of triggering a batch geocoding operation. */
+export interface GeocodingTriggerResult {
+  __typename?: 'GeocodingTriggerResult';
+  /** Number of records processed in this batch */
+  processed: Scalars['Int']['output'];
+  /** Number of records still awaiting geocoding */
+  remaining: Scalars['Int']['output'];
+  /** Number of records skipped via proximity deduplication */
+  skipped_dedup: Scalars['Int']['output'];
+}
+
 /** Service health status. */
 export interface HealthStatus {
   __typename?: 'HealthStatus';
@@ -255,6 +312,8 @@ export interface Location {
   created_at?: Maybe<Scalars['String']['output']>;
   /** OwnTracks device identifier (e.g. iphone_stuart) */
   device_id: Scalars['String']['output'];
+  /** Short formatted address from reverse geocoding */
+  display_address?: Maybe<Scalars['String']['output']>;
   /** Unique location record identifier */
   id: Scalars['Int']['output'];
   /** GPS latitude in decimal degrees (WGS 84) */
@@ -300,6 +359,8 @@ export interface LocationDetail {
   __typename?: 'LocationDetail';
   /** Horizontal accuracy of the GPS fix in meters */
   accuracy?: Maybe<Scalars['Float']['output']>;
+  /** Full reverse-geocoded address components from Pelias */
+  address?: Maybe<GeocodedAddress>;
   /** Altitude above sea level in meters */
   altitude?: Maybe<Scalars['Float']['output']>;
   /** Device battery level as a percentage (0-100) */
@@ -334,11 +395,18 @@ export interface Mutation {
   __typename?: 'Mutation';
   /** Trigger an on-demand Garmin sync in the upstream API. */
   triggerGarminSync: GarminSyncTriggerResult;
+  /** Trigger batch reverse-geocoding of un-geocoded location records. */
+  triggerGeocoding: GeocodingTriggerResult;
 }
 
 export interface MutationTriggerGarminSyncArgs {
   lookback?: InputMaybe<Scalars['Int']['input']>;
   window_hours?: InputMaybe<Scalars['Int']['input']>;
+}
+
+export interface MutationTriggerGeocodingArgs {
+  batch_size?: InputMaybe<Scalars['Int']['input']>;
+  retry_failed?: InputMaybe<Scalars['Boolean']['input']>;
 }
 
 /** GPS point found within a spatial proximity search. */
@@ -387,6 +455,8 @@ export interface Query {
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
   garminTrackPoints: GarminTrackPointConnection;
+  /** Get geocoding coverage statistics. */
+  geocodingStatus: GeocodingStatus;
   /** Get service health status. */
   health: HealthStatus;
   /** Retrieve a single location by its ID, including raw payload. */
