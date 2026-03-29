@@ -122,6 +122,10 @@ type Location {
   UTC timestamp when the record was inserted into the database
   """
   created_at: String
+  """
+  Short formatted address from reverse geocoding
+  """
+  display_address: String
 }
 
 """
@@ -188,9 +192,118 @@ type LocationDetail {
   Original OwnTracks JSON payload as received from the MQTT broker
   """
   raw_payload: JSON
+  """
+  Full reverse-geocoded address components from Pelias
+  """
+  address: GeocodedAddress
 }
 
 scalar JSON
+
+# -------------------------------------------------------
+# Geocoding
+# -------------------------------------------------------
+"""
+Reverse-geocoded address components from Pelias.
+"""
+type GeocodedAddress {
+  """
+  Full formatted address label from Pelias
+  """
+  display_address: String
+  """
+  Street name
+  """
+  street: String
+  """
+  House or building number
+  """
+  housenumber: String
+  """
+  Neighbourhood name
+  """
+  neighbourhood: String
+  """
+  City or town
+  """
+  locality: String
+  """
+  State or province
+  """
+  region: String
+  """
+  Country name
+  """
+  country: String
+  """
+  Postal or ZIP code
+  """
+  postalcode: String
+  """
+  Pelias confidence score (0-1)
+  """
+  confidence: Float
+  """
+  Geocoding status: success, no_coverage, error, pending
+  """
+  status: String!
+  """
+  UTC timestamp when geocoding was performed
+  """
+  geocoded_at: String
+}
+
+"""
+Coverage statistics for geocoded location records.
+"""
+type GeocodingStatus {
+  """
+  Total number of OwnTracks location records
+  """
+  total_locations: Int!
+  """
+  Number of locations with a geocoded address (any status)
+  """
+  geocoded: Int!
+  """
+  Number of successfully geocoded locations
+  """
+  success: Int!
+  """
+  Number of locations awaiting geocoding
+  """
+  pending: Int!
+  """
+  Number of locations outside Pelias coverage area
+  """
+  no_coverage: Int!
+  """
+  Number of locations that failed geocoding
+  """
+  errors: Int!
+  """
+  Percentage of locations with a geocoded address
+  """
+  coverage_percent: Float!
+}
+
+"""
+Result of triggering a batch geocoding operation.
+"""
+type GeocodingTriggerResult {
+  """
+  Number of records processed in this batch
+  """
+  processed: Int!
+  """
+  Number of records still awaiting geocoding
+  """
+  remaining: Int!
+  """
+  Number of records skipped via proximity deduplication
+  """
+  skipped_dedup: Int!
+}
 
 """
 Paginated list of OwnTracks location records.
@@ -1113,6 +1226,12 @@ type Query {
     """
     limit: Int
   ): WithinReferenceResult!
+
+  # Geocoding
+  """
+  Get geocoding coverage statistics.
+  """
+  geocodingStatus: GeocodingStatus!
 }
 
 # -------------------------------------------------------
@@ -1132,4 +1251,18 @@ type Mutation {
     """
     lookback: Int
   ): GarminSyncTriggerResult!
+
+  """
+  Trigger batch reverse-geocoding of un-geocoded location records.
+  """
+  triggerGeocoding(
+    """
+    Number of locations to geocode in this batch (default 100)
+    """
+    batch_size: Int
+    """
+    Re-process previously failed location records (for example, those with status `no_coverage`)
+    """
+    retry_failed: Boolean
+  ): GeocodingTriggerResult!
 }

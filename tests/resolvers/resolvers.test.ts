@@ -1,6 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { config } from '../../src/config.js';
 import { garminResolvers } from '../../src/resolvers/garmin.js';
+import { geocodingResolvers } from '../../src/resolvers/geocoding.js';
 import { gpsResolvers } from '../../src/resolvers/gps.js';
 import { healthResolvers } from '../../src/resolvers/health.js';
 import resolvers from '../../src/resolvers/index.js';
@@ -253,6 +254,37 @@ describe('spatial resolvers', () => {
   });
 });
 
+describe('geocoding resolvers', () => {
+  it('delegates geocodingStatus query to data source', async () => {
+    const result = {
+      total_locations: 100,
+      geocoded: 50,
+      success: 45,
+      pending: 50,
+      no_coverage: 3,
+      errors: 2,
+      coverage_percent: 50.0,
+    };
+    const ctx = contextWith({ getGeocodingStatus: mockAsync(result) });
+
+    const response = await runResolver(geocodingResolvers.Query.geocodingStatus, {}, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGeocodingStatus).toHaveBeenCalled();
+    expect(response).toEqual(result);
+  });
+
+  it('delegates triggerGeocoding mutation with args', async () => {
+    const args = { batch_size: 50, retry_failed: true };
+    const result = { processed: 50, remaining: 25, skipped_dedup: 5 };
+    const ctx = contextWith({ triggerGeocoding: mockAsync(result) });
+
+    const response = await runResolver(geocodingResolvers.Mutation.triggerGeocoding, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.triggerGeocoding).toHaveBeenCalledWith(args);
+    expect(response).toEqual(result);
+  });
+});
+
 describe('resolver index', () => {
   it('merges all resolver query fields', () => {
     const keys = Object.keys(resolvers.Query);
@@ -277,12 +309,13 @@ describe('resolver index', () => {
         'nearbyPoints',
         'calculateDistance',
         'withinReference',
+        'geocodingStatus',
       ]),
     );
   });
 
   it('merges mutation resolver fields', () => {
     const keys = Object.keys(resolvers.Mutation);
-    expect(keys).toEqual(expect.arrayContaining(['triggerGarminSync']));
+    expect(keys).toEqual(expect.arrayContaining(['triggerGarminSync', 'triggerGeocoding']));
   });
 });

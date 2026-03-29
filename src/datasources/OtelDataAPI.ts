@@ -379,4 +379,29 @@ export class OtelDataAPI {
       query: params,
     });
   }
+
+  // ── Geocoding ───────────────────────────────────────
+
+  async getGeocodingStatus() {
+    return this.fetch<{
+      total_locations: number;
+      geocoded: number;
+      success: number;
+      pending: number;
+      no_coverage: number;
+      errors: number;
+      coverage_percent: number;
+    }>({ path: '/api/v1/geocoding/status', cacheTtlMs: 15_000 });
+  }
+
+  async triggerGeocoding(params?: Nullable<{ batch_size?: number; retry_failed?: boolean }>) {
+    const query: Record<string, string | number | undefined | null> = {};
+    if (params?.batch_size != null) query.batch_size = params.batch_size;
+    if (params?.retry_failed != null) query.retry_failed = String(params.retry_failed);
+    return this.fetch<{
+      processed: number;
+      remaining: number;
+      skipped_dedup: number;
+    }>({ path: '/api/v1/geocoding/trigger', method: 'POST', query });
+  }
 }
