@@ -394,7 +394,10 @@ export class OtelDataAPI {
     }>({ path: '/api/v1/geocoding/status', cacheTtlMs: 15_000 });
   }
 
-  async triggerGeocoding(params?: Nullable<{ batch_size?: number; retry_failed?: boolean }>) {
+  async triggerGeocoding(
+    params?: Nullable<{ batch_size?: number; retry_failed?: boolean }>,
+    token?: string,
+  ) {
     const query: Record<string, string | number | undefined | null> = {};
     if (params?.batch_size != null) query.batch_size = params.batch_size;
     if (params?.retry_failed != null) query.retry_failed = String(params.retry_failed);
@@ -402,6 +405,11 @@ export class OtelDataAPI {
       processed: number;
       remaining: number;
       skipped_dedup: number;
-    }>({ path: '/api/v1/geocoding/trigger', method: 'POST', query });
+    }>({
+      path: '/api/v1/geocoding/trigger',
+      method: 'POST',
+      query,
+      ...(token ? { headers: { Authorization: token } } : {}),
+    });
   }
 }

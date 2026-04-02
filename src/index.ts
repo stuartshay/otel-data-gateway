@@ -46,10 +46,11 @@ app.use(
   cors<cors.CorsRequest>(),
   express.json(),
   expressMiddleware(server, {
-    context: async (): Promise<GatewayContext> => ({
+    context: async ({ req }): Promise<GatewayContext> => ({
       dataSources: {
         otelAPI: new OtelDataAPI(),
       },
+      token: req.headers.authorization,
     }),
   }),
 );

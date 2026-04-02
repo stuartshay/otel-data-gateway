@@ -11,8 +11,8 @@ export const geocodingResolvers: {
   },
 
   Mutation: {
-    triggerGeocoding: async (_parent, args, { dataSources }) => {
-      return dataSources.otelAPI.triggerGeocoding(args);
+    triggerGeocoding: async (_parent, args, { dataSources, token }) => {
+      return dataSources.otelAPI.triggerGeocoding(args, token);
     },
   },
 };

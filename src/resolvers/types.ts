@@ -4,4 +4,5 @@ export interface GatewayContext {
   dataSources: {
     otelAPI: OtelDataAPI;
   };
+  token?: string;
 }
