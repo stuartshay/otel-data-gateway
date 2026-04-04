@@ -26,6 +26,8 @@ interface FetchParams {
   acceptStatusCodes?: number[];
   /** Extra HTTP headers to include in the request. */
   headers?: Record<string, string>;
+  /** Abort timeout in milliseconds (default: 30 000). */
+  timeoutMs?: number;
 }
 
 interface CacheEntry<T> {
@@ -96,6 +98,7 @@ export class OtelDataAPI {
     cacheTtlMs,
     acceptStatusCodes,
     headers,
+    timeoutMs,
   }: FetchParams): Promise<T> {
     const url = this.buildUrl(path, query);
     const urlString = url.toString();
@@ -122,6 +125,7 @@ export class OtelDataAPI {
       cacheTtlMs,
       acceptStatusCodes,
       headers,
+      timeoutMs,
     });
 
     if (isCacheable) {
@@ -142,12 +146,20 @@ export class OtelDataAPI {
       cacheTtlMs?: number;
       acceptStatusCodes?: number[];
       headers?: Record<string, string>;
+      timeoutMs?: number;
     },
   ): Promise<T> {
-    const { method, cacheKey, cacheTtlMs, acceptStatusCodes, headers: extraHeaders } = options;
+    const {
+      method,
+      cacheKey,
+      cacheTtlMs,
+      acceptStatusCodes,
+      headers: extraHeaders,
+      timeoutMs,
+    } = options;
     const response = await fetch(urlString, {
       method,
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(timeoutMs ?? 30_000),
       headers: { ...extraHeaders, Accept: 'application/json' },
     });
 
@@ -409,6 +421,7 @@ export class OtelDataAPI {
       path: '/api/v1/geocoding/trigger',
       method: 'POST',
       query,
+      timeoutMs: 120_000,
       ...(token ? { headers: { Authorization: token } } : {}),
     });
   }
