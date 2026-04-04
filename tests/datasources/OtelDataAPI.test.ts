@@ -75,6 +75,25 @@ describe('OtelDataAPI', () => {
     expect(parsed.searchParams.get('limit')).toBe('5');
   });
 
+  it('serializes boolean query params for unified GPS filters', async () => {
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.getUnifiedGps({
+      source: 'gps',
+      limit: 100,
+      exclude_stationary: true,
+      deduplicate: true,
+    });
+
+    const [url] = fetchMock.mock.calls[0] as [string];
+    const parsed = new URL(url);
+
+    expect(parsed.pathname).toBe('/api/v1/gps/unified');
+    expect(parsed.searchParams.get('source')).toBe('gps');
+    expect(parsed.searchParams.get('exclude_stationary')).toBe('true');
+    expect(parsed.searchParams.get('deduplicate')).toBe('true');
+  });
+
   it('throws informative errors when REST API responds with failure', async () => {
     fetchMock.mockResolvedValueOnce(
       new Response('backend failed', {
