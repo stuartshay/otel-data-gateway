@@ -195,6 +195,22 @@ describe('gps resolvers', () => {
     expect(ctx.dataSources.otelAPI.getUnifiedGps).toHaveBeenCalledWith({ limit: 2, source: 'gps' });
     expect(ctx.dataSources.otelAPI.getDailySummary).toHaveBeenCalledWith({ limit: 1 });
   });
+
+  it('forwards exclude_stationary and deduplicate args to data source', async () => {
+    const ctx = contextWith({
+      getUnifiedGps: mockAsync({ items: [], total: 0, limit: 100, offset: 0 }),
+    });
+    const args = {
+      limit: 100,
+      source: 'gps',
+      exclude_stationary: true,
+      deduplicate: true,
+    };
+
+    await runResolver(gpsResolvers.Query.unifiedGps, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.getUnifiedGps).toHaveBeenCalledWith(args);
+  });
 });
 
 describe('reference resolvers', () => {
