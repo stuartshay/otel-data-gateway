@@ -553,6 +553,8 @@ export interface QueryReferenceLocationArgs {
 export interface QueryUnifiedGpsArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
   date_to?: InputMaybe<Scalars['String']['input']>;
+  deduplicate?: InputMaybe<Scalars['Boolean']['input']>;
+  exclude_stationary?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<SortOrder>;

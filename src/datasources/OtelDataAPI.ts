@@ -18,7 +18,7 @@ type GarminSyncUpstreamResponse = Schemas['GarminSyncResponse'] & {
 
 interface FetchParams {
   path: string;
-  query?: Record<string, string | number | undefined | null>;
+  query?: Record<string, string | number | boolean | undefined | null>;
   method?: 'GET' | 'POST';
   /** TTL in milliseconds. When set, responses are cached and deduplicated. */
   cacheTtlMs?: number;
@@ -79,7 +79,10 @@ export class OtelDataAPI {
     this.baseUrl = baseUrl ?? config.otelDataApiUrl;
   }
 
-  private buildUrl(path: string, query?: Record<string, string | number | undefined | null>): URL {
+  private buildUrl(
+    path: string,
+    query?: Record<string, string | number | boolean | undefined | null>,
+  ): URL {
     const url = new URL(path, this.baseUrl);
     if (query) {
       for (const [key, value] of Object.entries(query)) {
@@ -326,6 +329,8 @@ export class OtelDataAPI {
       limit?: number;
       offset?: number;
       order?: string;
+      exclude_stationary?: boolean;
+      deduplicate?: boolean;
     }>,
   ) {
     return this.fetch<Schemas['PaginatedResponse_UnifiedGpsPoint_']>({

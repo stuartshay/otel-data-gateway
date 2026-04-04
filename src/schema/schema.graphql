@@ -1125,6 +1125,14 @@ type Query {
     Sort direction
     """
     order: SortOrder
+    """
+    Exclude stationary points where speed is zero
+    """
+    exclude_stationary: Boolean
+    """
+    Remove points with duplicate coordinates (rounded to ~11m precision)
+    """
+    deduplicate: Boolean
   ): UnifiedGpsConnection!
 
   """
