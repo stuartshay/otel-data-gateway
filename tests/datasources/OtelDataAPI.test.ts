@@ -239,6 +239,36 @@ describe('OtelDataAPI', () => {
     expect(url).toBe('https://example.test/api/v1/geocoding/trigger');
   });
 
+  it('forwards Authorization header when token is provided to triggerGeocoding', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ processed: 10, remaining: 90, skipped_dedup: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.triggerGeocoding({ batch_size: 25 }, 'Bearer my-jwt-token');
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(options.headers).toMatchObject({ Authorization: 'Bearer my-jwt-token' });
+  });
+
+  it('does not include Authorization header when no token is provided', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(JSON.stringify({ processed: 10, remaining: 90, skipped_dedup: 0 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.triggerGeocoding({ batch_size: 25 });
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(options.headers).not.toHaveProperty('Authorization');
+  });
+
   it('caches getGeocodingStatus within TTL', async () => {
     fetchMock.mockImplementation(() =>
       jsonResponse({ total_locations: 100, geocoded: 50, coverage_percent: 50.0 }),

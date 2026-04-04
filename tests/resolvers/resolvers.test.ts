@@ -277,10 +277,14 @@ describe('geocoding resolvers', () => {
     const args = { batch_size: 50, retry_failed: true };
     const result = { processed: 50, remaining: 25, skipped_dedup: 5 };
     const ctx = contextWith({ triggerGeocoding: mockAsync(result) });
+    ctx.token = 'Bearer test-token';
 
     const response = await runResolver(geocodingResolvers.Mutation.triggerGeocoding, args, ctx);
 
-    expect(ctx.dataSources.otelAPI.triggerGeocoding).toHaveBeenCalledWith(args);
+    expect(ctx.dataSources.otelAPI.triggerGeocoding).toHaveBeenCalledWith(
+      args,
+      'Bearer test-token',
+    );
     expect(response).toEqual(result);
   });
 });
