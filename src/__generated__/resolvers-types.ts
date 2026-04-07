@@ -357,9 +357,9 @@ export type LocationCount = {
 export type LocationDateRange = {
   __typename?: 'LocationDateRange';
   /** Latest location timestamp (ISO 8601) */
-  max_date: Scalars['String']['output'];
+  max_date: Scalars['DateTime']['output'];
   /** Earliest location timestamp (ISO 8601) */
-  min_date: Scalars['String']['output'];
+  min_date: Scalars['DateTime']['output'];
 };
 
 /** Full location detail including the original OwnTracks JSON payload. */
@@ -1025,8 +1025,8 @@ export type LocationCountResolvers<ContextType = GatewayContext, ParentType exte
 }>;
 
 export type LocationDateRangeResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['LocationDateRange'] = ResolversParentTypes['LocationDateRange']> = ResolversObject<{
-  max_date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  min_date?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  max_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  min_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 }>;
 
 export type LocationDetailResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['LocationDetail'] = ResolversParentTypes['LocationDetail']> = ResolversObject<{

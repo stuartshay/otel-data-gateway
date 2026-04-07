@@ -358,9 +358,9 @@ export interface LocationCount {
 export interface LocationDateRange {
   __typename?: 'LocationDateRange';
   /** Latest location timestamp (ISO 8601) */
-  max_date: Scalars['String']['output'];
+  max_date: Scalars['DateTime']['output'];
   /** Earliest location timestamp (ISO 8601) */
-  min_date: Scalars['String']['output'];
+  min_date: Scalars['DateTime']['output'];
 }
 
 /** Full location detail including the original OwnTracks JSON payload. */

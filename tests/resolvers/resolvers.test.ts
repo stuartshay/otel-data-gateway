@@ -111,6 +111,7 @@ describe('location resolvers', () => {
     const dateRange = await runResolver(locationResolvers.Query.locationDateRange, {}, ctx);
 
     expect(ctx.dataSources.otelAPI.getLocation).toHaveBeenCalledWith(10);
+    expect(ctx.dataSources.otelAPI.getLocationDateRange).toHaveBeenCalled();
     expect(location).toEqual({ id: 10 });
     expect(devices).toEqual([{ device_id: 'iphone' }]);
     expect(count).toEqual({ total: 4 });
