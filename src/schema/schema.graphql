@@ -355,6 +355,20 @@ type LocationCount {
   device_id: String
 }
 
+"""
+Earliest and latest timestamps in the locations table.
+"""
+type LocationDateRange {
+  """
+  Earliest location timestamp (ISO 8601)
+  """
+  min_date: DateTime!
+  """
+  Latest location timestamp (ISO 8601)
+  """
+  max_date: DateTime!
+}
+
 # -------------------------------------------------------
 # Garmin
 # -------------------------------------------------------
@@ -1005,6 +1019,11 @@ type Query {
     """
     device_id: String
   ): LocationCount!
+
+  """
+  Get the earliest and latest location timestamps.
+  """
+  locationDateRange: LocationDateRange!
 
   # Garmin
   """

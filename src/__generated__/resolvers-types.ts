@@ -353,6 +353,15 @@ export type LocationCount = {
   device_id?: Maybe<Scalars['String']['output']>;
 };
 
+/** Earliest and latest timestamps in the locations table. */
+export type LocationDateRange = {
+  __typename?: 'LocationDateRange';
+  /** Latest location timestamp (ISO 8601) */
+  max_date: Scalars['DateTime']['output'];
+  /** Earliest location timestamp (ISO 8601) */
+  min_date: Scalars['DateTime']['output'];
+};
+
 /** Full location detail including the original OwnTracks JSON payload. */
 export type LocationDetail = {
   __typename?: 'LocationDetail';
@@ -464,6 +473,8 @@ export type Query = {
   location?: Maybe<LocationDetail>;
   /** Get aggregate count of location records with optional filters. */
   locationCount: LocationCount;
+  /** Get the earliest and latest location timestamps. */
+  locationDateRange: LocationDateRange;
   /** Retrieve a paginated list of OwnTracks location records. */
   locations: LocationConnection;
   /** Find GPS points within a radius of a geographic coordinate. */
@@ -776,6 +787,7 @@ export type ResolversTypes = ResolversObject<{
   Location: ResolverTypeWrapper<Location>;
   LocationConnection: ResolverTypeWrapper<LocationConnection>;
   LocationCount: ResolverTypeWrapper<LocationCount>;
+  LocationDateRange: ResolverTypeWrapper<LocationDateRange>;
   LocationDetail: ResolverTypeWrapper<LocationDetail>;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   NearbyPoint: ResolverTypeWrapper<NearbyPoint>;
@@ -814,6 +826,7 @@ export type ResolversParentTypes = ResolversObject<{
   Location: Location;
   LocationConnection: LocationConnection;
   LocationCount: LocationCount;
+  LocationDateRange: LocationDateRange;
   LocationDetail: LocationDetail;
   Mutation: Record<PropertyKey, never>;
   NearbyPoint: NearbyPoint;
@@ -1011,6 +1024,11 @@ export type LocationCountResolvers<ContextType = GatewayContext, ParentType exte
   device_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
+export type LocationDateRangeResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['LocationDateRange'] = ResolversParentTypes['LocationDateRange']> = ResolversObject<{
+  max_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  min_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+}>;
+
 export type LocationDetailResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['LocationDetail'] = ResolversParentTypes['LocationDetail']> = ResolversObject<{
   accuracy?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   address?: Resolver<Maybe<ResolversTypes['GeocodedAddress']>, ParentType, ContextType>;
@@ -1063,6 +1081,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   health?: Resolver<ResolversTypes['HealthStatus'], ParentType, ContextType>;
   location?: Resolver<Maybe<ResolversTypes['LocationDetail']>, ParentType, ContextType, RequireFields<QueryLocationArgs, 'id'>>;
   locationCount?: Resolver<ResolversTypes['LocationCount'], ParentType, ContextType, Partial<QueryLocationCountArgs>>;
+  locationDateRange?: Resolver<ResolversTypes['LocationDateRange'], ParentType, ContextType>;
   locations?: Resolver<ResolversTypes['LocationConnection'], ParentType, ContextType, Partial<QueryLocationsArgs>>;
   nearbyPoints?: Resolver<Array<ResolversTypes['NearbyPoint']>, ParentType, ContextType, RequireFields<QueryNearbyPointsArgs, 'lat' | 'lon'>>;
   ready?: Resolver<ResolversTypes['ReadyStatus'], ParentType, ContextType>;
@@ -1140,6 +1159,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   Location?: LocationResolvers<ContextType>;
   LocationConnection?: LocationConnectionResolvers<ContextType>;
   LocationCount?: LocationCountResolvers<ContextType>;
+  LocationDateRange?: LocationDateRangeResolvers<ContextType>;
   LocationDetail?: LocationDetailResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   NearbyPoint?: NearbyPointResolvers<ContextType>;

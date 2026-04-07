@@ -354,6 +354,15 @@ export interface LocationCount {
   device_id?: Maybe<Scalars['String']['output']>;
 }
 
+/** Earliest and latest timestamps in the locations table. */
+export interface LocationDateRange {
+  __typename?: 'LocationDateRange';
+  /** Latest location timestamp (ISO 8601) */
+  max_date: Scalars['DateTime']['output'];
+  /** Earliest location timestamp (ISO 8601) */
+  min_date: Scalars['DateTime']['output'];
+}
+
 /** Full location detail including the original OwnTracks JSON payload. */
 export interface LocationDetail {
   __typename?: 'LocationDetail';
@@ -463,6 +472,8 @@ export interface Query {
   location?: Maybe<LocationDetail>;
   /** Get aggregate count of location records with optional filters. */
   locationCount: LocationCount;
+  /** Get the earliest and latest location timestamps. */
+  locationDateRange: LocationDateRange;
   /** Retrieve a paginated list of OwnTracks location records. */
   locations: LocationConnection;
   /** Find GPS points within a radius of a geographic coordinate. */
