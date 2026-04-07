@@ -90,11 +90,15 @@ describe('location resolvers', () => {
     expect(response).toBe(result);
   });
 
-  it('delegates detail, devices, and count queries', async () => {
+  it('delegates detail, devices, count, and date-range queries', async () => {
     const ctx = contextWith({
       getLocation: mockAsync({ id: 10 }),
       getDevices: mockAsync([{ device_id: 'iphone' }]),
       getLocationCount: mockAsync({ total: 4 }),
+      getLocationDateRange: mockAsync({
+        min_date: '2025-12-27T00:00:00Z',
+        max_date: '2026-01-15T00:00:00Z',
+      }),
     });
 
     const location = await runResolver(locationResolvers.Query.location, { id: 10 }, ctx);
@@ -104,11 +108,16 @@ describe('location resolvers', () => {
       { device_id: 'iphone' },
       ctx,
     );
+    const dateRange = await runResolver(locationResolvers.Query.locationDateRange, {}, ctx);
 
     expect(ctx.dataSources.otelAPI.getLocation).toHaveBeenCalledWith(10);
     expect(location).toEqual({ id: 10 });
     expect(devices).toEqual([{ device_id: 'iphone' }]);
     expect(count).toEqual({ total: 4 });
+    expect(dateRange).toEqual({
+      min_date: '2025-12-27T00:00:00Z',
+      max_date: '2026-01-15T00:00:00Z',
+    });
   });
 });
 
@@ -317,6 +326,7 @@ describe('resolver index', () => {
         'location',
         'devices',
         'locationCount',
+        'locationDateRange',
         'garminActivities',
         'garminActivity',
         'garminTrackPoints',

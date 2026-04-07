@@ -228,6 +228,13 @@ export class OtelDataAPI {
     });
   }
 
+  async getLocationDateRange() {
+    return this.fetch<{ min_date: string; max_date: string }>({
+      path: '/api/v1/locations/date-range',
+      cacheTtlMs: 60_000,
+    });
+  }
+
   // ── Garmin ──────────────────────────────────────────
 
   async getGarminActivities(
