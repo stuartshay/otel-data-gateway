@@ -237,6 +237,13 @@ export class OtelDataAPI {
 
   // ── Garmin ──────────────────────────────────────────
 
+  async getGarminDateRange() {
+    return this.fetch<{ min_date: string; max_date: string }>({
+      path: '/api/v1/garmin/date-range',
+      cacheTtlMs: 60_000,
+    });
+  }
+
   async getGarminActivities(
     params?: Nullable<{
       sport?: string;

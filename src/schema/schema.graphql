@@ -509,6 +509,20 @@ type GarminActivityConnection {
 }
 
 """
+Earliest and latest timestamps in the Garmin activities table.
+"""
+type GarminDateRange {
+  """
+  Earliest Garmin activity timestamp (ISO 8601)
+  """
+  min_date: DateTime!
+  """
+  Latest Garmin activity timestamp (ISO 8601)
+  """
+  max_date: DateTime!
+}
+
+"""
 Individual GPS track point within a Garmin activity.
 """
 type GarminTrackPoint {
@@ -1026,6 +1040,11 @@ type Query {
   locationDateRange: LocationDateRange!
 
   # Garmin
+  """
+  Get the earliest and latest Garmin activity timestamps.
+  """
+  garminDateRange: GarminDateRange!
+
   """
   Retrieve a paginated list of Garmin activities.
   """

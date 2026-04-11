@@ -3,11 +3,20 @@ import type { MutationResolvers, QueryResolvers } from '../__generated__/resolve
 export const garminResolvers: {
   Query: Pick<
     QueryResolvers,
-    'garminActivities' | 'garminActivity' | 'garminTrackPoints' | 'garminSports' | 'garminChartData'
+    | 'garminDateRange'
+    | 'garminActivities'
+    | 'garminActivity'
+    | 'garminTrackPoints'
+    | 'garminSports'
+    | 'garminChartData'
   >;
   Mutation: Pick<MutationResolvers, 'triggerGarminSync'>;
 } = {
   Query: {
+    garminDateRange: async (_parent, _args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminDateRange();
+    },
+
     garminActivities: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminActivities(args);
     },

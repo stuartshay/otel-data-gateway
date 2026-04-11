@@ -166,6 +166,15 @@ export interface GarminChartPoint {
   timestamp: Scalars['DateTime']['output'];
 }
 
+/** Earliest and latest timestamps in the Garmin activities table. */
+export interface GarminDateRange {
+  __typename?: 'GarminDateRange';
+  /** Latest Garmin activity timestamp (ISO 8601) */
+  max_date: Scalars['DateTime']['output'];
+  /** Earliest Garmin activity timestamp (ISO 8601) */
+  min_date: Scalars['DateTime']['output'];
+}
+
 /** Result payload returned when triggering an on-demand Garmin sync. */
 export interface GarminSyncTriggerResult {
   __typename?: 'GarminSyncTriggerResult';
@@ -460,6 +469,8 @@ export interface Query {
   garminActivity?: Maybe<GarminActivity>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
+  /** Get the earliest and latest Garmin activity timestamps. */
+  garminDateRange: GarminDateRange;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */

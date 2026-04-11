@@ -165,6 +165,15 @@ export type GarminChartPoint = {
   timestamp: Scalars['DateTime']['output'];
 };
 
+/** Earliest and latest timestamps in the Garmin activities table. */
+export type GarminDateRange = {
+  __typename?: 'GarminDateRange';
+  /** Latest Garmin activity timestamp (ISO 8601) */
+  max_date: Scalars['DateTime']['output'];
+  /** Earliest Garmin activity timestamp (ISO 8601) */
+  min_date: Scalars['DateTime']['output'];
+};
+
 /** Result payload returned when triggering an on-demand Garmin sync. */
 export type GarminSyncTriggerResult = {
   __typename?: 'GarminSyncTriggerResult';
@@ -461,6 +470,8 @@ export type Query = {
   garminActivity?: Maybe<GarminActivity>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
+  /** Get the earliest and latest Garmin activity timestamps. */
+  garminDateRange: GarminDateRange;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
@@ -775,6 +786,7 @@ export type ResolversTypes = ResolversObject<{
   GarminActivity: ResolverTypeWrapper<GarminActivity>;
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
+  GarminDateRange: ResolverTypeWrapper<GarminDateRange>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
@@ -814,6 +826,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminActivity: GarminActivity;
   GarminActivityConnection: GarminActivityConnection;
   GarminChartPoint: GarminChartPoint;
+  GarminDateRange: GarminDateRange;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
@@ -919,6 +932,11 @@ export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType e
   speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+}>;
+
+export type GarminDateRangeResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminDateRange'] = ResolversParentTypes['GarminDateRange']> = ResolversObject<{
+  max_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  min_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 }>;
 
 export type GarminSyncTriggerResultResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSyncTriggerResult'] = ResolversParentTypes['GarminSyncTriggerResult']> = ResolversObject<{
@@ -1075,6 +1093,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminActivities?: Resolver<ResolversTypes['GarminActivityConnection'], ParentType, ContextType, Partial<QueryGarminActivitiesArgs>>;
   garminActivity?: Resolver<Maybe<ResolversTypes['GarminActivity']>, ParentType, ContextType, RequireFields<QueryGarminActivityArgs, 'activity_id'>>;
   garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
+  garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
   garminTrackPoints?: Resolver<ResolversTypes['GarminTrackPointConnection'], ParentType, ContextType, RequireFields<QueryGarminTrackPointsArgs, 'activity_id'>>;
   geocodingStatus?: Resolver<ResolversTypes['GeocodingStatus'], ParentType, ContextType>;
@@ -1148,6 +1167,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminActivity?: GarminActivityResolvers<ContextType>;
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
+  GarminDateRange?: GarminDateRangeResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;

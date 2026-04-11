@@ -327,6 +327,7 @@ describe('OtelDataAPI', () => {
     await api.getNearbyPoints({ lat: 1, lon: 2, radius_meters: 50, limit: 1, source: 'gps' });
     await api.getDistance({ from_lat: 1, from_lon: 2, to_lat: 3, to_lon: 4 });
     await api.getWithinReference('Home', { source: 'gps', limit: 2 });
+    await api.getGarminDateRange();
     await api.getGeocodingStatus();
     await api.triggerGeocoding({ batch_size: 100 });
 
@@ -352,6 +353,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/spatial/nearby',
       '/api/v1/spatial/distance',
       '/api/v1/spatial/within-reference/Home',
+      '/api/v1/garmin/date-range',
       '/api/v1/geocoding/status',
       '/api/v1/geocoding/trigger',
     ]);
@@ -436,6 +438,25 @@ describe('OtelDataAPI', () => {
 
     nowSpy.mockReturnValue(31_000);
     await api.getGarminChartData('ga-1');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
+  });
+
+  it('caches garminDateRange responses for 60s', async () => {
+    fetchMock.mockImplementation(() =>
+      jsonResponse({ min_date: '2020-01-01T00:00:00Z', max_date: '2026-04-01T00:00:00Z' }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
+
+    nowSpy.mockReturnValue(0);
+    await api.getGarminDateRange();
+    await api.getGarminDateRange();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(61_000);
+    await api.getGarminDateRange();
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
     nowSpy.mockRestore();
