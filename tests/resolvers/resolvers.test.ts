@@ -175,6 +175,16 @@ describe('garmin resolvers', () => {
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
   });
 
+  it('delegates garminDateRange to datasource', async () => {
+    const result = { min_date: '2020-01-01T00:00:00Z', max_date: '2026-04-01T00:00:00Z' };
+    const ctx = contextWith({ getGarminDateRange: mockAsync(result) });
+
+    const response = await runResolver(garminResolvers.Query.garminDateRange, {}, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGarminDateRange).toHaveBeenCalled();
+    expect(response).toEqual(result);
+  });
+
   it('delegates triggerGarminSync mutation with passthrough args', async () => {
     const args = { window_hours: 48, lookback: null };
     const result = {
