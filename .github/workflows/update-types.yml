@@ -64,7 +64,7 @@ jobs:
           echo "Updated @stuartshay/otel-data-types to ${VERSION}"
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.GITOPS_PAT }}
           commit-message: 'chore: Update @stuartshay/otel-data-types to v${{ steps.version.outputs.version }}'
