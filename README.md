@@ -5,6 +5,7 @@
 [![Publish Types](https://github.com/stuartshay/otel-data-gateway/actions/workflows/publish-types.yml/badge.svg)](https://github.com/stuartshay/otel-data-gateway/actions/workflows/publish-types.yml)
 [![Docker Hub](https://img.shields.io/badge/Docker%20Hub-stuartshay%2Fotel--data--gateway-blue?logo=docker)](https://hub.docker.com/repository/docker/stuartshay/otel-data-gateway)
 [![npm](https://img.shields.io/npm/v/@stuartshay/otel-graphql-types?logo=npm&label=otel-graphql-types)](https://www.npmjs.com/package/@stuartshay/otel-graphql-types)
+[![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen?logo=renovatebot)](https://developer.mend.io/github/stuartshay/otel-data-gateway)
 [![Node](https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
