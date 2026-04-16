@@ -187,7 +187,10 @@ export class OtelDataAPI {
   }
 
   async getReady() {
-    return this.fetch<{ status: string; database?: string; version?: string }>({ path: '/ready' });
+    return this.fetch<{ status: string; database?: string; version?: string }>({
+      path: '/ready',
+      timeoutMs: 2_000,
+    });
   }
 
   // ── Locations ───────────────────────────────────────
