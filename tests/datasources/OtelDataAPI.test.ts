@@ -382,6 +382,34 @@ describe('OtelDataAPI', () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
+  it('passes a 2s abort signal to fetch when calling getReady', async () => {
+    const timeoutSpy = jest.spyOn(AbortSignal, 'timeout');
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.getReady();
+
+    expect(timeoutSpy).toHaveBeenCalledWith(2_000);
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(options.signal).toBeDefined();
+
+    timeoutSpy.mockRestore();
+  });
+
+  it('rejects when the ready endpoint times out', async () => {
+    fetchMock.mockImplementation(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          const signal = (init as RequestInit).signal!;
+          signal.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted', 'AbortError'));
+          });
+        }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await expect(api.getReady()).rejects.toThrow('aborted');
+  });
+
   it('does not cache endpoints without cacheTtlMs', async () => {
     fetchMock.mockImplementation(() => jsonResponse({ status: 'healthy', version: '1.0.0' }));
     const api = new OtelDataAPI('https://example.test');
