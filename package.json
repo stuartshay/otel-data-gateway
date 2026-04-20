@@ -55,7 +55,7 @@
     "@types/express": "^5.0.6",
     "@types/newrelic": "^9.14.8",
     "@types/node": "^25.5.0",
-    "cspell": "^9.7.0",
+    "cspell": "^10.0.0",
     "eslint": "^9.39.4",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
