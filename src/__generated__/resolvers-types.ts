@@ -142,6 +142,23 @@ export type GarminActivityConnection = {
   total: Scalars['Int']['output'];
 };
 
+/** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
+export type GarminActivityTotal = {
+  __typename?: 'GarminActivityTotal';
+  /** Number of activities in the period */
+  activity_count: Scalars['Int']['output'];
+  /** Start date of the period bucket (DATE_TRUNC of week/month/year) */
+  period_start: Scalars['String']['output'];
+  /** Sum of elevation gain in meters */
+  total_ascent_m?: Maybe<Scalars['Int']['output']>;
+  /** Sum of calories burned */
+  total_calories?: Maybe<Scalars['Int']['output']>;
+  /** Sum of distance in kilometres */
+  total_distance_km?: Maybe<Scalars['Float']['output']>;
+  /** Sum of active duration in seconds (excludes pauses) */
+  total_duration_seconds?: Maybe<Scalars['Int']['output']>;
+};
+
 /** Lightweight track point optimised for time-series chart rendering. */
 export type GarminChartPoint = {
   __typename?: 'GarminChartPoint';
@@ -468,6 +485,8 @@ export type Query = {
   garminActivities: GarminActivityConnection;
   /** Retrieve a single Garmin activity by its ID. */
   garminActivity?: Maybe<GarminActivity>;
+  /** Aggregate Garmin activity totals grouped by week, month, or year. */
+  garminActivityTotals: Array<GarminActivityTotal>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
@@ -531,6 +550,14 @@ export type QueryGarminActivitiesArgs = {
 
 export type QueryGarminActivityArgs = {
   activity_id: Scalars['String']['input'];
+};
+
+
+export type QueryGarminActivityTotalsArgs = {
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  period: Scalars['String']['input'];
+  sport?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -785,6 +812,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GarminActivity: ResolverTypeWrapper<GarminActivity>;
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
+  GarminActivityTotal: ResolverTypeWrapper<GarminActivityTotal>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
   GarminDateRange: ResolverTypeWrapper<GarminDateRange>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
@@ -825,6 +853,7 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float']['output'];
   GarminActivity: GarminActivity;
   GarminActivityConnection: GarminActivityConnection;
+  GarminActivityTotal: GarminActivityTotal;
   GarminChartPoint: GarminChartPoint;
   GarminDateRange: GarminDateRange;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
@@ -920,6 +949,15 @@ export type GarminActivityConnectionResolvers<ContextType = GatewayContext, Pare
   limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   offset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+}>;
+
+export type GarminActivityTotalResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityTotal'] = ResolversParentTypes['GarminActivityTotal']> = ResolversObject<{
+  activity_count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  period_start?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  total_ascent_m?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  total_calories?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  total_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  total_duration_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
 }>;
 
 export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminChartPoint'] = ResolversParentTypes['GarminChartPoint']> = ResolversObject<{
@@ -1092,6 +1130,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   devices?: Resolver<Array<ResolversTypes['DeviceInfo']>, ParentType, ContextType>;
   garminActivities?: Resolver<ResolversTypes['GarminActivityConnection'], ParentType, ContextType, Partial<QueryGarminActivitiesArgs>>;
   garminActivity?: Resolver<Maybe<ResolversTypes['GarminActivity']>, ParentType, ContextType, RequireFields<QueryGarminActivityArgs, 'activity_id'>>;
+  garminActivityTotals?: Resolver<Array<ResolversTypes['GarminActivityTotal']>, ParentType, ContextType, RequireFields<QueryGarminActivityTotalsArgs, 'period'>>;
   garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
   garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
@@ -1166,6 +1205,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   DistanceResult?: DistanceResultResolvers<ContextType>;
   GarminActivity?: GarminActivityResolvers<ContextType>;
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
+  GarminActivityTotal?: GarminActivityTotalResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
   GarminDateRange?: GarminDateRangeResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;

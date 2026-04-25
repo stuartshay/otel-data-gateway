@@ -302,6 +302,30 @@ export class OtelDataAPI {
     });
   }
 
+  async getGarminActivityTotals(
+    params: Nullable<{
+      period: string;
+      sport?: string;
+      date_from?: string;
+      date_to?: string;
+    }>,
+  ) {
+    return this.fetch<
+      {
+        period_start: string;
+        activity_count: number;
+        total_distance_km: number | null;
+        total_duration_seconds: number | null;
+        total_ascent_m: number | null;
+        total_calories: number | null;
+      }[]
+    >({
+      path: '/api/v1/garmin/activity-totals',
+      query: params,
+      cacheTtlMs: 30_000,
+    });
+  }
+
   async triggerGarminSync(
     params?: Nullable<{
       window_hours?: number;

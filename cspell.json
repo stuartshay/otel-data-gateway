@@ -29,7 +29,8 @@
     "postalcode",
     "shellcheck",
     "stuartshay",
-    "tini"
+    "tini",
+    "trunc"
   ],
   "ignorePaths": [
     "node_modules",

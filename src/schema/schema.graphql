@@ -654,6 +654,36 @@ type GarminChartPoint {
   longitude: Float!
 }
 
+"""
+Aggregated Garmin activity totals for a single time bucket (week, month, or year).
+"""
+type GarminActivityTotal {
+  """
+  Start date of the period bucket (DATE_TRUNC of week/month/year)
+  """
+  period_start: String!
+  """
+  Number of activities in the period
+  """
+  activity_count: Int!
+  """
+  Sum of distance in kilometres
+  """
+  total_distance_km: Float
+  """
+  Sum of active duration in seconds (excludes pauses)
+  """
+  total_duration_seconds: Int
+  """
+  Sum of elevation gain in meters
+  """
+  total_ascent_m: Int
+  """
+  Sum of calories burned
+  """
+  total_calories: Int
+}
+
 # -------------------------------------------------------
 # Unified GPS
 # -------------------------------------------------------
@@ -1133,6 +1163,28 @@ type Query {
     """
     activity_id: String!
   ): [GarminChartPoint!]!
+
+  """
+  Aggregate Garmin activity totals grouped by week, month, or year.
+  """
+  garminActivityTotals(
+    """
+    Aggregation period: 'week', 'month', or 'year'
+    """
+    period: String!
+    """
+    Filter by sport (e.g. cycling, running)
+    """
+    sport: String
+    """
+    Inclusive lower bound on activity start time (YYYY-MM-DD)
+    """
+    date_from: String
+    """
+    Inclusive upper bound on activity start time (YYYY-MM-DD)
+    """
+    date_to: String
+  ): [GarminActivityTotal!]!
 
   # Unified GPS
   """

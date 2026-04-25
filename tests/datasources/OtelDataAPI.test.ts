@@ -319,6 +319,7 @@ describe('OtelDataAPI', () => {
     await api.getGarminTrackPoints('ga-1', { limit: 2 });
     await api.getGarminSports();
     await api.getGarminChartData('ga-1');
+    await api.getGarminActivityTotals({ period: 'week' });
     await api.triggerGarminSync({ window_hours: 24 });
     await api.getUnifiedGps({ source: 'gps' });
     await api.getDailySummary({ limit: 3 });
@@ -345,6 +346,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/activities/ga-1/tracks',
       '/api/v1/garmin/sports',
       '/api/v1/garmin/activities/ga-1/chart-data',
+      '/api/v1/garmin/activity-totals',
       '/api/v1/garmin/sync',
       '/api/v1/gps/unified',
       '/api/v1/gps/daily-summary',
