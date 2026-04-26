@@ -473,6 +473,23 @@ describe('OtelDataAPI', () => {
     nowSpy.mockRestore();
   });
 
+  it('caches garminActivityTotals responses for 30s', async () => {
+    fetchMock.mockImplementation(() => jsonResponse([]));
+    const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
+
+    nowSpy.mockReturnValue(0);
+    await api.getGarminActivityTotals({ period: 'week' });
+    await api.getGarminActivityTotals({ period: 'week' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(31_000);
+    await api.getGarminActivityTotals({ period: 'week' });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
+  });
+
   it('caches garminDateRange responses for 60s', async () => {
     fetchMock.mockImplementation(() =>
       jsonResponse({ min_date: '2020-01-01T00:00:00Z', max_date: '2026-04-01T00:00:00Z' }),
