@@ -175,6 +175,20 @@ describe('garmin resolvers', () => {
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
   });
 
+  it('passes filter args to garminActivityTotals', async () => {
+    const args = {
+      period: 'week',
+      sport: 'cycling',
+      date_from: '2025-01-01',
+      date_to: '2025-12-31',
+    };
+    const ctx = contextWith({ getGarminActivityTotals: mockAsync([]) });
+
+    await runResolver(garminResolvers.Query.garminActivityTotals, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGarminActivityTotals).toHaveBeenCalledWith(args);
+  });
+
   it('delegates garminDateRange to datasource', async () => {
     const result = { min_date: '2020-01-01T00:00:00Z', max_date: '2026-04-01T00:00:00Z' };
     const ctx = contextWith({ getGarminDateRange: mockAsync(result) });
