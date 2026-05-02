@@ -381,11 +381,28 @@ export class OtelDataAPI {
   }
 
   async getDailySummary(
-    params?: Nullable<{ date_from?: string; date_to?: string; limit?: number }>,
+    params?: Nullable<{
+      date_from?: string;
+      date_to?: string;
+      limit?: number;
+      offset?: number;
+    }>,
   ) {
-    return this.fetch<Schemas['DailyActivitySummary'][]>({
+    return this.fetch<{
+      items: Schemas['DailyActivitySummary'][];
+      total: number;
+      limit: number;
+      offset: number;
+    }>({
       path: '/api/v1/gps/daily-summary',
       query: params,
+      cacheTtlMs: 60_000,
+    });
+  }
+
+  async getDailySummaryDateRange() {
+    return this.fetch<{ min_date: string; max_date: string }>({
+      path: '/api/v1/gps/daily-summary/date-range',
       cacheTtlMs: 60_000,
     });
   }

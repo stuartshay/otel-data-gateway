@@ -323,6 +323,7 @@ describe('OtelDataAPI', () => {
     await api.triggerGarminSync({ window_hours: 24 });
     await api.getUnifiedGps({ source: 'gps' });
     await api.getDailySummary({ limit: 3 });
+    await api.getDailySummaryDateRange();
     await api.getReferenceLocations();
     await api.getReferenceLocation(77);
     await api.getNearbyPoints({ lat: 1, lon: 2, radius_meters: 50, limit: 1, source: 'gps' });
@@ -350,6 +351,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/sync',
       '/api/v1/gps/unified',
       '/api/v1/gps/daily-summary',
+      '/api/v1/gps/daily-summary/date-range',
       '/api/v1/reference-locations',
       '/api/v1/reference-locations/77',
       '/api/v1/spatial/nearby',

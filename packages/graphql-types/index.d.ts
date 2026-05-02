@@ -3,21 +3,17 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = {
-  [_ in K]?: never;
-};
-export type Incremental<T> =
-  | T
-  | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export interface Scalars {
-  ID: { input: string; output: string };
-  String: { input: string; output: string };
-  Boolean: { input: boolean; output: boolean };
-  Int: { input: number; output: number };
-  Float: { input: number; output: number };
-  DateTime: { input: string; output: string };
-  JSON: { input: Record<string, unknown>; output: Record<string, unknown> };
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  DateTime: { input: string; output: string; }
+  JSON: { input: Record<string, unknown>; output: Record<string, unknown>; }
 }
 
 /** Per-day aggregate combining OwnTracks location stats and Garmin activity metrics. */
@@ -47,6 +43,28 @@ export interface DailyActivitySummary {
   total_distance_km?: Maybe<Scalars['Float']['output']>;
   /** Combined Garmin activity duration in seconds */
   total_duration_seconds?: Maybe<Scalars['Float']['output']>;
+}
+
+/** Paginated list of daily activity summaries. */
+export interface DailySummaryConnection {
+  __typename?: 'DailySummaryConnection';
+  /** List of daily activity summary items in the current page */
+  items: Array<DailyActivitySummary>;
+  /** Maximum number of items per page */
+  limit: Scalars['Int']['output'];
+  /** Number of items skipped from the start */
+  offset: Scalars['Int']['output'];
+  /** Total number of items matching the query */
+  total: Scalars['Int']['output'];
+}
+
+/** Earliest and latest activity dates available in the daily activity summary view. */
+export interface DailySummaryDateRange {
+  __typename?: 'DailySummaryDateRange';
+  /** Latest activity date with daily summary data (YYYY-MM-DD) */
+  max_date: Scalars['String']['output'];
+  /** Earliest activity date with daily summary data (YYYY-MM-DD) */
+  min_date: Scalars['String']['output'];
 }
 
 /** Distinct OwnTracks device identifier. */
@@ -434,10 +452,12 @@ export interface Mutation {
   triggerGeocoding: GeocodingTriggerResult;
 }
 
+
 export interface MutationTriggerGarminSyncArgs {
   lookback?: InputMaybe<Scalars['Int']['input']>;
   window_hours?: InputMaybe<Scalars['Int']['input']>;
 }
+
 
 export interface MutationTriggerGeocodingArgs {
   batch_size?: InputMaybe<Scalars['Int']['input']>;
@@ -477,7 +497,9 @@ export interface Query {
   /** Calculate the geodesic distance between two geographic points. */
   calculateDistance: DistanceResult;
   /** Retrieve daily activity summaries combining OwnTracks and Garmin data. */
-  dailySummary: Array<DailyActivitySummary>;
+  dailySummary: DailySummaryConnection;
+  /** Get the earliest and latest activity dates available in the daily activity summary view. */
+  dailySummaryDateRange: DailySummaryDateRange;
   /** List all distinct OwnTracks device identifiers. */
   devices: Array<DeviceInfo>;
   /** Retrieve a paginated list of Garmin activities. */
@@ -520,6 +542,7 @@ export interface Query {
   withinReference: WithinReferenceResult;
 }
 
+
 export interface QueryCalculateDistanceArgs {
   from_lat: Scalars['Float']['input'];
   from_lon: Scalars['Float']['input'];
@@ -527,11 +550,14 @@ export interface QueryCalculateDistanceArgs {
   to_lon: Scalars['Float']['input'];
 }
 
+
 export interface QueryDailySummaryArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
   date_to?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 }
+
 
 export interface QueryGarminActivitiesArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
@@ -542,6 +568,7 @@ export interface QueryGarminActivitiesArgs {
   sort?: InputMaybe<Scalars['String']['input']>;
   sport?: InputMaybe<Scalars['String']['input']>;
 }
+
 
 export interface QueryGarminActivityArgs {
   activity_id: Scalars['String']['input'];
@@ -558,6 +585,7 @@ export interface QueryGarminChartDataArgs {
   activity_id: Scalars['String']['input'];
 }
 
+
 export interface QueryGarminTrackPointsArgs {
   activity_id: Scalars['String']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -567,14 +595,17 @@ export interface QueryGarminTrackPointsArgs {
   sort?: InputMaybe<Scalars['String']['input']>;
 }
 
+
 export interface QueryLocationArgs {
   id: Scalars['Int']['input'];
 }
+
 
 export interface QueryLocationCountArgs {
   date?: InputMaybe<Scalars['String']['input']>;
   device_id?: InputMaybe<Scalars['String']['input']>;
 }
+
 
 export interface QueryLocationsArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
@@ -586,6 +617,7 @@ export interface QueryLocationsArgs {
   sort?: InputMaybe<Scalars['String']['input']>;
 }
 
+
 export interface QueryNearbyPointsArgs {
   lat: Scalars['Float']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -594,9 +626,11 @@ export interface QueryNearbyPointsArgs {
   source?: InputMaybe<Scalars['String']['input']>;
 }
 
+
 export interface QueryReferenceLocationArgs {
   id: Scalars['Int']['input'];
 }
+
 
 export interface QueryUnifiedGpsArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
@@ -608,6 +642,7 @@ export interface QueryUnifiedGpsArgs {
   order?: InputMaybe<SortOrder>;
   source?: InputMaybe<Scalars['String']['input']>;
 }
+
 
 export interface QueryWithinReferenceArgs {
   limit?: InputMaybe<Scalars['Int']['input']>;
