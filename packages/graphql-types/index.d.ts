@@ -49,6 +49,28 @@ export interface DailyActivitySummary {
   total_duration_seconds?: Maybe<Scalars['Float']['output']>;
 }
 
+/** Paginated list of daily activity summaries. */
+export interface DailySummaryConnection {
+  __typename?: 'DailySummaryConnection';
+  /** List of daily activity summary items in the current page */
+  items: Array<DailyActivitySummary>;
+  /** Maximum number of items per page */
+  limit: Scalars['Int']['output'];
+  /** Number of items skipped from the start */
+  offset: Scalars['Int']['output'];
+  /** Total number of items matching the query */
+  total: Scalars['Int']['output'];
+}
+
+/** Earliest and latest activity dates available in the daily activity summary view. */
+export interface DailySummaryDateRange {
+  __typename?: 'DailySummaryDateRange';
+  /** Latest activity date with daily summary data (YYYY-MM-DD) */
+  max_date: Scalars['String']['output'];
+  /** Earliest activity date with daily summary data (YYYY-MM-DD) */
+  min_date: Scalars['String']['output'];
+}
+
 /** Distinct OwnTracks device identifier. */
 export interface DeviceInfo {
   __typename?: 'DeviceInfo';
@@ -141,6 +163,23 @@ export interface GarminActivityConnection {
   offset: Scalars['Int']['output'];
   /** Total number of items matching the query */
   total: Scalars['Int']['output'];
+}
+
+/** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
+export interface GarminActivityTotal {
+  __typename?: 'GarminActivityTotal';
+  /** Number of activities in the period */
+  activity_count: Scalars['Int']['output'];
+  /** Start date of the period bucket (DATE_TRUNC of week/month/year) */
+  period_start: Scalars['String']['output'];
+  /** Sum of elevation gain in meters */
+  total_ascent_m?: Maybe<Scalars['Int']['output']>;
+  /** Sum of calories burned */
+  total_calories?: Maybe<Scalars['Int']['output']>;
+  /** Sum of distance in kilometres */
+  total_distance_km?: Maybe<Scalars['Float']['output']>;
+  /** Sum of active duration in seconds (excludes pauses) */
+  total_duration_seconds?: Maybe<Scalars['Int']['output']>;
 }
 
 /** Lightweight track point optimised for time-series chart rendering. */
@@ -460,13 +499,17 @@ export interface Query {
   /** Calculate the geodesic distance between two geographic points. */
   calculateDistance: DistanceResult;
   /** Retrieve daily activity summaries combining OwnTracks and Garmin data. */
-  dailySummary: Array<DailyActivitySummary>;
+  dailySummary: DailySummaryConnection;
+  /** Get the earliest and latest activity dates available in the daily activity summary view. */
+  dailySummaryDateRange: DailySummaryDateRange;
   /** List all distinct OwnTracks device identifiers. */
   devices: Array<DeviceInfo>;
   /** Retrieve a paginated list of Garmin activities. */
   garminActivities: GarminActivityConnection;
   /** Retrieve a single Garmin activity by its ID. */
   garminActivity?: Maybe<GarminActivity>;
+  /** Aggregate Garmin activity totals grouped by week, month, or year. */
+  garminActivityTotals: Array<GarminActivityTotal>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
@@ -512,6 +555,7 @@ export interface QueryDailySummaryArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
   date_to?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 }
 
 export interface QueryGarminActivitiesArgs {
@@ -526,6 +570,13 @@ export interface QueryGarminActivitiesArgs {
 
 export interface QueryGarminActivityArgs {
   activity_id: Scalars['String']['input'];
+}
+
+export interface QueryGarminActivityTotalsArgs {
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  period: Scalars['String']['input'];
+  sport?: InputMaybe<Scalars['String']['input']>;
 }
 
 export interface QueryGarminChartDataArgs {

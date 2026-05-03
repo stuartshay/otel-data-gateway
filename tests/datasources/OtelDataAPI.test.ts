@@ -319,9 +319,11 @@ describe('OtelDataAPI', () => {
     await api.getGarminTrackPoints('ga-1', { limit: 2 });
     await api.getGarminSports();
     await api.getGarminChartData('ga-1');
+    await api.getGarminActivityTotals({ period: 'week' });
     await api.triggerGarminSync({ window_hours: 24 });
     await api.getUnifiedGps({ source: 'gps' });
     await api.getDailySummary({ limit: 3 });
+    await api.getDailySummaryDateRange();
     await api.getReferenceLocations();
     await api.getReferenceLocation(77);
     await api.getNearbyPoints({ lat: 1, lon: 2, radius_meters: 50, limit: 1, source: 'gps' });
@@ -345,9 +347,11 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/activities/ga-1/tracks',
       '/api/v1/garmin/sports',
       '/api/v1/garmin/activities/ga-1/chart-data',
+      '/api/v1/garmin/activity-totals',
       '/api/v1/garmin/sync',
       '/api/v1/gps/unified',
       '/api/v1/gps/daily-summary',
+      '/api/v1/gps/daily-summary/date-range',
       '/api/v1/reference-locations',
       '/api/v1/reference-locations/77',
       '/api/v1/spatial/nearby',
@@ -380,6 +384,34 @@ describe('OtelDataAPI', () => {
 
     expect(r1).toEqual(r2);
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('passes a 2s abort signal to fetch when calling getReady', async () => {
+    const timeoutSpy = jest.spyOn(AbortSignal, 'timeout');
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.getReady();
+
+    expect(timeoutSpy).toHaveBeenCalledWith(2_000);
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(options.signal).toBeDefined();
+
+    timeoutSpy.mockRestore();
+  });
+
+  it('rejects when the ready endpoint times out', async () => {
+    fetchMock.mockImplementation(
+      (_url, init) =>
+        new Promise((_resolve, reject) => {
+          const signal = (init as RequestInit).signal!;
+          signal.addEventListener('abort', () => {
+            reject(new DOMException('The operation was aborted', 'AbortError'));
+          });
+        }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await expect(api.getReady()).rejects.toThrow('aborted');
   });
 
   it('does not cache endpoints without cacheTtlMs', async () => {
@@ -438,6 +470,23 @@ describe('OtelDataAPI', () => {
 
     nowSpy.mockReturnValue(31_000);
     await api.getGarminChartData('ga-1');
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockRestore();
+  });
+
+  it('caches garminActivityTotals responses for 30s', async () => {
+    fetchMock.mockImplementation(() => jsonResponse([]));
+    const api = new OtelDataAPI('https://example.test');
+    const nowSpy = jest.spyOn(Date, 'now');
+
+    nowSpy.mockReturnValue(0);
+    await api.getGarminActivityTotals({ period: 'week' });
+    await api.getGarminActivityTotals({ period: 'week' });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(31_000);
+    await api.getGarminActivityTotals({ period: 'week' });
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
     nowSpy.mockRestore();

@@ -187,7 +187,10 @@ export class OtelDataAPI {
   }
 
   async getReady() {
-    return this.fetch<{ status: string; database?: string; version?: string }>({ path: '/ready' });
+    return this.fetch<{ status: string; database?: string; version?: string }>({
+      path: '/ready',
+      timeoutMs: 2_000,
+    });
   }
 
   // ── Locations ───────────────────────────────────────
@@ -299,6 +302,30 @@ export class OtelDataAPI {
     });
   }
 
+  async getGarminActivityTotals(
+    params: Nullable<{
+      period: string;
+      sport?: string;
+      date_from?: string;
+      date_to?: string;
+    }>,
+  ) {
+    return this.fetch<
+      {
+        period_start: string;
+        activity_count: number;
+        total_distance_km: number | null;
+        total_duration_seconds: number | null;
+        total_ascent_m: number | null;
+        total_calories: number | null;
+      }[]
+    >({
+      path: '/api/v1/garmin/activity-totals',
+      query: params,
+      cacheTtlMs: 30_000,
+    });
+  }
+
   async triggerGarminSync(
     params?: Nullable<{
       window_hours?: number;
@@ -354,11 +381,28 @@ export class OtelDataAPI {
   }
 
   async getDailySummary(
-    params?: Nullable<{ date_from?: string; date_to?: string; limit?: number }>,
+    params?: Nullable<{
+      date_from?: string;
+      date_to?: string;
+      limit?: number;
+      offset?: number;
+    }>,
   ) {
-    return this.fetch<Schemas['DailyActivitySummary'][]>({
+    return this.fetch<{
+      items: Schemas['DailyActivitySummary'][];
+      total: number;
+      limit: number;
+      offset: number;
+    }>({
       path: '/api/v1/gps/daily-summary',
       query: params,
+      cacheTtlMs: 60_000,
+    });
+  }
+
+  async getDailySummaryDateRange() {
+    return this.fetch<{ min_date: string; max_date: string }>({
+      path: '/api/v1/gps/daily-summary/date-range',
       cacheTtlMs: 60_000,
     });
   }

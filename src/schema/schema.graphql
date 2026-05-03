@@ -654,6 +654,36 @@ type GarminChartPoint {
   longitude: Float!
 }
 
+"""
+Aggregated Garmin activity totals for a single time bucket (week, month, or year).
+"""
+type GarminActivityTotal {
+  """
+  Start date of the period bucket (DATE_TRUNC of week/month/year)
+  """
+  period_start: String!
+  """
+  Number of activities in the period
+  """
+  activity_count: Int!
+  """
+  Sum of distance in kilometres
+  """
+  total_distance_km: Float
+  """
+  Sum of active duration in seconds (excludes pauses)
+  """
+  total_duration_seconds: Int
+  """
+  Sum of elevation gain in meters
+  """
+  total_ascent_m: Int
+  """
+  Sum of calories burned
+  """
+  total_calories: Int
+}
+
 # -------------------------------------------------------
 # Unified GPS
 # -------------------------------------------------------
@@ -777,6 +807,42 @@ type DailyActivitySummary {
   Total calories burned across Garmin activities
   """
   total_calories: Int
+}
+
+"""
+Paginated list of daily activity summaries.
+"""
+type DailySummaryConnection {
+  """
+  List of daily activity summary items in the current page
+  """
+  items: [DailyActivitySummary!]!
+  """
+  Total number of items matching the query
+  """
+  total: Int!
+  """
+  Maximum number of items per page
+  """
+  limit: Int!
+  """
+  Number of items skipped from the start
+  """
+  offset: Int!
+}
+
+"""
+Earliest and latest activity dates available in the daily activity summary view.
+"""
+type DailySummaryDateRange {
+  """
+  Earliest activity date with daily summary data (YYYY-MM-DD)
+  """
+  min_date: String!
+  """
+  Latest activity date with daily summary data (YYYY-MM-DD)
+  """
+  max_date: String!
 }
 
 # -------------------------------------------------------
@@ -1134,6 +1200,28 @@ type Query {
     activity_id: String!
   ): [GarminChartPoint!]!
 
+  """
+  Aggregate Garmin activity totals grouped by week, month, or year.
+  """
+  garminActivityTotals(
+    """
+    Aggregation period: 'week', 'month', or 'year'
+    """
+    period: String!
+    """
+    Filter by sport (e.g. cycling, running)
+    """
+    sport: String
+    """
+    Inclusive lower bound on activity start time (YYYY-MM-DD)
+    """
+    date_from: String
+    """
+    Inclusive upper bound on activity start time (YYYY-MM-DD)
+    """
+    date_to: String
+  ): [GarminActivityTotal!]!
+
   # Unified GPS
   """
   Retrieve a paginated list of unified GPS points from all sources.
@@ -1186,10 +1274,19 @@ type Query {
     """
     date_to: String
     """
-    Maximum number of days to return
+    Maximum number of days to return per page
     """
     limit: Int
-  ): [DailyActivitySummary!]!
+    """
+    Number of items to skip for pagination
+    """
+    offset: Int
+  ): DailySummaryConnection!
+
+  """
+  Get the earliest and latest activity dates available in the daily activity summary view.
+  """
+  dailySummaryDateRange: DailySummaryDateRange!
 
   # Reference Locations
   """
