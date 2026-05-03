@@ -19,7 +19,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "davidanson.vscode-markdownlint",
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
     "editor.wordWrap": "on"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
