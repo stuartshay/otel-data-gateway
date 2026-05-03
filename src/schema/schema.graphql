@@ -809,6 +809,42 @@ type DailyActivitySummary {
   total_calories: Int
 }
 
+"""
+Paginated list of daily activity summaries.
+"""
+type DailySummaryConnection {
+  """
+  List of daily activity summary items in the current page
+  """
+  items: [DailyActivitySummary!]!
+  """
+  Total number of items matching the query
+  """
+  total: Int!
+  """
+  Maximum number of items per page
+  """
+  limit: Int!
+  """
+  Number of items skipped from the start
+  """
+  offset: Int!
+}
+
+"""
+Earliest and latest activity dates available in the daily activity summary view.
+"""
+type DailySummaryDateRange {
+  """
+  Earliest activity date with daily summary data (YYYY-MM-DD)
+  """
+  min_date: String!
+  """
+  Latest activity date with daily summary data (YYYY-MM-DD)
+  """
+  max_date: String!
+}
+
 # -------------------------------------------------------
 # Reference Locations
 # -------------------------------------------------------
@@ -1238,10 +1274,19 @@ type Query {
     """
     date_to: String
     """
-    Maximum number of days to return
+    Maximum number of days to return per page
     """
     limit: Int
-  ): [DailyActivitySummary!]!
+    """
+    Number of items to skip for pagination
+    """
+    offset: Int
+  ): DailySummaryConnection!
+
+  """
+  Get the earliest and latest activity dates available in the daily activity summary view.
+  """
+  dailySummaryDateRange: DailySummaryDateRange!
 
   # Reference Locations
   """

@@ -49,6 +49,28 @@ export interface DailyActivitySummary {
   total_duration_seconds?: Maybe<Scalars['Float']['output']>;
 }
 
+/** Paginated list of daily activity summaries. */
+export interface DailySummaryConnection {
+  __typename?: 'DailySummaryConnection';
+  /** List of daily activity summary items in the current page */
+  items: Array<DailyActivitySummary>;
+  /** Maximum number of items per page */
+  limit: Scalars['Int']['output'];
+  /** Number of items skipped from the start */
+  offset: Scalars['Int']['output'];
+  /** Total number of items matching the query */
+  total: Scalars['Int']['output'];
+}
+
+/** Earliest and latest activity dates available in the daily activity summary view. */
+export interface DailySummaryDateRange {
+  __typename?: 'DailySummaryDateRange';
+  /** Latest activity date with daily summary data (YYYY-MM-DD) */
+  max_date: Scalars['String']['output'];
+  /** Earliest activity date with daily summary data (YYYY-MM-DD) */
+  min_date: Scalars['String']['output'];
+}
+
 /** Distinct OwnTracks device identifier. */
 export interface DeviceInfo {
   __typename?: 'DeviceInfo';
@@ -477,7 +499,9 @@ export interface Query {
   /** Calculate the geodesic distance between two geographic points. */
   calculateDistance: DistanceResult;
   /** Retrieve daily activity summaries combining OwnTracks and Garmin data. */
-  dailySummary: Array<DailyActivitySummary>;
+  dailySummary: DailySummaryConnection;
+  /** Get the earliest and latest activity dates available in the daily activity summary view. */
+  dailySummaryDateRange: DailySummaryDateRange;
   /** List all distinct OwnTracks device identifiers. */
   devices: Array<DeviceInfo>;
   /** Retrieve a paginated list of Garmin activities. */
@@ -531,6 +555,7 @@ export interface QueryDailySummaryArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
   date_to?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 }
 
 export interface QueryGarminActivitiesArgs {

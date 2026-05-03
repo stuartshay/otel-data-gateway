@@ -220,14 +220,17 @@ describe('gps resolvers', () => {
   it('delegates unifiedGps and dailySummary queries', async () => {
     const ctx = contextWith({
       getUnifiedGps: mockAsync({ items: [] }),
-      getDailySummary: mockAsync([]),
+      getDailySummary: mockAsync({ items: [], total: 0, limit: 30, offset: 0 }),
+      getDailySummaryDateRange: mockAsync({ min_date: '2024-01-01', max_date: '2026-01-01' }),
     });
 
     await runResolver(gpsResolvers.Query.unifiedGps, { limit: 2, source: 'gps' }, ctx);
-    await runResolver(gpsResolvers.Query.dailySummary, { limit: 1 }, ctx);
+    await runResolver(gpsResolvers.Query.dailySummary, { limit: 1, offset: 0 }, ctx);
+    await runResolver(gpsResolvers.Query.dailySummaryDateRange, {}, ctx);
 
     expect(ctx.dataSources.otelAPI.getUnifiedGps).toHaveBeenCalledWith({ limit: 2, source: 'gps' });
-    expect(ctx.dataSources.otelAPI.getDailySummary).toHaveBeenCalledWith({ limit: 1 });
+    expect(ctx.dataSources.otelAPI.getDailySummary).toHaveBeenCalledWith({ limit: 1, offset: 0 });
+    expect(ctx.dataSources.otelAPI.getDailySummaryDateRange).toHaveBeenCalled();
   });
 
   it('forwards exclude_stationary and deduplicate args to data source', async () => {
@@ -359,6 +362,7 @@ describe('resolver index', () => {
         'garminChartData',
         'unifiedGps',
         'dailySummary',
+        'dailySummaryDateRange',
         'referenceLocations',
         'referenceLocation',
         'nearbyPoints',
