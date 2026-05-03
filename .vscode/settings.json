@@ -33,7 +33,8 @@
     "**/dist": true
   },
   "jest.jestCommandLine": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-  "jest.rootPath": ".",
-  "jest.autoRun": "off",
-  "jest.showCoverageOnLoad": false
+  "jest.runMode": {
+    "type": "on-demand",
+    "coverage": false
+  }
 }
