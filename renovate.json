@@ -6,6 +6,8 @@
   "schedule": ["before 6am on Monday"],
   "prHourlyLimit": 2,
   "prConcurrentLimit": 5,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "🤖 Renovate Dependency Dashboard",
   "enabledManagers": ["npm", "dockerfile", "github-actions"],
   "packageRules": [
     {
@@ -13,6 +15,25 @@
       "matchPackageNames": ["@stuartshay/**"],
       "enabled": false
     },
+
+    {
+      "description": "Severity label: patch updates",
+      "matchUpdateTypes": ["patch"],
+      "addLabels": ["patch"]
+    },
+    {
+      "description": "Severity label: minor updates",
+      "matchUpdateTypes": ["minor"],
+      "addLabels": ["minor"]
+    },
+    {
+      "description": "Severity label: major updates (require manual review)",
+      "matchUpdateTypes": ["major"],
+      "addLabels": ["major", "breaking", "needs-review"],
+      "automerge": false,
+      "prPriority": 10
+    },
+
     {
       "description": "Auto-merge patch updates for npm dependencies",
       "matchManagers": ["npm"],
@@ -21,7 +42,31 @@
       "automergeType": "pr"
     },
     {
-      "description": "Group Apollo Server ecosystem",
+      "description": "npm major updates: no automerge, require manual review",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "addLabels": ["needs-review"]
+    },
+
+    {
+      "description": "Manager tag: npm",
+      "matchManagers": ["npm"],
+      "addLabels": ["npm"]
+    },
+    {
+      "description": "Manager tag: docker",
+      "matchManagers": ["dockerfile"],
+      "addLabels": ["docker"]
+    },
+    {
+      "description": "Manager tag: github-actions",
+      "matchManagers": ["github-actions"],
+      "addLabels": ["ci", "github-actions"]
+    },
+
+    {
+      "description": "Group Apollo Server / GraphQL runtime ecosystem",
       "matchPackageNames": [
         "@apollo/server",
         "@as-integrations/express5",
@@ -29,7 +74,9 @@
         "graphql-tag"
       ],
       "groupName": "apollo-server",
-      "groupSlug": "apollo-server"
+      "groupSlug": "apollo-server",
+      "addLabels": ["graphql", "apollo", "runtime"],
+      "semanticCommitScope": "deps/apollo"
     },
     {
       "description": "Group GraphQL Codegen",
@@ -39,39 +86,83 @@
         "@graphql-codegen/typescript-resolvers"
       ],
       "groupName": "graphql-codegen",
-      "groupSlug": "graphql-codegen"
+      "groupSlug": "graphql-codegen",
+      "addLabels": ["graphql", "codegen", "dev-deps"],
+      "semanticCommitScope": "deps/codegen"
     },
     {
       "description": "Group ESLint ecosystem",
-      "matchPackageNames": ["eslint", "@eslint/js", "typescript-eslint"],
+      "matchPackageNames": ["eslint", "@eslint/js", "typescript-eslint", "globals"],
       "groupName": "eslint",
-      "groupSlug": "eslint"
+      "groupSlug": "eslint",
+      "addLabels": ["linting", "dev-deps"],
+      "semanticCommitScope": "deps/eslint"
     },
     {
       "description": "Group Jest testing",
       "matchPackageNames": ["jest", "@jest/globals", "ts-jest"],
       "groupName": "jest",
-      "groupSlug": "jest"
+      "groupSlug": "jest",
+      "addLabels": ["testing", "dev-deps"],
+      "semanticCommitScope": "deps/testing"
     },
     {
-      "description": "Group formatting tools",
+      "description": "Group formatting / commit hook tooling",
       "matchPackageNames": ["cspell", "prettier", "markdownlint-cli2", "husky", "lint-staged"],
       "groupName": "formatting-tools",
-      "groupSlug": "formatting-tools"
+      "groupSlug": "formatting-tools",
+      "addLabels": ["formatting", "dev-deps"],
+      "semanticCommitScope": "deps/formatting"
     },
     {
-      "description": "Docker base image updates",
+      "description": "Group TypeScript compiler and type definitions",
+      "matchPackageNames": ["typescript", "tsx", "@types/**"],
+      "groupName": "typescript",
+      "groupSlug": "typescript",
+      "addLabels": ["typescript", "dev-deps"],
+      "semanticCommitScope": "deps/typescript"
+    },
+    {
+      "description": "Runtime dependency: New Relic APM agent",
+      "matchPackageNames": ["newrelic", "@types/newrelic"],
+      "groupName": "newrelic",
+      "groupSlug": "newrelic",
+      "addLabels": ["observability", "runtime"],
+      "semanticCommitScope": "deps/newrelic"
+    },
+    {
+      "description": "Runtime dependency: Express / CORS",
+      "matchPackageNames": ["express", "cors", "@types/express", "@types/cors"],
+      "groupName": "express",
+      "groupSlug": "express",
+      "addLabels": ["runtime"],
+      "semanticCommitScope": "deps/express"
+    },
+
+    {
+      "description": "Docker base image updates (minor/patch auto-merge)",
       "matchManagers": ["dockerfile"],
       "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
+      "automerge": true,
+      "semanticCommitScope": "deps/docker"
     },
+    {
+      "description": "Docker base image major updates (manual review)",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "addLabels": ["needs-review"],
+      "semanticCommitScope": "deps/docker"
+    },
+
     {
       "description": "GitHub Actions minor/patch updates (auto-merge)",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "github-actions-minor",
       "groupSlug": "github-actions-minor",
-      "automerge": true
+      "automerge": true,
+      "semanticCommitScope": "deps/ci"
     },
     {
       "description": "GitHub Actions major updates (manual review)",
@@ -79,7 +170,14 @@
       "matchUpdateTypes": ["major"],
       "groupName": "github-actions-major",
       "groupSlug": "github-actions-major",
-      "automerge": false
+      "automerge": false,
+      "addLabels": ["needs-review"],
+      "semanticCommitScope": "deps/ci"
     }
-  ]
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "addLabels": ["security", "needs-review"],
+    "prPriority": 20
+  }
 }
