@@ -7,6 +7,9 @@ const scalarConfig = {
 
 const config: CodegenConfig = {
   schema: 'src/schema/schema.graphql',
+  hooks: {
+    afterAllFileWrite: ['prettier --write'],
+  },
   generates: {
     // Internal resolver types (used by gateway source code)
     'src/__generated__/resolvers-types.ts': {
