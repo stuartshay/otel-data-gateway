@@ -177,7 +177,6 @@
   ],
   "vulnerabilityAlerts": {
     "enabled": true,
-    "addLabels": ["security", "needs-review"],
-    "prPriority": 20
+    "addLabels": ["security", "needs-review"]
   }
 }
