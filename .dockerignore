@@ -1,0 +1,40 @@
+# Dependencies and build outputs (rebuilt in image)
+node_modules
+dist
+packages
+
+# Test/CI artifacts
+coverage
+results
+loadtest
+tests
+jest.config.ts
+
+# VCS and editor
+.git
+.gitignore
+.github
+.vscode
+.husky
+
+# Local config / secrets
+.env
+.env.*
+.secrets.baseline
+newrelic_agent.log
+*.log
+
+# Docs (not needed at runtime)
+README.md
+AGENTS.md
+docs
+
+# Lint/format configs (not needed inside image)
+.eslintrc*
+eslint.config.js
+.prettierrc
+.prettierignore
+.markdownlint.yaml
+cspell.json
+renovate.json
+.nvmrc

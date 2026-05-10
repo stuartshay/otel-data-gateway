@@ -1,17 +1,19 @@
+# syntax=docker/dockerfile:1.7
 # =============================================================================
-# Stage 1: Build TypeScript
+# Stage 1: Build TypeScript (runs on the build host, not the target arch)
 # =============================================================================
-FROM node:24-alpine AS builder
+FROM --platform=$BUILDPLATFORM node:24-alpine AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN HUSKY=0 npm ci
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --ignore-scripts
 
 COPY codegen.ts tsconfig.json ./
 COPY src/ ./src/
 
-RUN npm run build
+RUN npm run build && npm prune --omit=dev
 
 # =============================================================================
 # Stage 2: Production runtime
@@ -23,14 +25,9 @@ RUN apk add --no-cache tini
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm pkg delete scripts.prepare && \
-    npm ci --omit=dev && \
-    npm cache clean --force
-
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY newrelic.cjs ./
-COPY VERSION ./
+COPY package*.json newrelic.cjs VERSION ./
 
 ENV NODE_ENV=production
 ENV PORT=4000
