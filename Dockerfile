@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.23
 # =============================================================================
 # Stage 1: Build TypeScript (runs on the build host, not the target arch)
 # Pinned to $BUILDPLATFORM because tsc output is architecture-independent.
