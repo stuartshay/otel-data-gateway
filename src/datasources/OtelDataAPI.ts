@@ -302,6 +302,33 @@ export class OtelDataAPI {
     });
   }
 
+  async getGarminActivityAddresses(activityId: string) {
+    return this.fetch<
+      {
+        track_point_id: number;
+        activity_id: string;
+        waypoint_kind: string;
+        timestamp: string;
+        latitude: number;
+        longitude: number;
+        display_address: string | null;
+        street: string | null;
+        housenumber: string | null;
+        neighbourhood: string | null;
+        locality: string | null;
+        region: string | null;
+        country: string | null;
+        postalcode: string | null;
+        confidence: number | null;
+        status: string;
+        geocoded_at: string | null;
+      }[]
+    >({
+      path: `/api/v1/garmin/activities/${activityId}/addresses`,
+      cacheTtlMs: 30_000,
+    });
+  }
+
   async getGarminActivityTotals(
     params: Nullable<{
       period: string;
@@ -466,6 +493,25 @@ export class OtelDataAPI {
       no_coverage: number;
       errors: number;
       coverage_percent: number;
+      by_source: {
+        owntracks: {
+          success: number;
+          pending: number;
+          no_coverage: number;
+          errors: number;
+          total: number;
+        };
+        garmin: {
+          success: number;
+          pending: number;
+          no_coverage: number;
+          errors: number;
+          total: number;
+        };
+        garmin_activities_total: number;
+        garmin_activities_geocoded: number;
+        garmin_coverage_percent: number;
+      };
     }>({ path: '/api/v1/geocoding/status', cacheTtlMs: 15_000 });
   }
 
