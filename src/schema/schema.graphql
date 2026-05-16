@@ -285,6 +285,62 @@ type GeocodingStatus {
   Percentage of locations with a geocoded address
   """
   coverage_percent: Float!
+  """
+  Per-source breakdown of geocoding coverage (owntracks, garmin)
+  """
+  by_source: GeocodingStatusBySource!
+}
+
+"""
+Coverage statistics for a single geocoding source (owntracks or garmin).
+"""
+type GeocodingSourceStatus {
+  """
+  Number of successfully geocoded records for this source
+  """
+  success: Int!
+  """
+  Number of records awaiting geocoding for this source
+  """
+  pending: Int!
+  """
+  Number of records outside Pelias coverage area
+  """
+  no_coverage: Int!
+  """
+  Number of records that failed geocoding
+  """
+  errors: Int!
+  """
+  Total number of geocoded_addresses rows for this source
+  """
+  total: Int!
+}
+
+"""
+Per-source breakdown of geocoding coverage.
+"""
+type GeocodingStatusBySource {
+  """
+  Coverage stats for OwnTracks rows
+  """
+  owntracks: GeocodingSourceStatus!
+  """
+  Coverage stats for Garmin rows
+  """
+  garmin: GeocodingSourceStatus!
+  """
+  Total number of Garmin activities (denominator for activity-level coverage)
+  """
+  garmin_activities_total: Int!
+  """
+  Number of Garmin activities that have at least one address row
+  """
+  garmin_activities_geocoded: Int!
+  """
+  Percentage of Garmin activities with at least one geocoded address
+  """
+  garmin_coverage_percent: Float!
 }
 
 """
@@ -574,6 +630,114 @@ type GarminTrackPoint {
   UTC timestamp when the record was inserted
   """
   created_at: String
+  """
+  Compact reverse-geocoded address summary, when geocoded
+  """
+  address: GeocodedAddressSummary
+}
+
+"""
+Compact reverse-geocoded address summary embedded in track-point payloads.
+"""
+type GeocodedAddressSummary {
+  """
+  Full formatted address label from Pelias
+  """
+  display_address: String
+  """
+  City or town
+  """
+  locality: String
+  """
+  State or province
+  """
+  region: String
+  """
+  Country name
+  """
+  country: String
+  """
+  Role of this waypoint within a Garmin activity (start, end, waypoint). Null for OwnTracks records.
+  """
+  waypoint_kind: String
+  """
+  Geocoding status: success, no_coverage, error, pending
+  """
+  status: String!
+}
+
+"""
+Full reverse-geocoded address attached to a Garmin activity waypoint.
+"""
+type GarminActivityAddress {
+  """
+  garmin_track_points.id this address was geocoded from
+  """
+  track_point_id: Int!
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  Role of this waypoint within the activity: start, end, or waypoint
+  """
+  waypoint_kind: String!
+  """
+  UTC timestamp of the track point this address was derived from
+  """
+  timestamp: DateTime!
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
+  latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
+  longitude: Float!
+  """
+  Full formatted address label from Pelias
+  """
+  display_address: String
+  """
+  Street name
+  """
+  street: String
+  """
+  House or building number
+  """
+  housenumber: String
+  """
+  Neighbourhood name
+  """
+  neighbourhood: String
+  """
+  City or town
+  """
+  locality: String
+  """
+  State or province
+  """
+  region: String
+  """
+  Country name
+  """
+  country: String
+  """
+  Postal or ZIP code
+  """
+  postalcode: String
+  """
+  Pelias confidence score (0-1)
+  """
+  confidence: Float
+  """
+  Geocoding status: success, no_coverage, error, pending
+  """
+  status: String!
+  """
+  UTC timestamp when geocoding was performed
+  """
+  geocoded_at: String
 }
 
 """
@@ -1199,6 +1363,16 @@ type Query {
     """
     activity_id: String!
   ): [GarminChartPoint!]!
+
+  """
+  Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end).
+  """
+  garminActivityAddresses(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): [GarminActivityAddress!]!
 
   """
   Aggregate Garmin activity totals grouped by week, month, or year.

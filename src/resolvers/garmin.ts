@@ -10,6 +10,7 @@ export const garminResolvers: {
     | 'garminSports'
     | 'garminChartData'
     | 'garminActivityTotals'
+    | 'garminActivityAddresses'
   >;
   Mutation: Pick<MutationResolvers, 'triggerGarminSync'>;
 } = {
@@ -41,6 +42,10 @@ export const garminResolvers: {
 
     garminActivityTotals: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminActivityTotals(args);
+    },
+
+    garminActivityAddresses: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminActivityAddresses(args.activity_id);
     },
   },
   Mutation: {
