@@ -43,7 +43,7 @@
     "express": "^5.2.1",
     "graphql": "^16.14.0",
     "graphql-tag": "^2.12.6",
-    "newrelic": "^13.19.2"
+    "newrelic": "^14.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
