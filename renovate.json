@@ -127,6 +127,7 @@
       "matchPackageNames": ["newrelic", "@types/newrelic"],
       "groupName": "newrelic",
       "groupSlug": "newrelic",
+      "separateMajorMinor": false,
       "addLabels": ["observability", "runtime"],
       "semanticCommitScope": "deps/newrelic"
     },
