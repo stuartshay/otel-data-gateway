@@ -339,16 +339,28 @@ export interface GeocodedAddress {
 /** Compact reverse-geocoded address summary embedded in track-point payloads. */
 export interface GeocodedAddressSummary {
   __typename?: 'GeocodedAddressSummary';
+  /** Pelias confidence score (0-1) */
+  confidence?: Maybe<Scalars['Float']['output']>;
   /** Country name */
   country?: Maybe<Scalars['String']['output']>;
   /** Full formatted address label from Pelias */
   display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number */
+  housenumber?: Maybe<Scalars['String']['output']>;
   /** City or town */
   locality?: Maybe<Scalars['String']['output']>;
+  /** Neighbourhood name */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code */
+  postalcode?: Maybe<Scalars['String']['output']>;
   /** State or province */
   region?: Maybe<Scalars['String']['output']>;
   /** Geocoding status: success, no_coverage, error, pending */
   status: Scalars['String']['output'];
+  /** Street name */
+  street?: Maybe<Scalars['String']['output']>;
   /** Role of this waypoint within a Garmin activity (start, end, waypoint). Null for OwnTracks records. */
   waypoint_kind?: Maybe<Scalars['String']['output']>;
 }

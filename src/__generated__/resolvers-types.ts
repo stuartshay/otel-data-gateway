@@ -342,16 +342,28 @@ export type GeocodedAddress = {
 /** Compact reverse-geocoded address summary embedded in track-point payloads. */
 export type GeocodedAddressSummary = {
   __typename?: 'GeocodedAddressSummary';
+  /** Pelias confidence score (0-1) */
+  confidence?: Maybe<Scalars['Float']['output']>;
   /** Country name */
   country?: Maybe<Scalars['String']['output']>;
   /** Full formatted address label from Pelias */
   display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number */
+  housenumber?: Maybe<Scalars['String']['output']>;
   /** City or town */
   locality?: Maybe<Scalars['String']['output']>;
+  /** Neighbourhood name */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code */
+  postalcode?: Maybe<Scalars['String']['output']>;
   /** State or province */
   region?: Maybe<Scalars['String']['output']>;
   /** Geocoding status: success, no_coverage, error, pending */
   status: Scalars['String']['output'];
+  /** Street name */
+  street?: Maybe<Scalars['String']['output']>;
   /** Role of this waypoint within a Garmin activity (start, end, waypoint). Null for OwnTracks records. */
   waypoint_kind?: Maybe<Scalars['String']['output']>;
 };
@@ -1187,11 +1199,17 @@ export type GeocodedAddressResolvers<ContextType = GatewayContext, ParentType ex
 }>;
 
 export type GeocodedAddressSummaryResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GeocodedAddressSummary'] = ResolversParentTypes['GeocodedAddressSummary']> = ResolversObject<{
+  confidence?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   display_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  geocoded_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  housenumber?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   locality?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  neighbourhood?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  postalcode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   region?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  street?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   waypoint_kind?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 

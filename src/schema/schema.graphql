@@ -645,6 +645,18 @@ type GeocodedAddressSummary {
   """
   display_address: String
   """
+  Street name
+  """
+  street: String
+  """
+  House or building number
+  """
+  housenumber: String
+  """
+  Neighbourhood name
+  """
+  neighbourhood: String
+  """
   City or town
   """
   locality: String
@@ -657,6 +669,14 @@ type GeocodedAddressSummary {
   """
   country: String
   """
+  Postal or ZIP code
+  """
+  postalcode: String
+  """
+  Pelias confidence score (0-1)
+  """
+  confidence: Float
+  """
   Role of this waypoint within a Garmin activity (start, end, waypoint). Null for OwnTracks records.
   """
   waypoint_kind: String
@@ -664,6 +684,10 @@ type GeocodedAddressSummary {
   Geocoding status: success, no_coverage, error, pending
   """
   status: String!
+  """
+  UTC timestamp when geocoding was performed
+  """
+  geocoded_at: String
 }
 
 """
