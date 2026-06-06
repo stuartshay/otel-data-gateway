@@ -92,12 +92,18 @@ export type GarminActivity = {
   __typename?: 'GarminActivity';
   /** Garmin Connect activity identifier */
   activity_id: Scalars['String']['output'];
+  /** Aerobic training effect score */
+  aerobic_training_effect?: Maybe<Scalars['Float']['output']>;
+  /** Anaerobic training effect score */
+  anaerobic_training_effect?: Maybe<Scalars['Float']['output']>;
   /** Average cadence in RPM */
   avg_cadence?: Maybe<Scalars['Int']['output']>;
   /** Average heart rate in beats per minute */
   avg_heart_rate?: Maybe<Scalars['Int']['output']>;
   /** Average pace in minutes per kilometre */
   avg_pace?: Maybe<Scalars['Float']['output']>;
+  /** Average respiration rate in breaths per minute */
+  avg_respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Average speed in km/h */
   avg_speed_kmh?: Maybe<Scalars['Float']['output']>;
   /** Average ambient temperature in degrees C */
@@ -114,22 +120,38 @@ export type GarminActivity = {
   duration_seconds?: Maybe<Scalars['Float']['output']>;
   /** Activity end time in UTC */
   end_time?: Maybe<Scalars['String']['output']>;
+  /** Exercise load score */
+  exercise_load?: Maybe<Scalars['Int']['output']>;
+  /** Whether this activity has usable heart-rate data in summary or track points */
+  hr_available: Scalars['Boolean']['output'];
   /** Maximum cadence in RPM */
   max_cadence?: Maybe<Scalars['Int']['output']>;
   /** Maximum heart rate in beats per minute */
   max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Maximum respiration rate in breaths per minute */
+  max_respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Maximum speed in km/h */
   max_speed_kmh?: Maybe<Scalars['Float']['output']>;
   /** Maximum ambient temperature in degrees C */
   max_temperature_c?: Maybe<Scalars['Int']['output']>;
+  /** Minimum heart rate in beats per minute */
+  min_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Minimum respiration rate in breaths per minute */
+  min_respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Minimum ambient temperature in degrees C */
   min_temperature_c?: Maybe<Scalars['Int']['output']>;
+  /** Moderate intensity minutes */
+  moderate_intensity_minutes?: Maybe<Scalars['Int']['output']>;
+  /** Distance over paved surfaces in kilometres */
+  paved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** Primary sport type (e.g. cycling, running) */
   sport: Scalars['String']['output'];
   /** Activity start time in UTC */
   start_time?: Maybe<Scalars['String']['output']>;
   /** Sub-sport classification (e.g. road, trail) */
   sub_sport?: Maybe<Scalars['String']['output']>;
+  /** Estimated sweat loss in millilitres */
+  sweat_loss_ml?: Maybe<Scalars['Int']['output']>;
   /** Total elevation gain in meters */
   total_ascent_m?: Maybe<Scalars['Float']['output']>;
   /** Total elevation loss in meters */
@@ -138,12 +160,18 @@ export type GarminActivity = {
   total_distance?: Maybe<Scalars['Float']['output']>;
   /** Total elapsed time in seconds (includes pauses) */
   total_elapsed_time?: Maybe<Scalars['Float']['output']>;
+  /** Total intensity minutes */
+  total_intensity_minutes?: Maybe<Scalars['Int']['output']>;
   /** Total timer time in seconds (active recording) */
   total_timer_time?: Maybe<Scalars['Float']['output']>;
   /** Number of GPS track points in this activity */
   track_point_count?: Maybe<Scalars['Int']['output']>;
+  /** Distance over unpaved surfaces in kilometres */
+  unpaved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp when the FIT file was uploaded */
   uploaded_at?: Maybe<Scalars['String']['output']>;
+  /** Vigorous intensity minutes */
+  vigorous_intensity_minutes?: Maybe<Scalars['Int']['output']>;
 };
 
 /** Full reverse-geocoded address attached to a Garmin activity waypoint. */
@@ -1069,9 +1097,12 @@ export type DistanceResultResolvers<ContextType = GatewayContext, ParentType ext
 
 export type GarminActivityResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivity'] = ResolversParentTypes['GarminActivity']> = ResolversObject<{
   activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  aerobic_training_effect?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  anaerobic_training_effect?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   avg_cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   avg_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   avg_pace?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  avg_respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   avg_speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   avg_temperature_c?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   calories?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -1080,21 +1111,32 @@ export type GarminActivityResolvers<ContextType = GatewayContext, ParentType ext
   distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   duration_seconds?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   end_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  exercise_load?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hr_available?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   max_cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   max_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  max_respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   max_speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   max_temperature_c?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  min_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  min_respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   min_temperature_c?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  moderate_intensity_minutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  paved_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   sport?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   start_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   sub_sport?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  sweat_loss_ml?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   total_ascent_m?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   total_descent_m?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   total_distance?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   total_elapsed_time?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  total_intensity_minutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   total_timer_time?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   track_point_count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  unpaved_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   uploaded_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  vigorous_intensity_minutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
 }>;
 
 export type GarminActivityAddressResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityAddress'] = ResolversParentTypes['GarminActivityAddress']> = ResolversObject<{
