@@ -89,12 +89,18 @@ export interface GarminActivity {
   __typename?: 'GarminActivity';
   /** Garmin Connect activity identifier */
   activity_id: Scalars['String']['output'];
+  /** Aerobic training effect score */
+  aerobic_training_effect?: Maybe<Scalars['Float']['output']>;
+  /** Anaerobic training effect score */
+  anaerobic_training_effect?: Maybe<Scalars['Float']['output']>;
   /** Average cadence in RPM */
   avg_cadence?: Maybe<Scalars['Int']['output']>;
   /** Average heart rate in beats per minute */
   avg_heart_rate?: Maybe<Scalars['Int']['output']>;
   /** Average pace in minutes per kilometre */
   avg_pace?: Maybe<Scalars['Float']['output']>;
+  /** Average respiration rate in breaths per minute */
+  avg_respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Average speed in km/h */
   avg_speed_kmh?: Maybe<Scalars['Float']['output']>;
   /** Average ambient temperature in degrees C */
@@ -111,22 +117,38 @@ export interface GarminActivity {
   duration_seconds?: Maybe<Scalars['Float']['output']>;
   /** Activity end time in UTC */
   end_time?: Maybe<Scalars['String']['output']>;
+  /** Exercise load score */
+  exercise_load?: Maybe<Scalars['Int']['output']>;
+  /** Whether this activity has usable heart-rate data in summary or track points */
+  hr_available: Scalars['Boolean']['output'];
   /** Maximum cadence in RPM */
   max_cadence?: Maybe<Scalars['Int']['output']>;
   /** Maximum heart rate in beats per minute */
   max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Maximum respiration rate in breaths per minute */
+  max_respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Maximum speed in km/h */
   max_speed_kmh?: Maybe<Scalars['Float']['output']>;
   /** Maximum ambient temperature in degrees C */
   max_temperature_c?: Maybe<Scalars['Int']['output']>;
+  /** Minimum heart rate in beats per minute */
+  min_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Minimum respiration rate in breaths per minute */
+  min_respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Minimum ambient temperature in degrees C */
   min_temperature_c?: Maybe<Scalars['Int']['output']>;
+  /** Moderate intensity minutes */
+  moderate_intensity_minutes?: Maybe<Scalars['Int']['output']>;
+  /** Distance over paved surfaces in kilometres */
+  paved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** Primary sport type (e.g. cycling, running) */
   sport: Scalars['String']['output'];
   /** Activity start time in UTC */
   start_time?: Maybe<Scalars['String']['output']>;
   /** Sub-sport classification (e.g. road, trail) */
   sub_sport?: Maybe<Scalars['String']['output']>;
+  /** Estimated sweat loss in millilitres */
+  sweat_loss_ml?: Maybe<Scalars['Int']['output']>;
   /** Total elevation gain in meters */
   total_ascent_m?: Maybe<Scalars['Float']['output']>;
   /** Total elevation loss in meters */
@@ -135,12 +157,18 @@ export interface GarminActivity {
   total_distance?: Maybe<Scalars['Float']['output']>;
   /** Total elapsed time in seconds (includes pauses) */
   total_elapsed_time?: Maybe<Scalars['Float']['output']>;
+  /** Total intensity minutes */
+  total_intensity_minutes?: Maybe<Scalars['Int']['output']>;
   /** Total timer time in seconds (active recording) */
   total_timer_time?: Maybe<Scalars['Float']['output']>;
   /** Number of GPS track points in this activity */
   track_point_count?: Maybe<Scalars['Int']['output']>;
+  /** Distance over unpaved surfaces in kilometres */
+  unpaved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp when the FIT file was uploaded */
   uploaded_at?: Maybe<Scalars['String']['output']>;
+  /** Vigorous intensity minutes */
+  vigorous_intensity_minutes?: Maybe<Scalars['Int']['output']>;
 }
 
 /** Full reverse-geocoded address attached to a Garmin activity waypoint. */

@@ -469,6 +469,62 @@ type GarminActivity {
   """
   max_heart_rate: Int
   """
+  Whether this activity has usable heart-rate data in summary or track points
+  """
+  hr_available: Boolean!
+  """
+  Minimum heart rate in beats per minute
+  """
+  min_heart_rate: Int
+  """
+  Aerobic training effect score
+  """
+  aerobic_training_effect: Float
+  """
+  Anaerobic training effect score
+  """
+  anaerobic_training_effect: Float
+  """
+  Exercise load score
+  """
+  exercise_load: Int
+  """
+  Average respiration rate in breaths per minute
+  """
+  avg_respiration_rate: Int
+  """
+  Minimum respiration rate in breaths per minute
+  """
+  min_respiration_rate: Int
+  """
+  Maximum respiration rate in breaths per minute
+  """
+  max_respiration_rate: Int
+  """
+  Estimated sweat loss in millilitres
+  """
+  sweat_loss_ml: Int
+  """
+  Moderate intensity minutes
+  """
+  moderate_intensity_minutes: Int
+  """
+  Vigorous intensity minutes
+  """
+  vigorous_intensity_minutes: Int
+  """
+  Total intensity minutes
+  """
+  total_intensity_minutes: Int
+  """
+  Distance over paved surfaces in kilometres
+  """
+  paved_distance_km: Float
+  """
+  Distance over unpaved surfaces in kilometres
+  """
+  unpaved_distance_km: Float
+  """
   Average cadence in RPM
   """
   avg_cadence: Int

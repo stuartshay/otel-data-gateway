@@ -20,11 +20,36 @@ export const garminResolvers: {
     },
 
     garminActivities: async (_parent, args, { dataSources }) => {
-      return dataSources.otelAPI.getGarminActivities(args);
+      const connection = await dataSources.otelAPI.getGarminActivities(args);
+      return {
+        ...connection,
+        items: connection.items.map((item) => {
+          const source = item as Record<string, unknown>;
+          const avgHr = source['avg_heart_rate'];
+          const maxHr = source['max_heart_rate'];
+          const hrAvailable = source['hr_available'];
+
+          return {
+            ...item,
+            hr_available:
+              typeof hrAvailable === 'boolean' ? hrAvailable : avgHr != null || maxHr != null,
+          };
+        }),
+      };
     },
 
     garminActivity: async (_parent, args, { dataSources }) => {
-      return dataSources.otelAPI.getGarminActivity(args.activity_id);
+      const activity = await dataSources.otelAPI.getGarminActivity(args.activity_id);
+      const source = activity as Record<string, unknown>;
+      const avgHr = source['avg_heart_rate'];
+      const maxHr = source['max_heart_rate'];
+      const hrAvailable = source['hr_available'];
+
+      return {
+        ...activity,
+        hr_available:
+          typeof hrAvailable === 'boolean' ? hrAvailable : avgHr != null || maxHr != null,
+      };
     },
 
     garminTrackPoints: async (_parent, args, { dataSources }) => {
