@@ -6,8 +6,8 @@ const serviceName = process.env.OTEL_SERVICE_NAME ?? 'otel-data-gateway';
 const serviceNamespace = process.env.SERVICE_NAMESPACE ?? 'otel-data-gateway';
 const environment = process.env.NODE_ENV ?? 'production';
 
-function emit(level: LogLevel, event: string, fields: LogFields = {}): void {
-  const payload = {
+function basePayload(level: LogLevel, event: string, fields: LogFields = {}): LogFields {
+  return {
     ...fields,
     event,
     message: event,
@@ -18,13 +18,31 @@ function emit(level: LogLevel, event: string, fields: LogFields = {}): void {
     'service.namespace': serviceNamespace,
     environment,
   };
+}
 
-  const line = JSON.stringify(payload);
-  if (level === 'error') {
-    process.stderr.write(`${line}\n`);
-    return;
+function writeLine(level: LogLevel, line: string): void {
+  try {
+    if (level === 'error') {
+      process.stderr.write(`${line}\n`);
+      return;
+    }
+    process.stdout.write(`${line}\n`);
+  } catch {
+    // Logging must never crash the process.
   }
-  process.stdout.write(`${line}\n`);
+}
+
+function emit(level: LogLevel, event: string, fields: LogFields = {}): void {
+  try {
+    writeLine(level, JSON.stringify(basePayload(level, event, fields)));
+  } catch (error) {
+    const serializationError = error instanceof Error ? error.message : String(error);
+    const fallback = basePayload('error', 'Log serialization failed', {
+      original_event: event,
+      serialization_error: serializationError,
+    });
+    writeLine('error', JSON.stringify(fallback));
+  }
 }
 
 export const logger = {

@@ -65,4 +65,22 @@ describe('logger', () => {
     expect(payload.level).toBe('error');
     expect(payload.reason).toBe('boom');
   });
+
+  it('falls back to a minimal error log when fields are not serializable', () => {
+    const stderrSpy = jest
+      .spyOn(process.stderr, 'write')
+      .mockImplementation(() => true as never);
+
+    expect(() => logger.info('Bad payload', { value: 1n })).not.toThrow();
+
+    expect(stderrSpy).toHaveBeenCalledTimes(1);
+    const output = String(stderrSpy.mock.calls[0]?.[0] ?? '').trim();
+    const payload = JSON.parse(output) as Record<string, unknown>;
+
+    expect(payload.event).toBe('Log serialization failed');
+    expect(payload.message).toBe('Log serialization failed');
+    expect(payload.level).toBe('error');
+    expect(payload.original_event).toBe('Bad payload');
+    expect(String(payload.serialization_error)).toContain('serialize');
+  });
 });
