@@ -7,11 +7,19 @@ import typeDefs from './schema/typeDefs.js';
 import resolvers from './resolvers/index.js';
 import { OtelDataAPI } from './datasources/OtelDataAPI.js';
 import { config } from './config.js';
+import { logger } from './logging.js';
 import type { GatewayContext } from './resolvers/types.js';
 
 // Safety net: log and survive unhandled rejections instead of crashing
 process.on('unhandledRejection', (reason) => {
-  console.error('Unhandled rejection:', reason);
+  const details =
+    reason instanceof Error
+      ? { reason: reason.message, error_name: reason.name, stack: reason.stack }
+      : { reason: String(reason) };
+
+  logger.error('Unhandled rejection', {
+    ...details,
+  });
 });
 
 const app = express();
@@ -27,7 +35,11 @@ app.get('/ready', async (_req, res) => {
     const api = new OtelDataAPI();
     const result = await api.getReady();
     res.json({ status: 'ready', backend: result.status, version: config.version });
-  } catch {
+  } catch (error) {
+    logger.warn('Readiness check failed', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     res.status(503).json({ status: 'not_ready', version: config.version });
   }
 });
@@ -57,4 +69,4 @@ app.use(
 
 await new Promise<void>((resolve) => httpServer.listen({ port: config.port }, resolve));
 
-console.log(`🚀 otel-data-gateway v${config.version} ready at http://localhost:${config.port}/`);
+logger.info('Gateway started', { version: config.version, port: config.port });

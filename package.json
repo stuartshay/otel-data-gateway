@@ -42,8 +42,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "graphql": "^16.14.0",
-    "graphql-tag": "^2.12.6",
-    "newrelic": "^14.0.0"
+    "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
@@ -53,7 +52,6 @@
     "@jest/globals": "^30.4.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/newrelic": "^9.14.8",
     "@types/node": "^25.6.2",
     "cspell": "^10.0.0",
     "eslint": "^10.3.0",

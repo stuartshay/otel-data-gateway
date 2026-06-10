@@ -2,7 +2,7 @@
 # =============================================================================
 # Stage 1: Build TypeScript (runs on the build host, not the target arch)
 # Pinned to $BUILDPLATFORM because tsc output is architecture-independent.
-# Native/optional deps installed here are NOT copied into the final image.
+# Build-stage dependencies are not copied into the final runtime image.
 # =============================================================================
 FROM --platform=$BUILDPLATFORM node:24-alpine AS builder
 
@@ -10,8 +10,7 @@ WORKDIR /app
 
 COPY package*.json ./
 # Drop the husky `prepare` lifecycle (devDep, not present in the image) but
-# keep all other install scripts so packages like `@newrelic/native-metrics`
-# resolve their prebuilt binaries via `node-gyp-build`.
+# keep all other install scripts for normal package installation behavior.
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
     npm pkg delete scripts.prepare && npm ci
 
@@ -22,8 +21,7 @@ RUN npm run build
 
 # =============================================================================
 # Stage 2: Production deps (runs on the TARGET platform)
-# Installs production-only dependencies for the runtime architecture so
-# native/optional binaries (e.g. @newrelic/native-metrics) match the image arch.
+# Installs production-only dependencies for the runtime architecture.
 # =============================================================================
 FROM node:24-alpine AS deps
 
@@ -45,11 +43,10 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
-COPY package*.json newrelic.cjs VERSION ./
+COPY package*.json VERSION ./
 
 ENV NODE_ENV=production
 ENV PORT=4000
-ENV NEW_RELIC_CONFIG_FILE=./newrelic.cjs
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:4000/health || exit 1
@@ -66,4 +63,4 @@ LABEL org.opencontainers.image.version="${APP_VERSION}"
 LABEL org.opencontainers.image.vendor="homelab"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "--require", "newrelic", "dist/index.js"]
+CMD ["node", "dist/index.js"]
