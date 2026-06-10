@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { createRequire } from 'node:module';
 import type { components } from '@stuartshay/otel-data-types';
 import { config } from '../config.js';
 
@@ -360,18 +359,6 @@ export class OtelDataAPI {
     }>,
   ): Promise<GarminSyncTriggerResult> {
     const syncId = randomUUID();
-
-    // Add NR custom attributes for cross-service correlation
-    try {
-      const require = createRequire(import.meta.url);
-      const newrelic = require('newrelic') as typeof import('newrelic');
-      newrelic.addCustomAttributes({
-        'garmin.sync_id': syncId,
-        'garmin.flow': true,
-      });
-    } catch {
-      // NR agent not available — ignore
-    }
 
     const response = await this.fetch<GarminSyncUpstreamResponse>({
       path: '/api/v1/garmin/sync',
