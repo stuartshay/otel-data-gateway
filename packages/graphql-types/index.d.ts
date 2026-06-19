@@ -255,6 +255,8 @@ export interface GarminChartPoint {
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */
   longitude: Scalars['Float']['output'];
+  /** Respiration rate in breaths per minute */
+  respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Instantaneous speed in km/h */
   speed_kmh?: Maybe<Scalars['Float']['output']>;
   /** Ambient temperature in degrees C */

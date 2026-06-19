@@ -258,6 +258,8 @@ export type GarminChartPoint = {
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */
   longitude: Scalars['Float']['output'];
+  /** Respiration rate in breaths per minute */
+  respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Instantaneous speed in km/h */
   speed_kmh?: Maybe<Scalars['Float']['output']>;
   /** Ambient temperature in degrees C */
@@ -1182,6 +1184,7 @@ export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType e
   heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
