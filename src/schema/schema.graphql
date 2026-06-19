@@ -881,6 +881,10 @@ type GarminChartPoint {
   """
   heart_rate: Int
   """
+  Respiration rate in breaths per minute
+  """
+  respiration_rate: Int
+  """
   Pedal/step cadence in RPM
   """
   cadence: Int
