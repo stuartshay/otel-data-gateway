@@ -49,4 +49,49 @@ describe('typeDefs', () => {
       ],
     });
   });
+
+  it('exposes extended metrics on Garmin track points', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminTrackPoints(activity_id: "activity-1") {
+            items {
+              hr_zone
+              respiration_rate
+              surface_type
+              effort_level
+            }
+          }
+        }
+      `,
+      rootValue: {
+        garminTrackPoints: () => ({
+          items: [
+            {
+              hr_zone: 3,
+              respiration_rate: 27,
+              surface_type: 'paved',
+              effort_level: 'steady',
+            },
+          ],
+        }),
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      garminTrackPoints: {
+        items: [
+          {
+            hr_zone: 3,
+            respiration_rate: 27,
+            surface_type: 'paved',
+            effort_level: 'steady',
+          },
+        ],
+      },
+    });
+  });
 });
