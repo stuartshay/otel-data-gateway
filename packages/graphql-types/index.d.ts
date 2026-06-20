@@ -310,16 +310,24 @@ export interface GarminTrackPoint {
   created_at?: Maybe<Scalars['String']['output']>;
   /** Cumulative distance from activity start in km */
   distance_from_start_km?: Maybe<Scalars['Float']['output']>;
+  /** Effort classification label */
+  effort_level?: Maybe<Scalars['String']['output']>;
   /** Heart rate in beats per minute */
   heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Heart-rate zone index (1-5) */
+  hr_zone?: Maybe<Scalars['Int']['output']>;
   /** Unique track point record identifier */
   id: Scalars['Int']['output'];
   /** GPS latitude in decimal degrees (WGS 84) */
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */
   longitude: Scalars['Float']['output'];
+  /** Respiration rate in breaths per minute */
+  respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Instantaneous speed in km/h */
   speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Road or terrain type */
+  surface_type?: Maybe<Scalars['String']['output']>;
   /** Ambient temperature in degrees C */
   temperature_c?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp of the track point recording */
