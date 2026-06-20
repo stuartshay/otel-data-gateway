@@ -15,6 +15,11 @@
       "matchPackageNames": ["@stuartshay/**"],
       "enabled": false
     },
+    {
+      "description": "Hold GraphQL at v16 until dependent tooling supports v17",
+      "matchPackageNames": ["graphql"],
+      "allowedVersions": "<17"
+    },
 
     {
       "description": "Severity label: patch updates",
