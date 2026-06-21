@@ -533,6 +533,10 @@ type GarminActivity {
   """
   max_cadence: Int
   """
+  Total activity strokes
+  """
+  total_strokes: Int
+  """
   Total calories burned
   """
   calories: Int

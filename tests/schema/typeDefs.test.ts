@@ -9,6 +9,7 @@ describe('typeDefs', () => {
     expect(typeDefs).toContain('health');
     expect(typeDefs).toContain('garminActivities');
     expect(typeDefs).toContain('triggerGarminSync');
+    expect(typeDefs).toContain('total_strokes: Int');
   });
 
   it('exposes heart-rate zone and respiration rate on Garmin chart points', async () => {
