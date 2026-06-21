@@ -251,6 +251,8 @@ export interface GarminChartPoint {
   distance_from_start_km?: Maybe<Scalars['Float']['output']>;
   /** Heart rate in beats per minute */
   heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Heart-rate zone index (1-5) */
+  hr_zone?: Maybe<Scalars['Int']['output']>;
   /** GPS latitude in decimal degrees (WGS 84) */
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */

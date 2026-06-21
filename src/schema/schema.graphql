@@ -897,6 +897,10 @@ type GarminChartPoint {
   """
   heart_rate: Int
   """
+  Heart-rate zone index (1-5)
+  """
+  hr_zone: Int
+  """
   Respiration rate in breaths per minute
   """
   respiration_rate: Int

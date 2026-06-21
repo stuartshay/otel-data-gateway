@@ -254,6 +254,8 @@ export type GarminChartPoint = {
   distance_from_start_km?: Maybe<Scalars['Float']['output']>;
   /** Heart rate in beats per minute */
   heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Heart-rate zone index (1-5) */
+  hr_zone?: Maybe<Scalars['Int']['output']>;
   /** GPS latitude in decimal degrees (WGS 84) */
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */
@@ -1190,6 +1192,7 @@ export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType e
   cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   distance_from_start_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hr_zone?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;

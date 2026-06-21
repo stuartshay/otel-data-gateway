@@ -11,7 +11,7 @@ describe('typeDefs', () => {
     expect(typeDefs).toContain('triggerGarminSync');
   });
 
-  it('exposes respiration rate on Garmin chart points', async () => {
+  it('exposes heart-rate zone and respiration rate on Garmin chart points', async () => {
     const schema = buildSchema(typeDefs);
     const result = await graphql({
       schema,
@@ -21,6 +21,7 @@ describe('typeDefs', () => {
             timestamp
             latitude
             longitude
+            hr_zone
             respiration_rate
           }
         }
@@ -31,6 +32,7 @@ describe('typeDefs', () => {
             timestamp: '2026-06-19T12:00:00Z',
             latitude: 40.7,
             longitude: -74,
+            hr_zone: 3,
             respiration_rate: 27,
           },
         ],
@@ -44,6 +46,7 @@ describe('typeDefs', () => {
           timestamp: '2026-06-19T12:00:00Z',
           latitude: 40.7,
           longitude: -74,
+          hr_zone: 3,
           respiration_rate: 27,
         },
       ],
