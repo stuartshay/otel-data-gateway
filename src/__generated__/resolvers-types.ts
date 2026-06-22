@@ -252,14 +252,22 @@ export type GarminChartPoint = {
   cadence?: Maybe<Scalars['Int']['output']>;
   /** Cumulative distance from activity start in km */
   distance_from_start_km?: Maybe<Scalars['Float']['output']>;
+  /** Effort classification label */
+  effort_level?: Maybe<Scalars['String']['output']>;
   /** Heart rate in beats per minute */
   heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Heart-rate zone index (1-5) */
+  hr_zone?: Maybe<Scalars['Int']['output']>;
   /** GPS latitude in decimal degrees (WGS 84) */
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */
   longitude: Scalars['Float']['output'];
+  /** Respiration rate in breaths per minute */
+  respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Instantaneous speed in km/h */
   speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Road or terrain type */
+  surface_type?: Maybe<Scalars['String']['output']>;
   /** Ambient temperature in degrees C */
   temperature_c?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp of the data point */
@@ -311,16 +319,24 @@ export type GarminTrackPoint = {
   created_at?: Maybe<Scalars['String']['output']>;
   /** Cumulative distance from activity start in km */
   distance_from_start_km?: Maybe<Scalars['Float']['output']>;
+  /** Effort classification label */
+  effort_level?: Maybe<Scalars['String']['output']>;
   /** Heart rate in beats per minute */
   heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Heart-rate zone index (1-5) */
+  hr_zone?: Maybe<Scalars['Int']['output']>;
   /** Unique track point record identifier */
   id: Scalars['Int']['output'];
   /** GPS latitude in decimal degrees (WGS 84) */
   latitude: Scalars['Float']['output'];
   /** GPS longitude in decimal degrees (WGS 84) */
   longitude: Scalars['Float']['output'];
+  /** Respiration rate in breaths per minute */
+  respiration_rate?: Maybe<Scalars['Int']['output']>;
   /** Instantaneous speed in km/h */
   speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Road or terrain type */
+  surface_type?: Maybe<Scalars['String']['output']>;
   /** Ambient temperature in degrees C */
   temperature_c?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp of the track point recording */
@@ -1179,10 +1195,14 @@ export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType e
   altitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   distance_from_start_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  effort_level?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hr_zone?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  surface_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 }>;
@@ -1210,11 +1230,15 @@ export type GarminTrackPointResolvers<ContextType = GatewayContext, ParentType e
   cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   created_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   distance_from_start_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  effort_level?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hr_zone?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  surface_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
 }>;
