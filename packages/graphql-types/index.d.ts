@@ -159,6 +159,8 @@ export interface GarminActivity {
   total_elapsed_time?: Maybe<Scalars['Float']['output']>;
   /** Total intensity minutes */
   total_intensity_minutes?: Maybe<Scalars['Int']['output']>;
+  /** Total activity strokes */
+  total_strokes?: Maybe<Scalars['Int']['output']>;
   /** Total timer time in seconds (active recording) */
   total_timer_time?: Maybe<Scalars['Float']['output']>;
   /** Number of GPS track points in this activity */

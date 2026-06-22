@@ -162,6 +162,8 @@ export type GarminActivity = {
   total_elapsed_time?: Maybe<Scalars['Float']['output']>;
   /** Total intensity minutes */
   total_intensity_minutes?: Maybe<Scalars['Int']['output']>;
+  /** Total activity strokes */
+  total_strokes?: Maybe<Scalars['Int']['output']>;
   /** Total timer time in seconds (active recording) */
   total_timer_time?: Maybe<Scalars['Float']['output']>;
   /** Number of GPS track points in this activity */
@@ -1144,6 +1146,7 @@ export type GarminActivityResolvers<ContextType = GatewayContext, ParentType ext
   total_distance?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   total_elapsed_time?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   total_intensity_minutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  total_strokes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   total_timer_time?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   track_point_count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   unpaved_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
