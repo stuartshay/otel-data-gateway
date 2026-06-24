@@ -102,6 +102,7 @@ jobs:
 
       - name: Enable auto-merge
         if: steps.cpr.outputs.pull-request-number
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITOPS_PAT }}
         run: |
