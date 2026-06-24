@@ -98,4 +98,51 @@ describe('typeDefs', () => {
       },
     });
   });
+
+  it('exposes recording device metadata on a Garmin activity', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminActivity(activity_id: "activity-1") {
+            activity_id
+            device {
+              device_id
+              manufacturer
+              garmin_product
+              model
+              software_version
+            }
+          }
+        }
+      `,
+      rootValue: {
+        garminActivity: () => ({
+          activity_id: 'activity-1',
+          device: {
+            device_id: 3444454776,
+            manufacturer: 'garmin',
+            garmin_product: 4061,
+            model: 'Edge 540 Solar',
+            software_version: '31.30',
+          },
+        }),
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      garminActivity: {
+        activity_id: 'activity-1',
+        device: {
+          device_id: 3444454776,
+          manufacturer: 'garmin',
+          garmin_product: 4061,
+          model: 'Edge 540 Solar',
+          software_version: '31.30',
+        },
+      },
+    });
+  });
 });

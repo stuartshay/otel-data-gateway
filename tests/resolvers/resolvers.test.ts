@@ -175,6 +175,41 @@ describe('garmin resolvers', () => {
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
   });
 
+  it('passes device metadata through garminActivity', async () => {
+    const device = {
+      device_id: 3444454776,
+      manufacturer: 'garmin',
+      garmin_product: 4061,
+      model: 'Edge 540 Solar',
+      software_version: '31.30',
+    };
+    const ctx = contextWith({
+      getGarminActivity: mockAsync({ activity_id: 'abc', avg_heart_rate: 120, device }),
+    });
+
+    const activity = await runResolver<{ activity_id: string }, { device?: typeof device }>(
+      garminResolvers.Query.garminActivity,
+      { activity_id: 'abc' },
+      ctx,
+    );
+
+    expect(activity.device).toEqual(device);
+  });
+
+  it('returns null device when activity has no recording device', async () => {
+    const ctx = contextWith({
+      getGarminActivity: mockAsync({ activity_id: 'abc', avg_heart_rate: 120, device: null }),
+    });
+
+    const activity = await runResolver<{ activity_id: string }, { device?: unknown }>(
+      garminResolvers.Query.garminActivity,
+      { activity_id: 'abc' },
+      ctx,
+    );
+
+    expect(activity.device).toBeNull();
+  });
+
   it('passes filter args to garminActivityTotals', async () => {
     const args = {
       period: 'week',

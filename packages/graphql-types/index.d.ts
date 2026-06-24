@@ -109,6 +109,8 @@ export interface GarminActivity {
   calories?: Maybe<Scalars['Int']['output']>;
   /** UTC timestamp when the record was inserted */
   created_at?: Maybe<Scalars['String']['output']>;
+  /** Recording device metadata (manufacturer, model, firmware) */
+  device?: Maybe<GarminDevice>;
   /** Device manufacturer (e.g. garmin) */
   device_manufacturer?: Maybe<Scalars['String']['output']>;
   /** Total distance in kilometres */
@@ -276,6 +278,21 @@ export interface GarminDateRange {
   max_date: Scalars['DateTime']['output'];
   /** Earliest Garmin activity timestamp (ISO 8601) */
   min_date: Scalars['DateTime']['output'];
+}
+
+/** Recording device metadata captured from a Garmin activity's FIT file. */
+export interface GarminDevice {
+  __typename?: 'GarminDevice';
+  /** Recording device serial number */
+  device_id?: Maybe<Scalars['Float']['output']>;
+  /** Raw Garmin product enum id from the FIT file (e.g. 4061) */
+  garmin_product?: Maybe<Scalars['Int']['output']>;
+  /** Device manufacturer (e.g. garmin) */
+  manufacturer?: Maybe<Scalars['String']['output']>;
+  /** Friendly device model name (e.g. Edge 540 Solar) */
+  model?: Maybe<Scalars['String']['output']>;
+  /** Device firmware/software version (e.g. 31.30) */
+  software_version?: Maybe<Scalars['String']['output']>;
 }
 
 /** Result payload returned when triggering an on-demand Garmin sync. */
