@@ -112,6 +112,8 @@ export type GarminActivity = {
   calories?: Maybe<Scalars['Int']['output']>;
   /** UTC timestamp when the record was inserted */
   created_at?: Maybe<Scalars['String']['output']>;
+  /** Recording device metadata (manufacturer, model, firmware) */
+  device?: Maybe<GarminDevice>;
   /** Device manufacturer (e.g. garmin) */
   device_manufacturer?: Maybe<Scalars['String']['output']>;
   /** Total distance in kilometres */
@@ -279,6 +281,21 @@ export type GarminDateRange = {
   max_date: Scalars['DateTime']['output'];
   /** Earliest Garmin activity timestamp (ISO 8601) */
   min_date: Scalars['DateTime']['output'];
+};
+
+/** Recording device metadata captured from a Garmin activity's FIT file. */
+export type GarminDevice = {
+  __typename?: 'GarminDevice';
+  /** Recording device serial number */
+  device_id?: Maybe<Scalars['Float']['output']>;
+  /** Raw Garmin product enum id from the FIT file (e.g. 4061) */
+  garmin_product?: Maybe<Scalars['Int']['output']>;
+  /** Device manufacturer (e.g. garmin) */
+  manufacturer?: Maybe<Scalars['String']['output']>;
+  /** Friendly device model name (e.g. Edge 540 Solar) */
+  model?: Maybe<Scalars['String']['output']>;
+  /** Device firmware/software version (e.g. 31.30) */
+  software_version?: Maybe<Scalars['String']['output']>;
 };
 
 /** Result payload returned when triggering an on-demand Garmin sync. */
@@ -989,6 +1006,7 @@ export type ResolversTypes = ResolversObject<{
   GarminActivityTotal: ResolverTypeWrapper<GarminActivityTotal>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
   GarminDateRange: ResolverTypeWrapper<GarminDateRange>;
+  GarminDevice: ResolverTypeWrapper<GarminDevice>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
@@ -1036,6 +1054,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminActivityTotal: GarminActivityTotal;
   GarminChartPoint: GarminChartPoint;
   GarminDateRange: GarminDateRange;
+  GarminDevice: GarminDevice;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
@@ -1121,6 +1140,7 @@ export type GarminActivityResolvers<ContextType = GatewayContext, ParentType ext
   avg_temperature_c?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   calories?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   created_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  device?: Resolver<Maybe<ResolversTypes['GarminDevice']>, ParentType, ContextType>;
   device_manufacturer?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   duration_seconds?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
@@ -1207,6 +1227,14 @@ export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType e
 export type GarminDateRangeResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminDateRange'] = ResolversParentTypes['GarminDateRange']> = ResolversObject<{
   max_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   min_date?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+}>;
+
+export type GarminDeviceResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminDevice'] = ResolversParentTypes['GarminDevice']> = ResolversObject<{
+  device_id?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  garmin_product?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  manufacturer?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  model?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  software_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
 export type GarminSyncTriggerResultResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSyncTriggerResult'] = ResolversParentTypes['GarminSyncTriggerResult']> = ResolversObject<{
@@ -1482,6 +1510,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminActivityTotal?: GarminActivityTotalResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
   GarminDateRange?: GarminDateRangeResolvers<ContextType>;
+  GarminDevice?: GarminDeviceResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;

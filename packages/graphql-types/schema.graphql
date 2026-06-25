@@ -285,6 +285,62 @@ type GeocodingStatus {
   Percentage of locations with a geocoded address
   """
   coverage_percent: Float!
+  """
+  Per-source breakdown of geocoding coverage (owntracks, garmin)
+  """
+  by_source: GeocodingStatusBySource!
+}
+
+"""
+Coverage statistics for a single geocoding source (owntracks or garmin).
+"""
+type GeocodingSourceStatus {
+  """
+  Number of successfully geocoded records for this source
+  """
+  success: Int!
+  """
+  Number of records awaiting geocoding for this source
+  """
+  pending: Int!
+  """
+  Number of records outside Pelias coverage area
+  """
+  no_coverage: Int!
+  """
+  Number of records that failed geocoding
+  """
+  errors: Int!
+  """
+  Total number of geocoded_addresses rows for this source
+  """
+  total: Int!
+}
+
+"""
+Per-source breakdown of geocoding coverage.
+"""
+type GeocodingStatusBySource {
+  """
+  Coverage stats for OwnTracks rows
+  """
+  owntracks: GeocodingSourceStatus!
+  """
+  Coverage stats for Garmin rows
+  """
+  garmin: GeocodingSourceStatus!
+  """
+  Total number of Garmin activities (denominator for activity-level coverage)
+  """
+  garmin_activities_total: Int!
+  """
+  Number of Garmin activities that have at least one address row
+  """
+  garmin_activities_geocoded: Int!
+  """
+  Percentage of Garmin activities with at least one geocoded address
+  """
+  garmin_coverage_percent: Float!
 }
 
 """
@@ -373,6 +429,32 @@ type LocationDateRange {
 # Garmin
 # -------------------------------------------------------
 """
+Recording device metadata captured from a Garmin activity's FIT file.
+"""
+type GarminDevice {
+  """
+  Recording device serial number
+  """
+  device_id: Float
+  """
+  Device manufacturer (e.g. garmin)
+  """
+  manufacturer: String
+  """
+  Raw Garmin product enum id from the FIT file (e.g. 4061)
+  """
+  garmin_product: Int
+  """
+  Friendly device model name (e.g. Edge 540 Solar)
+  """
+  model: String
+  """
+  Device firmware/software version (e.g. 31.30)
+  """
+  software_version: String
+}
+
+"""
 Summary of a Garmin Connect activity parsed from a FIT file.
 """
 type GarminActivity {
@@ -413,6 +495,62 @@ type GarminActivity {
   """
   max_heart_rate: Int
   """
+  Whether this activity has usable heart-rate data in summary or track points
+  """
+  hr_available: Boolean!
+  """
+  Minimum heart rate in beats per minute
+  """
+  min_heart_rate: Int
+  """
+  Aerobic training effect score
+  """
+  aerobic_training_effect: Float
+  """
+  Anaerobic training effect score
+  """
+  anaerobic_training_effect: Float
+  """
+  Exercise load score
+  """
+  exercise_load: Int
+  """
+  Average respiration rate in breaths per minute
+  """
+  avg_respiration_rate: Int
+  """
+  Minimum respiration rate in breaths per minute
+  """
+  min_respiration_rate: Int
+  """
+  Maximum respiration rate in breaths per minute
+  """
+  max_respiration_rate: Int
+  """
+  Estimated sweat loss in millilitres
+  """
+  sweat_loss_ml: Int
+  """
+  Moderate intensity minutes
+  """
+  moderate_intensity_minutes: Int
+  """
+  Vigorous intensity minutes
+  """
+  vigorous_intensity_minutes: Int
+  """
+  Total intensity minutes
+  """
+  total_intensity_minutes: Int
+  """
+  Distance over paved surfaces in kilometres
+  """
+  paved_distance_km: Float
+  """
+  Distance over unpaved surfaces in kilometres
+  """
+  unpaved_distance_km: Float
+  """
   Average cadence in RPM
   """
   avg_cadence: Int
@@ -420,6 +558,10 @@ type GarminActivity {
   Maximum cadence in RPM
   """
   max_cadence: Int
+  """
+  Total activity strokes
+  """
+  total_strokes: Int
   """
   Total calories burned
   """
@@ -452,6 +594,10 @@ type GarminActivity {
   Device manufacturer (e.g. garmin)
   """
   device_manufacturer: String
+  """
+  Recording device metadata (manufacturer, model, firmware)
+  """
+  device: GarminDevice
   """
   Average ambient temperature in degrees C
   """
@@ -563,6 +709,14 @@ type GarminTrackPoint {
   """
   heart_rate: Int
   """
+  Heart-rate zone index (1-5)
+  """
+  hr_zone: Int
+  """
+  Respiration rate in breaths per minute
+  """
+  respiration_rate: Int
+  """
   Pedal/step cadence in RPM
   """
   cadence: Int
@@ -571,9 +725,149 @@ type GarminTrackPoint {
   """
   temperature_c: Float
   """
+  Road or terrain type
+  """
+  surface_type: String
+  """
+  Effort classification label
+  """
+  effort_level: String
+  """
   UTC timestamp when the record was inserted
   """
   created_at: String
+  """
+  Compact reverse-geocoded address summary, when geocoded
+  """
+  address: GeocodedAddressSummary
+}
+
+"""
+Compact reverse-geocoded address summary embedded in track-point payloads.
+"""
+type GeocodedAddressSummary {
+  """
+  Full formatted address label from Pelias
+  """
+  display_address: String
+  """
+  Street name
+  """
+  street: String
+  """
+  House or building number
+  """
+  housenumber: String
+  """
+  Neighbourhood name
+  """
+  neighbourhood: String
+  """
+  City or town
+  """
+  locality: String
+  """
+  State or province
+  """
+  region: String
+  """
+  Country name
+  """
+  country: String
+  """
+  Postal or ZIP code
+  """
+  postalcode: String
+  """
+  Pelias confidence score (0-1)
+  """
+  confidence: Float
+  """
+  Role of this waypoint within a Garmin activity (start, end, waypoint). Null for OwnTracks records.
+  """
+  waypoint_kind: String
+  """
+  Geocoding status: success, no_coverage, error, pending
+  """
+  status: String!
+  """
+  UTC timestamp when geocoding was performed
+  """
+  geocoded_at: String
+}
+
+"""
+Full reverse-geocoded address attached to a Garmin activity waypoint.
+"""
+type GarminActivityAddress {
+  """
+  garmin_track_points.id this address was geocoded from
+  """
+  track_point_id: Int!
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  Role of this waypoint within the activity: start, end, or waypoint
+  """
+  waypoint_kind: String!
+  """
+  UTC timestamp of the track point this address was derived from
+  """
+  timestamp: DateTime!
+  """
+  GPS latitude in decimal degrees (WGS 84)
+  """
+  latitude: Float!
+  """
+  GPS longitude in decimal degrees (WGS 84)
+  """
+  longitude: Float!
+  """
+  Full formatted address label from Pelias
+  """
+  display_address: String
+  """
+  Street name
+  """
+  street: String
+  """
+  House or building number
+  """
+  housenumber: String
+  """
+  Neighbourhood name
+  """
+  neighbourhood: String
+  """
+  City or town
+  """
+  locality: String
+  """
+  State or province
+  """
+  region: String
+  """
+  Country name
+  """
+  country: String
+  """
+  Postal or ZIP code
+  """
+  postalcode: String
+  """
+  Pelias confidence score (0-1)
+  """
+  confidence: Float
+  """
+  Geocoding status: success, no_coverage, error, pending
+  """
+  status: String!
+  """
+  UTC timestamp when geocoding was performed
+  """
+  geocoded_at: String
 }
 
 """
@@ -636,6 +930,14 @@ type GarminChartPoint {
   Heart rate in beats per minute
   """
   heart_rate: Int
+  """
+  Heart-rate zone index (1-5)
+  """
+  hr_zone: Int
+  """
+  Respiration rate in breaths per minute
+  """
+  respiration_rate: Int
   """
   Pedal/step cadence in RPM
   """
@@ -1199,6 +1501,16 @@ type Query {
     """
     activity_id: String!
   ): [GarminChartPoint!]!
+
+  """
+  Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end).
+  """
+  garminActivityAddresses(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): [GarminActivityAddress!]!
 
   """
   Aggregate Garmin activity totals grouped by week, month, or year.
