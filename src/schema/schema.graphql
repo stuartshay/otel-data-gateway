@@ -907,6 +907,20 @@ type SportInfo {
 }
 
 """
+Garmin activity count grouped by recording device model.
+"""
+type GarminDeviceCount {
+  """
+  Device model label, or Manual when an activity has no recording device.
+  """
+  label: String!
+  """
+  Number of activities for this device label.
+  """
+  activity_count: Int!
+}
+
+"""
 Lightweight track point optimised for time-series chart rendering.
 """
 type GarminChartPoint {
@@ -1491,6 +1505,11 @@ type Query {
   List all distinct sport types with activity counts.
   """
   garminSports: [SportInfo!]!
+
+  """
+  List Garmin recording device labels with activity counts.
+  """
+  garminDeviceCounts: [GarminDeviceCount!]!
 
   """
   Retrieve chart-optimised track points for a Garmin activity.

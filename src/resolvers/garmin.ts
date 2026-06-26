@@ -8,6 +8,7 @@ export const garminResolvers: {
     | 'garminActivity'
     | 'garminTrackPoints'
     | 'garminSports'
+    | 'garminDeviceCounts'
     | 'garminChartData'
     | 'garminActivityTotals'
     | 'garminActivityAddresses'
@@ -59,6 +60,10 @@ export const garminResolvers: {
 
     garminSports: async (_parent, _args, { dataSources }) => {
       return dataSources.otelAPI.getGarminSports();
+    },
+
+    garminDeviceCounts: async (_parent, _args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminDeviceCounts();
     },
 
     garminChartData: async (_parent, args, { dataSources }) => {

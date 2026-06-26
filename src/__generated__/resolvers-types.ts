@@ -298,6 +298,15 @@ export type GarminDevice = {
   software_version?: Maybe<Scalars['String']['output']>;
 };
 
+/** Garmin activity count grouped by recording device model. */
+export type GarminDeviceCount = {
+  __typename?: 'GarminDeviceCount';
+  /** Number of activities for this device label. */
+  activity_count: Scalars['Int']['output'];
+  /** Device model label, or Manual when an activity has no recording device. */
+  label: Scalars['String']['output'];
+};
+
 /** Result payload returned when triggering an on-demand Garmin sync. */
 export type GarminSyncTriggerResult = {
   __typename?: 'GarminSyncTriggerResult';
@@ -673,6 +682,8 @@ export type Query = {
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
   garminDateRange: GarminDateRange;
+  /** List Garmin recording device labels with activity counts. */
+  garminDeviceCounts: Array<GarminDeviceCount>;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
@@ -1007,6 +1018,7 @@ export type ResolversTypes = ResolversObject<{
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
   GarminDateRange: ResolverTypeWrapper<GarminDateRange>;
   GarminDevice: ResolverTypeWrapper<GarminDevice>;
+  GarminDeviceCount: ResolverTypeWrapper<GarminDeviceCount>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
@@ -1055,6 +1067,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminChartPoint: GarminChartPoint;
   GarminDateRange: GarminDateRange;
   GarminDevice: GarminDevice;
+  GarminDeviceCount: GarminDeviceCount;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
@@ -1235,6 +1248,11 @@ export type GarminDeviceResolvers<ContextType = GatewayContext, ParentType exten
   manufacturer?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   model?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   software_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
+export type GarminDeviceCountResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminDeviceCount'] = ResolversParentTypes['GarminDeviceCount']> = ResolversObject<{
+  activity_count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
 
 export type GarminSyncTriggerResultResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSyncTriggerResult'] = ResolversParentTypes['GarminSyncTriggerResult']> = ResolversObject<{
@@ -1432,6 +1450,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminActivityTotals?: Resolver<Array<ResolversTypes['GarminActivityTotal']>, ParentType, ContextType, RequireFields<QueryGarminActivityTotalsArgs, 'period'>>;
   garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
   garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
+  garminDeviceCounts?: Resolver<Array<ResolversTypes['GarminDeviceCount']>, ParentType, ContextType>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
   garminTrackPoints?: Resolver<ResolversTypes['GarminTrackPointConnection'], ParentType, ContextType, RequireFields<QueryGarminTrackPointsArgs, 'activity_id'>>;
   geocodingStatus?: Resolver<ResolversTypes['GeocodingStatus'], ParentType, ContextType>;
@@ -1511,6 +1530,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
   GarminDateRange?: GarminDateRangeResolvers<ContextType>;
   GarminDevice?: GarminDeviceResolvers<ContextType>;
+  GarminDeviceCount?: GarminDeviceCountResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;

@@ -145,4 +145,35 @@ describe('typeDefs', () => {
       },
     });
   });
+
+  it('exposes Garmin device activity counts', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminDeviceCounts {
+            label
+            activity_count
+          }
+        }
+      `,
+      rootValue: {
+        garminDeviceCounts: () => [
+          { label: 'Edge 500', activity_count: 1237 },
+          { label: 'Edge 540 Solar', activity_count: 194 },
+          { label: 'Manual', activity_count: 5 },
+        ],
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      garminDeviceCounts: [
+        { label: 'Edge 500', activity_count: 1237 },
+        { label: 'Edge 540 Solar', activity_count: 194 },
+        { label: 'Manual', activity_count: 5 },
+      ],
+    });
+  });
 });

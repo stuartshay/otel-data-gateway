@@ -163,15 +163,18 @@ describe('garmin resolvers', () => {
     const ctx = contextWith({
       getGarminActivity: mockAsync({ activity_id: 'abc' }),
       getGarminSports: mockAsync(['cycling']),
+      getGarminDeviceCounts: mockAsync([{ label: 'Edge 500', activity_count: 2 }]),
       getGarminChartData: mockAsync([{ timestamp: 'now' }]),
     });
 
     await runResolver(garminResolvers.Query.garminActivity, { activity_id: 'abc' }, ctx);
     await runResolver(garminResolvers.Query.garminSports, {}, ctx);
+    await runResolver(garminResolvers.Query.garminDeviceCounts, {}, ctx);
     await runResolver(garminResolvers.Query.garminChartData, { activity_id: 'abc' }, ctx);
 
     expect(ctx.dataSources.otelAPI.getGarminActivity).toHaveBeenCalledWith('abc');
     expect(ctx.dataSources.otelAPI.getGarminSports).toHaveBeenCalled();
+    expect(ctx.dataSources.otelAPI.getGarminDeviceCounts).toHaveBeenCalled();
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
   });
 
