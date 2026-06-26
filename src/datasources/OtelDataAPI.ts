@@ -34,6 +34,11 @@ interface CacheEntry<T> {
   expiry: number;
 }
 
+interface GarminDeviceCount {
+  label: string;
+  activity_count: number;
+}
+
 /** Map that evicts expired entries on access, preventing unbounded growth. */
 class ExpiringCache<K, V extends { expiry: number }> extends Map<K, V> {
   override get(key: K): V | undefined {
@@ -290,6 +295,13 @@ export class OtelDataAPI {
   async getGarminSports() {
     return this.fetch<Schemas['SportInfo'][]>({
       path: '/api/v1/garmin/sports',
+      cacheTtlMs: 60_000,
+    });
+  }
+
+  async getGarminDeviceCounts(): Promise<GarminDeviceCount[]> {
+    return this.fetch<GarminDeviceCount[]>({
+      path: '/api/v1/garmin/device-counts',
       cacheTtlMs: 60_000,
     });
   }

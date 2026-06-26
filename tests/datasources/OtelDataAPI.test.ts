@@ -318,6 +318,7 @@ describe('OtelDataAPI', () => {
     await api.getGarminActivity('ga-1');
     await api.getGarminTrackPoints('ga-1', { limit: 2 });
     await api.getGarminSports();
+    await api.getGarminDeviceCounts();
     await api.getGarminChartData('ga-1');
     await api.getGarminActivityTotals({ period: 'week' });
     await api.triggerGarminSync({ window_hours: 24 });
@@ -346,6 +347,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/activities/ga-1',
       '/api/v1/garmin/activities/ga-1/tracks',
       '/api/v1/garmin/sports',
+      '/api/v1/garmin/device-counts',
       '/api/v1/garmin/activities/ga-1/chart-data',
       '/api/v1/garmin/activity-totals',
       '/api/v1/garmin/sync',
@@ -439,6 +441,29 @@ describe('OtelDataAPI', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
     nowSpy.mockRestore();
+  });
+
+  it('fetches Garmin device counts from the aggregate endpoint', async () => {
+    fetchMock.mockImplementation(() =>
+      jsonResponse([
+        { label: 'Edge 500', activity_count: 2 },
+        { label: 'Edge 540 Solar', activity_count: 1 },
+        { label: 'Manual', activity_count: 1 },
+      ]),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    const counts = await api.getGarminDeviceCounts();
+
+    expect(counts).toEqual([
+      { label: 'Edge 500', activity_count: 2 },
+      { label: 'Edge 540 Solar', activity_count: 1 },
+      { label: 'Manual', activity_count: 1 },
+    ]);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toBe(
+      'https://example.test/api/v1/garmin/device-counts',
+    );
   });
 
   it('caches garminActivity responses for 30s', async () => {

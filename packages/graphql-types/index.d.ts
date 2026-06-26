@@ -295,6 +295,15 @@ export interface GarminDevice {
   software_version?: Maybe<Scalars['String']['output']>;
 }
 
+/** Garmin activity count grouped by recording device model. */
+export interface GarminDeviceCount {
+  __typename?: 'GarminDeviceCount';
+  /** Number of activities for this device label. */
+  activity_count: Scalars['Int']['output'];
+  /** Device model label, or Manual when an activity has no recording device. */
+  label: Scalars['String']['output'];
+}
+
 /** Result payload returned when triggering an on-demand Garmin sync. */
 export interface GarminSyncTriggerResult {
   __typename?: 'GarminSyncTriggerResult';
@@ -668,6 +677,8 @@ export interface Query {
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
   garminDateRange: GarminDateRange;
+  /** List Garmin recording device labels with activity counts. */
+  garminDeviceCounts: Array<GarminDeviceCount>;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
