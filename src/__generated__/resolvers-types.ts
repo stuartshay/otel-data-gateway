@@ -217,6 +217,81 @@ export type GarminActivityAddress = {
   waypoint_kind: Scalars['String']['output'];
 };
 
+/** Garmin-native ClimbPro typed split for an activity. */
+export type GarminActivityClimb = {
+  __typename?: 'GarminActivityClimb';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Average elapsed vertical speed in meters per second */
+  average_elapsed_vertical_speed_mps?: Maybe<Scalars['Float']['output']>;
+  /** Average climb grade percent */
+  average_grade_percent?: Maybe<Scalars['Float']['output']>;
+  /** Average moving speed in meters per second */
+  average_moving_speed_mps?: Maybe<Scalars['Float']['output']>;
+  /** Average speed in meters per second */
+  average_speed_mps?: Maybe<Scalars['Float']['output']>;
+  /** Average temperature in degrees C */
+  average_temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** Average vertical speed in meters per second */
+  average_vertical_speed_mps?: Maybe<Scalars['Float']['output']>;
+  /** BMR calories recorded for this climb */
+  bmr_calories?: Maybe<Scalars['Float']['output']>;
+  /** Calories recorded for this climb */
+  calories?: Maybe<Scalars['Float']['output']>;
+  /** Garmin ClimbPro difficulty */
+  climb_pro_difficulty?: Maybe<Scalars['String']['output']>;
+  /** Garmin ClimbPro typed split type */
+  climb_type?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** Climb distance in meters */
+  distance_meters?: Maybe<Scalars['Float']['output']>;
+  /** Climb duration in seconds */
+  duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Elapsed climb duration in seconds */
+  elapsed_duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Climb elevation gain in meters */
+  elevation_gain_meters?: Maybe<Scalars['Float']['output']>;
+  /** Climb elevation loss in meters */
+  elevation_loss_meters?: Maybe<Scalars['Float']['output']>;
+  /** Climb end latitude */
+  end_latitude?: Maybe<Scalars['Float']['output']>;
+  /** Climb end longitude */
+  end_longitude?: Maybe<Scalars['Float']['output']>;
+  /** UTC climb end time */
+  end_time?: Maybe<Scalars['String']['output']>;
+  /** Unique climb row identifier */
+  id: Scalars['Float']['output'];
+  /** Maximum climb grade percent */
+  max_grade_percent?: Maybe<Scalars['Float']['output']>;
+  /** Maximum speed in meters per second */
+  max_speed_mps?: Maybe<Scalars['Float']['output']>;
+  /** Maximum temperature in degrees C */
+  max_temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** Garmin message index */
+  message_index?: Maybe<Scalars['Int']['output']>;
+  /** Minimum temperature in degrees C */
+  min_temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** Moving climb duration in seconds */
+  moving_duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Zero-based Garmin typed split order */
+  source_split_index: Scalars['Int']['output'];
+  /** Garmin split type label when provided */
+  split_type?: Maybe<Scalars['String']['output']>;
+  /** Climb start elevation in meters */
+  start_elevation_meters?: Maybe<Scalars['Float']['output']>;
+  /** Climb start latitude */
+  start_latitude?: Maybe<Scalars['Float']['output']>;
+  /** Climb start longitude */
+  start_longitude?: Maybe<Scalars['Float']['output']>;
+  /** UTC climb start time */
+  start_time?: Maybe<Scalars['String']['output']>;
+  /** Local climb start time from Garmin */
+  start_time_local?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+};
+
 /** Paginated list of Garmin activities. */
 export type GarminActivityConnection = {
   __typename?: 'GarminActivityConnection';
@@ -676,6 +751,8 @@ export type Query = {
   garminActivity?: Maybe<GarminActivity>;
   /** Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end). */
   garminActivityAddresses: Array<GarminActivityAddress>;
+  /** Retrieve Garmin-native ClimbPro typed splits for a Garmin activity. */
+  garminActivityClimbs: Array<GarminActivityClimb>;
   /** Aggregate Garmin activity totals grouped by week, month, or year. */
   garminActivityTotals: Array<GarminActivityTotal>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
@@ -748,6 +825,11 @@ export type QueryGarminActivityArgs = {
 
 
 export type QueryGarminActivityAddressesArgs = {
+  activity_id: Scalars['String']['input'];
+};
+
+
+export type QueryGarminActivityClimbsArgs = {
   activity_id: Scalars['String']['input'];
 };
 
@@ -1013,6 +1095,7 @@ export type ResolversTypes = ResolversObject<{
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   GarminActivity: ResolverTypeWrapper<GarminActivity>;
   GarminActivityAddress: ResolverTypeWrapper<GarminActivityAddress>;
+  GarminActivityClimb: ResolverTypeWrapper<GarminActivityClimb>;
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
   GarminActivityTotal: ResolverTypeWrapper<GarminActivityTotal>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
@@ -1062,6 +1145,7 @@ export type ResolversParentTypes = ResolversObject<{
   Float: Scalars['Float']['output'];
   GarminActivity: GarminActivity;
   GarminActivityAddress: GarminActivityAddress;
+  GarminActivityClimb: GarminActivityClimb;
   GarminActivityConnection: GarminActivityConnection;
   GarminActivityTotal: GarminActivityTotal;
   GarminChartPoint: GarminChartPoint;
@@ -1205,6 +1289,44 @@ export type GarminActivityAddressResolvers<ContextType = GatewayContext, ParentT
   timestamp?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   track_point_id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   waypoint_kind?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+}>;
+
+export type GarminActivityClimbResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityClimb'] = ResolversParentTypes['GarminActivityClimb']> = ResolversObject<{
+  activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  average_elapsed_vertical_speed_mps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  average_grade_percent?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  average_moving_speed_mps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  average_speed_mps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  average_temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  average_vertical_speed_mps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  bmr_calories?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  calories?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  climb_pro_difficulty?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  climb_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  distance_meters?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  duration_seconds?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  elapsed_duration_seconds?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  elevation_gain_meters?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  elevation_loss_meters?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  end_latitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  end_longitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  end_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  max_grade_percent?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_speed_mps?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  message_index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  min_temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  moving_duration_seconds?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  source_split_index?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  split_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  start_elevation_meters?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  start_latitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  start_longitude?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  start_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  start_time_local?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
 export type GarminActivityConnectionResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityConnection'] = ResolversParentTypes['GarminActivityConnection']> = ResolversObject<{
@@ -1447,6 +1569,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminActivities?: Resolver<ResolversTypes['GarminActivityConnection'], ParentType, ContextType, Partial<QueryGarminActivitiesArgs>>;
   garminActivity?: Resolver<Maybe<ResolversTypes['GarminActivity']>, ParentType, ContextType, RequireFields<QueryGarminActivityArgs, 'activity_id'>>;
   garminActivityAddresses?: Resolver<Array<ResolversTypes['GarminActivityAddress']>, ParentType, ContextType, RequireFields<QueryGarminActivityAddressesArgs, 'activity_id'>>;
+  garminActivityClimbs?: Resolver<Array<ResolversTypes['GarminActivityClimb']>, ParentType, ContextType, RequireFields<QueryGarminActivityClimbsArgs, 'activity_id'>>;
   garminActivityTotals?: Resolver<Array<ResolversTypes['GarminActivityTotal']>, ParentType, ContextType, RequireFields<QueryGarminActivityTotalsArgs, 'period'>>;
   garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
   garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
@@ -1525,6 +1648,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   DistanceResult?: DistanceResultResolvers<ContextType>;
   GarminActivity?: GarminActivityResolvers<ContextType>;
   GarminActivityAddress?: GarminActivityAddressResolvers<ContextType>;
+  GarminActivityClimb?: GarminActivityClimbResolvers<ContextType>;
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
   GarminActivityTotal?: GarminActivityTotalResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
