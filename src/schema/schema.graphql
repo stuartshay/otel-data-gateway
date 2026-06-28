@@ -669,6 +669,152 @@ type GarminDateRange {
 }
 
 """
+Garmin-native ClimbPro typed split for an activity.
+"""
+type GarminActivityClimb {
+  """
+  Unique climb row identifier
+  """
+  id: Float!
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  Zero-based Garmin typed split order
+  """
+  source_split_index: Int!
+  """
+  Garmin message index
+  """
+  message_index: Int
+  """
+  Garmin split type label when provided
+  """
+  split_type: String
+  """
+  Garmin ClimbPro typed split type
+  """
+  climb_type: String
+  """
+  UTC climb start time
+  """
+  start_time: String
+  """
+  UTC climb end time
+  """
+  end_time: String
+  """
+  Local climb start time from Garmin
+  """
+  start_time_local: String
+  """
+  Climb duration in seconds
+  """
+  duration_seconds: Float
+  """
+  Elapsed climb duration in seconds
+  """
+  elapsed_duration_seconds: Float
+  """
+  Moving climb duration in seconds
+  """
+  moving_duration_seconds: Float
+  """
+  Climb distance in meters
+  """
+  distance_meters: Float
+  """
+  Climb elevation gain in meters
+  """
+  elevation_gain_meters: Float
+  """
+  Climb elevation loss in meters
+  """
+  elevation_loss_meters: Float
+  """
+  Climb start elevation in meters
+  """
+  start_elevation_meters: Float
+  """
+  Average climb grade percent
+  """
+  average_grade_percent: Float
+  """
+  Maximum climb grade percent
+  """
+  max_grade_percent: Float
+  """
+  Average speed in meters per second
+  """
+  average_speed_mps: Float
+  """
+  Average moving speed in meters per second
+  """
+  average_moving_speed_mps: Float
+  """
+  Maximum speed in meters per second
+  """
+  max_speed_mps: Float
+  """
+  Average vertical speed in meters per second
+  """
+  average_vertical_speed_mps: Float
+  """
+  Average elapsed vertical speed in meters per second
+  """
+  average_elapsed_vertical_speed_mps: Float
+  """
+  Climb start latitude
+  """
+  start_latitude: Float
+  """
+  Climb start longitude
+  """
+  start_longitude: Float
+  """
+  Climb end latitude
+  """
+  end_latitude: Float
+  """
+  Climb end longitude
+  """
+  end_longitude: Float
+  """
+  Garmin ClimbPro difficulty
+  """
+  climb_pro_difficulty: String
+  """
+  Calories recorded for this climb
+  """
+  calories: Float
+  """
+  BMR calories recorded for this climb
+  """
+  bmr_calories: Float
+  """
+  Average temperature in degrees C
+  """
+  average_temperature_c: Float
+  """
+  Minimum temperature in degrees C
+  """
+  min_temperature_c: Float
+  """
+  Maximum temperature in degrees C
+  """
+  max_temperature_c: Float
+  """
+  UTC timestamp when the row was inserted
+  """
+  created_at: String
+  """
+  UTC timestamp when the row was last updated
+  """
+  updated_at: String
+}
+
+"""
 Individual GPS track point within a Garmin activity.
 """
 type GarminTrackPoint {
@@ -1520,6 +1666,16 @@ type Query {
     """
     activity_id: String!
   ): [GarminChartPoint!]!
+
+  """
+  Retrieve Garmin-native ClimbPro typed splits for a Garmin activity.
+  """
+  garminActivityClimbs(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): [GarminActivityClimb!]!
 
   """
   Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end).

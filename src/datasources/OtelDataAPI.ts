@@ -39,6 +39,44 @@ interface GarminDeviceCount {
   activity_count: number;
 }
 
+interface GarminActivityClimb {
+  id: number;
+  activity_id: string;
+  source_split_index: number;
+  message_index: number | null;
+  split_type: string | null;
+  climb_type: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  start_time_local: string | null;
+  duration_seconds: number | null;
+  elapsed_duration_seconds: number | null;
+  moving_duration_seconds: number | null;
+  distance_meters: number | null;
+  elevation_gain_meters: number | null;
+  elevation_loss_meters: number | null;
+  start_elevation_meters: number | null;
+  average_grade_percent: number | null;
+  max_grade_percent: number | null;
+  average_speed_mps: number | null;
+  average_moving_speed_mps: number | null;
+  max_speed_mps: number | null;
+  average_vertical_speed_mps: number | null;
+  average_elapsed_vertical_speed_mps: number | null;
+  start_latitude: number | null;
+  start_longitude: number | null;
+  end_latitude: number | null;
+  end_longitude: number | null;
+  climb_pro_difficulty: string | null;
+  calories: number | null;
+  bmr_calories: number | null;
+  average_temperature_c: number | null;
+  min_temperature_c: number | null;
+  max_temperature_c: number | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 /** Map that evicts expired entries on access, preventing unbounded growth. */
 class ExpiringCache<K, V extends { expiry: number }> extends Map<K, V> {
   override get(key: K): V | undefined {
@@ -309,6 +347,13 @@ export class OtelDataAPI {
   async getGarminChartData(activityId: string) {
     return this.fetch<Schemas['GarminChartPoint'][]>({
       path: `/api/v1/garmin/activities/${activityId}/chart-data`,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminActivityClimbs(activityId: string): Promise<GarminActivityClimb[]> {
+    return this.fetch<GarminActivityClimb[]>({
+      path: `/api/v1/garmin/activities/${activityId}/climbs`,
       cacheTtlMs: 30_000,
     });
   }

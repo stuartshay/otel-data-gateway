@@ -10,6 +10,7 @@ export const garminResolvers: {
     | 'garminSports'
     | 'garminDeviceCounts'
     | 'garminChartData'
+    | 'garminActivityClimbs'
     | 'garminActivityTotals'
     | 'garminActivityAddresses'
   >;
@@ -68,6 +69,10 @@ export const garminResolvers: {
 
     garminChartData: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminChartData(args.activity_id);
+    },
+
+    garminActivityClimbs: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminActivityClimbs(args.activity_id);
     },
 
     garminActivityTotals: async (_parent, args, { dataSources }) => {
