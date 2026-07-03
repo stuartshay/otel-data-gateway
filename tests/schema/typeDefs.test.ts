@@ -176,4 +176,61 @@ describe('typeDefs', () => {
       ],
     });
   });
+
+  it('exposes Garmin activity laps', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminActivityLaps(activity_id: "activity-1") {
+            activity_id
+            lap_index
+            duration_seconds
+            distance_meters
+            paved_distance_meters
+            unpaved_distance_meters
+            avg_speed_mps
+            avg_heart_rate
+            max_heart_rate
+            total_ascent_meters
+          }
+        }
+      `,
+      rootValue: {
+        garminActivityLaps: () => [
+          {
+            activity_id: 'activity-1',
+            lap_index: 1,
+            duration_seconds: 1637.3,
+            distance_meters: 8046.72,
+            paved_distance_meters: 7805.32,
+            unpaved_distance_meters: 241.4,
+            avg_speed_mps: 4.915,
+            avg_heart_rate: 130,
+            max_heart_rate: 150,
+            total_ascent_meters: 30,
+          },
+        ],
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      garminActivityLaps: [
+        {
+          activity_id: 'activity-1',
+          lap_index: 1,
+          duration_seconds: 1637.3,
+          distance_meters: 8046.72,
+          paved_distance_meters: 7805.32,
+          unpaved_distance_meters: 241.4,
+          avg_speed_mps: 4.915,
+          avg_heart_rate: 130,
+          max_heart_rate: 150,
+          total_ascent_meters: 30,
+        },
+      ],
+    });
+  });
 });

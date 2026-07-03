@@ -165,17 +165,20 @@ describe('garmin resolvers', () => {
       getGarminSports: mockAsync(['cycling']),
       getGarminDeviceCounts: mockAsync([{ label: 'Edge 500', activity_count: 2 }]),
       getGarminChartData: mockAsync([{ timestamp: 'now' }]),
+      getGarminActivityLaps: mockAsync([{ activity_id: 'abc', lap_index: 1 }]),
     });
 
     await runResolver(garminResolvers.Query.garminActivity, { activity_id: 'abc' }, ctx);
     await runResolver(garminResolvers.Query.garminSports, {}, ctx);
     await runResolver(garminResolvers.Query.garminDeviceCounts, {}, ctx);
     await runResolver(garminResolvers.Query.garminChartData, { activity_id: 'abc' }, ctx);
+    await runResolver(garminResolvers.Query.garminActivityLaps, { activity_id: 'abc' }, ctx);
 
     expect(ctx.dataSources.otelAPI.getGarminActivity).toHaveBeenCalledWith('abc');
     expect(ctx.dataSources.otelAPI.getGarminSports).toHaveBeenCalled();
     expect(ctx.dataSources.otelAPI.getGarminDeviceCounts).toHaveBeenCalled();
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
+    expect(ctx.dataSources.otelAPI.getGarminActivityLaps).toHaveBeenCalledWith('abc');
   });
 
   it('passes device metadata through garminActivity', async () => {

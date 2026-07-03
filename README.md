@@ -50,6 +50,7 @@ open http://localhost:4000
 | `garminTrackPoints`  | `/api/v1/garmin/.../tracks`        | Track points        |
 | `garminSports`       | `/api/v1/garmin/sports`            | Sport types         |
 | `garminChartData`    | `/api/v1/garmin/.../chart-data`    | Chart data points   |
+| `garminActivityLaps` | `/api/v1/garmin/.../laps`          | Activity laps       |
 | `unifiedGps`         | `/api/v1/gps/unified`              | Unified GPS points  |
 | `dailySummary`       | `/api/v1/gps/daily-summary`        | Daily summary       |
 | `referenceLocations` | `/api/v1/reference-locations`      | Reference locations |
