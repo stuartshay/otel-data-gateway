@@ -50,9 +50,9 @@ type ReadyStatus {
   """
   status: String!
   """
-  Database connection status
+  Database readiness payload returned by otel-data-api
   """
-  database: String
+  database: JSON
   """
   Application version from VERSION file
   """
