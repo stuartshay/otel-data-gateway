@@ -77,6 +77,8 @@ interface GarminActivityClimb {
   updated_at: string | null;
 }
 
+type GarminActivityLap = Schemas['GarminActivityLap'];
+
 /** Map that evicts expired entries on access, preventing unbounded growth. */
 class ExpiringCache<K, V extends { expiry: number }> extends Map<K, V> {
   override get(key: K): V | undefined {
@@ -354,6 +356,13 @@ export class OtelDataAPI {
   async getGarminActivityClimbs(activityId: string): Promise<GarminActivityClimb[]> {
     return this.fetch<GarminActivityClimb[]>({
       path: `/api/v1/garmin/activities/${activityId}/climbs`,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminActivityLaps(activityId: string): Promise<GarminActivityLap[]> {
+    return this.fetch<GarminActivityLap[]>({
+      path: `/api/v1/garmin/activities/${activityId}/laps`,
       cacheTtlMs: 30_000,
     });
   }

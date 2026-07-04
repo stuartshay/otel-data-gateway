@@ -302,6 +302,49 @@ export interface GarminActivityConnection {
   total: Scalars['Int']['output'];
 }
 
+/** Garmin-native or derived activity lap row. */
+export interface GarminActivityLap {
+  __typename?: 'GarminActivityLap';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Average lap heart rate in bpm */
+  avg_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Average lap speed in meters per second */
+  avg_speed_mps?: Maybe<Scalars['Float']['output']>;
+  /** Calories recorded for this lap */
+  calories?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** Lap distance in meters */
+  distance_meters?: Maybe<Scalars['Float']['output']>;
+  /** Lap timer duration in seconds */
+  duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Lap elapsed duration in seconds */
+  elapsed_duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** UTC lap end time */
+  end_time?: Maybe<Scalars['String']['output']>;
+  /** Unique lap row identifier */
+  id: Scalars['Float']['output'];
+  /** One-based lap order within the activity */
+  lap_index: Scalars['Int']['output'];
+  /** Maximum lap heart rate in bpm */
+  max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Lap moving duration in seconds */
+  moving_duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Lap paved distance in meters */
+  paved_distance_meters?: Maybe<Scalars['Float']['output']>;
+  /** UTC lap start time */
+  start_time?: Maybe<Scalars['String']['output']>;
+  /** Lap elevation gain in meters */
+  total_ascent_meters?: Maybe<Scalars['Float']['output']>;
+  /** Lap elevation loss in meters */
+  total_descent_meters?: Maybe<Scalars['Float']['output']>;
+  /** Lap unpaved distance in meters */
+  unpaved_distance_meters?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+}
+
 /** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
 export interface GarminActivityTotal {
   __typename?: 'GarminActivityTotal';
@@ -748,6 +791,8 @@ export interface Query {
   garminActivityAddresses: Array<GarminActivityAddress>;
   /** Retrieve Garmin-native ClimbPro typed splits for a Garmin activity. */
   garminActivityClimbs: Array<GarminActivityClimb>;
+  /** Retrieve Garmin-native or derived laps for a Garmin activity. */
+  garminActivityLaps: Array<GarminActivityLap>;
   /** Aggregate Garmin activity totals grouped by week, month, or year. */
   garminActivityTotals: Array<GarminActivityTotal>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
@@ -819,6 +864,10 @@ export interface QueryGarminActivityAddressesArgs {
 }
 
 export interface QueryGarminActivityClimbsArgs {
+  activity_id: Scalars['String']['input'];
+}
+
+export interface QueryGarminActivityLapsArgs {
   activity_id: Scalars['String']['input'];
 }
 
