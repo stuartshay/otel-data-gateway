@@ -15,6 +15,21 @@ type GarminSyncUpstreamResponse = Schemas['GarminSyncResponse'] & {
   accepted?: boolean | null;
 };
 
+interface UpstreamReadyDatabaseStatus {
+  [key: string]: unknown;
+  status?: string | null;
+  version?: string | null;
+  server_time?: string | null;
+  pool_size?: number | null;
+  pool_free?: number | null;
+}
+
+interface UpstreamReadyStatus {
+  status: string;
+  database?: UpstreamReadyDatabaseStatus | null;
+  version?: string | null;
+}
+
 interface FetchParams {
   path: string;
   query?: Record<string, string | number | boolean | undefined | null>;
@@ -231,7 +246,7 @@ export class OtelDataAPI {
   }
 
   async getReady() {
-    return this.fetch<{ status: string; database?: string; version?: string }>({
+    return this.fetch<UpstreamReadyStatus>({
       path: '/ready',
       timeoutMs: 2_000,
     });

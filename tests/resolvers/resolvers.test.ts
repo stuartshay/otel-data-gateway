@@ -56,7 +56,17 @@ describe('health resolvers', () => {
   });
 
   it('returns readiness result when backend responds', async () => {
-    const result = { status: 'ready', database: 'ok', version: '1.2.3' };
+    const result = {
+      status: 'ready',
+      database: {
+        status: 'healthy',
+        version: 'PostgreSQL 15.3',
+        server_time: '2026-07-04 02:38:48.710129+00:00',
+        pool_size: 2,
+        pool_free: 2,
+      },
+      version: '1.2.3',
+    };
     const ctx = contextWith({ getReady: mockAsync(result) });
 
     const response = await runResolver(healthResolvers.Query.ready, {}, ctx);
@@ -72,7 +82,9 @@ describe('health resolvers', () => {
 
     expect(response).toEqual({
       status: 'unhealthy',
-      database: 'database down',
+      database: {
+        status: 'database down',
+      },
       version: config.version,
     });
   });

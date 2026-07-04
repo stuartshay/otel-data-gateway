@@ -942,8 +942,8 @@ export interface QueryWithinReferenceArgs {
 /** Service readiness status including database connectivity. */
 export interface ReadyStatus {
   __typename?: 'ReadyStatus';
-  /** Database connection status */
-  database?: Maybe<Scalars['String']['output']>;
+  /** Database readiness payload returned by otel-data-api */
+  database?: Maybe<Scalars['JSON']['output']>;
   /** Service readiness status */
   status: Scalars['String']['output'];
   /** Application version from VERSION file */

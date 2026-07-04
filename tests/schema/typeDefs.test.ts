@@ -12,6 +12,50 @@ describe('typeDefs', () => {
     expect(typeDefs).toContain('total_strokes: Int');
   });
 
+  it('exposes structured readiness database status', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          ready {
+            status
+            version
+            database
+          }
+        }
+      `,
+      rootValue: {
+        ready: () => ({
+          status: 'ready',
+          version: '1.0.501',
+          database: {
+            status: 'healthy',
+            version: 'PostgreSQL 15.3',
+            server_time: '2026-07-04 02:38:48.710129+00:00',
+            pool_size: 2,
+            pool_free: 2,
+          },
+        }),
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      ready: {
+        status: 'ready',
+        version: '1.0.501',
+        database: {
+          status: 'healthy',
+          version: 'PostgreSQL 15.3',
+          server_time: '2026-07-04 02:38:48.710129+00:00',
+          pool_size: 2,
+          pool_free: 2,
+        },
+      },
+    });
+  });
+
   it('exposes heart-rate zone and respiration rate on Garmin chart points', async () => {
     const schema = buildSchema(typeDefs);
     const result = await graphql({

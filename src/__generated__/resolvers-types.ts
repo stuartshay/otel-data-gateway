@@ -964,8 +964,8 @@ export type QueryWithinReferenceArgs = {
 /** Service readiness status including database connectivity. */
 export type ReadyStatus = {
   __typename?: 'ReadyStatus';
-  /** Database connection status */
-  database?: Maybe<Scalars['String']['output']>;
+  /** Database readiness payload returned by otel-data-api */
+  database?: Maybe<Scalars['JSON']['output']>;
   /** Service readiness status */
   status: Scalars['String']['output'];
   /** Application version from VERSION file */
@@ -1666,7 +1666,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
 }>;
 
 export type ReadyStatusResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['ReadyStatus'] = ResolversParentTypes['ReadyStatus']> = ResolversObject<{
-  database?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  database?: Resolver<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;

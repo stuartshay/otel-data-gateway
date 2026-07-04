@@ -17,7 +17,9 @@ export const healthResolvers: { Query: Pick<QueryResolvers, 'health' | 'ready'> 
       } catch (error) {
         return {
           status: 'unhealthy',
-          database: error instanceof Error ? error.message : 'unknown error',
+          database: {
+            status: error instanceof Error ? error.message : 'unknown error',
+          },
           version: config.version,
         };
       }
