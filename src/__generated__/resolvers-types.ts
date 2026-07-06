@@ -348,6 +348,15 @@ export type GarminActivityLap = {
   updated_at?: Maybe<Scalars['String']['output']>;
 };
 
+/** Laps for a single activity within the batch laps comparison response. */
+export type GarminActivityLapsGroup = {
+  __typename?: 'GarminActivityLapsGroup';
+  /** Parent activity summary */
+  activity: GarminLapsActivity;
+  /** Laps ordered by lap_index ascending */
+  laps: Array<GarminActivityLap>;
+};
+
 /** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
 export type GarminActivityTotal = {
   __typename?: 'GarminActivityTotal';
@@ -423,6 +432,44 @@ export type GarminDeviceCount = {
   activity_count: Scalars['Int']['output'];
   /** Device model label, or Manual when an activity has no recording device. */
   label: Scalars['String']['output'];
+};
+
+/** Activity summary metadata for a batch laps comparison item. */
+export type GarminLapsActivity = {
+  __typename?: 'GarminLapsActivity';
+  /** Garmin Connect activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Average activity heart rate in bpm */
+  avg_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Average activity speed in km/h */
+  avg_speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Total activity distance in kilometers */
+  distance_km?: Maybe<Scalars['Float']['output']>;
+  /** Total activity duration in seconds */
+  duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Maximum activity heart rate in bpm */
+  max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Sport type (e.g. cycling) */
+  sport?: Maybe<Scalars['String']['output']>;
+  /** UTC activity start time */
+  start_time?: Maybe<Scalars['String']['output']>;
+  /** Sub-sport type (e.g. road) */
+  sub_sport?: Maybe<Scalars['String']['output']>;
+  /** Total activity elevation gain in meters */
+  total_ascent_m?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Paginated batch of activities (each with their laps) for cross-activity lap comparison. */
+export type GarminLapsComparisonConnection = {
+  __typename?: 'GarminLapsComparisonConnection';
+  /** Activities (newest first), each with their laps ordered by lap_index */
+  items: Array<GarminActivityLapsGroup>;
+  /** Maximum number of activities per page */
+  limit: Scalars['Int']['output'];
+  /** Number of activities skipped from the start */
+  offset: Scalars['Int']['output'];
+  /** Total number of activities matching the query */
+  total: Scalars['Int']['output'];
 };
 
 /** Result payload returned when triggering an on-demand Garmin sync. */
@@ -806,6 +853,8 @@ export type Query = {
   garminDateRange: GarminDateRange;
   /** List Garmin recording device labels with activity counts. */
   garminDeviceCounts: Array<GarminDeviceCount>;
+  /** Batch laps across activities for cross-activity comparison (matrix of activities x lap_index). */
+  garminLapsComparison: GarminLapsComparisonConnection;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
@@ -894,6 +943,15 @@ export type QueryGarminActivityTotalsArgs = {
 
 export type QueryGarminChartDataArgs = {
   activity_id: Scalars['String']['input'];
+};
+
+
+export type QueryGarminLapsComparisonArgs = {
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1148,11 +1206,14 @@ export type ResolversTypes = ResolversObject<{
   GarminActivityClimb: ResolverTypeWrapper<GarminActivityClimb>;
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
   GarminActivityLap: ResolverTypeWrapper<GarminActivityLap>;
+  GarminActivityLapsGroup: ResolverTypeWrapper<GarminActivityLapsGroup>;
   GarminActivityTotal: ResolverTypeWrapper<GarminActivityTotal>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
   GarminDateRange: ResolverTypeWrapper<GarminDateRange>;
   GarminDevice: ResolverTypeWrapper<GarminDevice>;
   GarminDeviceCount: ResolverTypeWrapper<GarminDeviceCount>;
+  GarminLapsActivity: ResolverTypeWrapper<GarminLapsActivity>;
+  GarminLapsComparisonConnection: ResolverTypeWrapper<GarminLapsComparisonConnection>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
@@ -1199,11 +1260,14 @@ export type ResolversParentTypes = ResolversObject<{
   GarminActivityClimb: GarminActivityClimb;
   GarminActivityConnection: GarminActivityConnection;
   GarminActivityLap: GarminActivityLap;
+  GarminActivityLapsGroup: GarminActivityLapsGroup;
   GarminActivityTotal: GarminActivityTotal;
   GarminChartPoint: GarminChartPoint;
   GarminDateRange: GarminDateRange;
   GarminDevice: GarminDevice;
   GarminDeviceCount: GarminDeviceCount;
+  GarminLapsActivity: GarminLapsActivity;
+  GarminLapsComparisonConnection: GarminLapsComparisonConnection;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
@@ -1410,6 +1474,11 @@ export type GarminActivityLapResolvers<ContextType = GatewayContext, ParentType 
   updated_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
+export type GarminActivityLapsGroupResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityLapsGroup'] = ResolversParentTypes['GarminActivityLapsGroup']> = ResolversObject<{
+  activity?: Resolver<ResolversTypes['GarminLapsActivity'], ParentType, ContextType>;
+  laps?: Resolver<Array<ResolversTypes['GarminActivityLap']>, ParentType, ContextType>;
+}>;
+
 export type GarminActivityTotalResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityTotal'] = ResolversParentTypes['GarminActivityTotal']> = ResolversObject<{
   activity_count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   period_start?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -1449,6 +1518,26 @@ export type GarminDeviceResolvers<ContextType = GatewayContext, ParentType exten
 export type GarminDeviceCountResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminDeviceCount'] = ResolversParentTypes['GarminDeviceCount']> = ResolversObject<{
   activity_count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   label?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+}>;
+
+export type GarminLapsActivityResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminLapsActivity'] = ResolversParentTypes['GarminLapsActivity']> = ResolversObject<{
+  activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  avg_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  avg_speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  duration_seconds?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  max_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  sport?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  start_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  sub_sport?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  total_ascent_m?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+}>;
+
+export type GarminLapsComparisonConnectionResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminLapsComparisonConnection'] = ResolversParentTypes['GarminLapsComparisonConnection']> = ResolversObject<{
+  items?: Resolver<Array<ResolversTypes['GarminActivityLapsGroup']>, ParentType, ContextType>;
+  limit?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  offset?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 }>;
 
 export type GarminSyncTriggerResultResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSyncTriggerResult'] = ResolversParentTypes['GarminSyncTriggerResult']> = ResolversObject<{
@@ -1649,6 +1738,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
   garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
   garminDeviceCounts?: Resolver<Array<ResolversTypes['GarminDeviceCount']>, ParentType, ContextType>;
+  garminLapsComparison?: Resolver<ResolversTypes['GarminLapsComparisonConnection'], ParentType, ContextType, Partial<QueryGarminLapsComparisonArgs>>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
   garminTrackPoints?: Resolver<ResolversTypes['GarminTrackPointConnection'], ParentType, ContextType, RequireFields<QueryGarminTrackPointsArgs, 'activity_id'>>;
   geocodingStatus?: Resolver<ResolversTypes['GeocodingStatus'], ParentType, ContextType>;
@@ -1726,11 +1816,14 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminActivityClimb?: GarminActivityClimbResolvers<ContextType>;
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
   GarminActivityLap?: GarminActivityLapResolvers<ContextType>;
+  GarminActivityLapsGroup?: GarminActivityLapsGroupResolvers<ContextType>;
   GarminActivityTotal?: GarminActivityTotalResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
   GarminDateRange?: GarminDateRangeResolvers<ContextType>;
   GarminDevice?: GarminDeviceResolvers<ContextType>;
   GarminDeviceCount?: GarminDeviceCountResolvers<ContextType>;
+  GarminLapsActivity?: GarminLapsActivityResolvers<ContextType>;
+  GarminLapsComparisonConnection?: GarminLapsComparisonConnectionResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;

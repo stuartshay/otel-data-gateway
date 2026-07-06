@@ -94,6 +94,31 @@ interface GarminActivityClimb {
 
 type GarminActivityLap = Schemas['GarminActivityLap'];
 
+interface GarminLapsActivity {
+  activity_id: string;
+  sport: string | null;
+  sub_sport: string | null;
+  start_time: string | null;
+  distance_km: number | null;
+  duration_seconds: number | null;
+  avg_speed_kmh: number | null;
+  avg_heart_rate: number | null;
+  max_heart_rate: number | null;
+  total_ascent_m: number | null;
+}
+
+interface GarminActivityLapsGroup {
+  activity: GarminLapsActivity;
+  laps: GarminActivityLap[];
+}
+
+interface GarminLapsComparisonConnection {
+  items: GarminActivityLapsGroup[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 /** Map that evicts expired entries on access, preventing unbounded growth. */
 class ExpiringCache<K, V extends { expiry: number }> extends Map<K, V> {
   override get(key: K): V | undefined {
@@ -378,6 +403,22 @@ export class OtelDataAPI {
   async getGarminActivityLaps(activityId: string): Promise<GarminActivityLap[]> {
     return this.fetch<GarminActivityLap[]>({
       path: `/api/v1/garmin/activities/${activityId}/laps`,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminLapsComparison(
+    params?: Nullable<{
+      sport?: string;
+      date_from?: string;
+      date_to?: string;
+      limit?: number;
+      offset?: number;
+    }>,
+  ): Promise<GarminLapsComparisonConnection> {
+    return this.fetch<GarminLapsComparisonConnection>({
+      path: '/api/v1/garmin/laps',
+      query: params,
       cacheTtlMs: 30_000,
     });
   }

@@ -193,6 +193,23 @@ describe('garmin resolvers', () => {
     expect(ctx.dataSources.otelAPI.getGarminActivityLaps).toHaveBeenCalledWith('abc');
   });
 
+  it('proxies garminLapsComparison with all filters', async () => {
+    const connection = { items: [], total: 1448, limit: 50, offset: 0 };
+    const ctx = contextWith({ getGarminLapsComparison: mockAsync(connection) });
+    const args = {
+      sport: 'cycling',
+      date_from: '2026-01-01',
+      date_to: '2026-06-30',
+      limit: 50,
+      offset: 0,
+    };
+
+    const result = await runResolver(garminResolvers.Query.garminLapsComparison, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGarminLapsComparison).toHaveBeenCalledWith(args);
+    expect(result).toEqual(connection);
+  });
+
   it('passes device metadata through garminActivity', async () => {
     const device = {
       device_id: 3444454776,
