@@ -321,6 +321,7 @@ describe('OtelDataAPI', () => {
     await api.getGarminDeviceCounts();
     await api.getGarminChartData('ga-1');
     await api.getGarminActivityLaps('ga-1');
+    await api.getGarminLapsComparison({ sport: 'cycling' });
     await api.getGarminActivityTotals({ period: 'week' });
     await api.triggerGarminSync({ window_hours: 24 });
     await api.getUnifiedGps({ source: 'gps' });
@@ -351,6 +352,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/device-counts',
       '/api/v1/garmin/activities/ga-1/chart-data',
       '/api/v1/garmin/activities/ga-1/laps',
+      '/api/v1/garmin/laps',
       '/api/v1/garmin/activity-totals',
       '/api/v1/garmin/sync',
       '/api/v1/gps/unified',

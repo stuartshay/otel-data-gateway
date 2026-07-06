@@ -345,6 +345,15 @@ export interface GarminActivityLap {
   updated_at?: Maybe<Scalars['String']['output']>;
 }
 
+/** Laps for a single activity within the batch laps comparison response. */
+export interface GarminActivityLapsGroup {
+  __typename?: 'GarminActivityLapsGroup';
+  /** Parent activity summary */
+  activity: GarminLapsActivity;
+  /** Laps ordered by lap_index ascending */
+  laps: Array<GarminActivityLap>;
+}
+
 /** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
 export interface GarminActivityTotal {
   __typename?: 'GarminActivityTotal';
@@ -420,6 +429,44 @@ export interface GarminDeviceCount {
   activity_count: Scalars['Int']['output'];
   /** Device model label, or Manual when an activity has no recording device. */
   label: Scalars['String']['output'];
+}
+
+/** Activity summary metadata for a batch laps comparison item. */
+export interface GarminLapsActivity {
+  __typename?: 'GarminLapsActivity';
+  /** Garmin Connect activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Average activity heart rate in bpm */
+  avg_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Average activity speed in km/h */
+  avg_speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Total activity distance in kilometers */
+  distance_km?: Maybe<Scalars['Float']['output']>;
+  /** Total activity duration in seconds */
+  duration_seconds?: Maybe<Scalars['Float']['output']>;
+  /** Maximum activity heart rate in bpm */
+  max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Sport type (e.g. cycling) */
+  sport?: Maybe<Scalars['String']['output']>;
+  /** UTC activity start time */
+  start_time?: Maybe<Scalars['String']['output']>;
+  /** Sub-sport type (e.g. road) */
+  sub_sport?: Maybe<Scalars['String']['output']>;
+  /** Total activity elevation gain in meters */
+  total_ascent_m?: Maybe<Scalars['Float']['output']>;
+}
+
+/** Paginated batch of activities (each with their laps) for cross-activity lap comparison. */
+export interface GarminLapsComparisonConnection {
+  __typename?: 'GarminLapsComparisonConnection';
+  /** Activities (newest first), each with their laps ordered by lap_index */
+  items: Array<GarminActivityLapsGroup>;
+  /** Maximum number of activities per page */
+  limit: Scalars['Int']['output'];
+  /** Number of activities skipped from the start */
+  offset: Scalars['Int']['output'];
+  /** Total number of activities matching the query */
+  total: Scalars['Int']['output'];
 }
 
 /** Result payload returned when triggering an on-demand Garmin sync. */
@@ -801,6 +848,8 @@ export interface Query {
   garminDateRange: GarminDateRange;
   /** List Garmin recording device labels with activity counts. */
   garminDeviceCounts: Array<GarminDeviceCount>;
+  /** Batch laps across activities for cross-activity comparison (matrix of activities x lap_index). */
+  garminLapsComparison: GarminLapsComparisonConnection;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
@@ -880,6 +929,14 @@ export interface QueryGarminActivityTotalsArgs {
 
 export interface QueryGarminChartDataArgs {
   activity_id: Scalars['String']['input'];
+}
+
+export interface QueryGarminLapsComparisonArgs {
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
 }
 
 export interface QueryGarminTrackPointsArgs {

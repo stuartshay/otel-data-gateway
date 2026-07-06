@@ -277,4 +277,83 @@ describe('typeDefs', () => {
       ],
     });
   });
+
+  it('exposes Garmin laps comparison across activities', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminLapsComparison(sport: "cycling", limit: 1) {
+            total
+            limit
+            offset
+            items {
+              activity {
+                activity_id
+                sport
+                start_time
+                distance_km
+                avg_speed_kmh
+                avg_heart_rate
+              }
+              laps {
+                lap_index
+                avg_speed_mps
+                avg_heart_rate
+              }
+            }
+          }
+        }
+      `,
+      rootValue: {
+        garminLapsComparison: () => ({
+          total: 1,
+          limit: 1,
+          offset: 0,
+          items: [
+            {
+              activity: {
+                activity_id: 'activity-1',
+                sport: 'cycling',
+                start_time: '2026-07-05T19:30:44Z',
+                distance_km: 52.36,
+                avg_speed_kmh: 17.07,
+                avg_heart_rate: 118,
+              },
+              laps: [
+                { lap_index: 1, avg_speed_mps: 5.035, avg_heart_rate: 120 },
+                { lap_index: 2, avg_speed_mps: 4.9, avg_heart_rate: 125 },
+              ],
+            },
+          ],
+        }),
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      garminLapsComparison: {
+        total: 1,
+        limit: 1,
+        offset: 0,
+        items: [
+          {
+            activity: {
+              activity_id: 'activity-1',
+              sport: 'cycling',
+              start_time: '2026-07-05T19:30:44Z',
+              distance_km: 52.36,
+              avg_speed_kmh: 17.07,
+              avg_heart_rate: 118,
+            },
+            laps: [
+              { lap_index: 1, avg_speed_mps: 5.035, avg_heart_rate: 120 },
+              { lap_index: 2, avg_speed_mps: 4.9, avg_heart_rate: 125 },
+            ],
+          },
+        ],
+      },
+    });
+  });
 });
