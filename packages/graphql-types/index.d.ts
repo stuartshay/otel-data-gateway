@@ -11,6 +11,32 @@ export interface Scalars {
   JSON: { input: Record<string, unknown>; output: Record<string, unknown> };
 }
 
+/** Input for creating a saved Garmin segment (e.g. from an activity lap or climb). */
+export interface CreateGarminSegmentInput {
+  /** Segment length in meters (optional metadata) */
+  distance_meters?: InputMaybe<Scalars['Float']['input']>;
+  /** Segment end latitude */
+  end_latitude: Scalars['Float']['input'];
+  /** Segment end longitude */
+  end_longitude: Scalars['Float']['input'];
+  /** Corridor radius (m) used to match traversing activities (default 35) */
+  match_tolerance_meters?: InputMaybe<Scalars['Float']['input']>;
+  /** Human-readable segment name */
+  name: Scalars['String']['input'];
+  /** Garmin activity this segment is created from, if any */
+  source_activity_id?: InputMaybe<Scalars['String']['input']>;
+  /** Zero-based ClimbPro split index the segment is created from, if any */
+  source_climb_index?: InputMaybe<Scalars['Int']['input']>;
+  /** Zero-based lap index the segment is created from, if any */
+  source_lap_index?: InputMaybe<Scalars['Int']['input']>;
+  /** Sport this segment applies to (e.g. cycling); null matches all sports */
+  sport?: InputMaybe<Scalars['String']['input']>;
+  /** Segment start latitude */
+  start_latitude: Scalars['Float']['input'];
+  /** Segment start longitude */
+  start_longitude: Scalars['Float']['input'];
+}
+
 /** Per-day aggregate combining OwnTracks location stats and Garmin activity metrics. */
 export interface DailyActivitySummary {
   __typename?: 'DailyActivitySummary';
@@ -469,6 +495,95 @@ export interface GarminLapsComparisonConnection {
   total: Scalars['Int']['output'];
 }
 
+/**
+ * A saved (named) Garmin segment: a start→end corridor used to compare efforts
+ * across all activities that traverse the same route.
+ */
+export interface GarminSegment {
+  __typename?: 'GarminSegment';
+  /** UTC timestamp when the segment was created */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** Segment length in meters (optional metadata) */
+  distance_meters?: Maybe<Scalars['Float']['output']>;
+  /** Segment end latitude */
+  end_latitude: Scalars['Float']['output'];
+  /** Segment end longitude */
+  end_longitude: Scalars['Float']['output'];
+  /** Unique segment identifier */
+  id: Scalars['Int']['output'];
+  /** Corridor radius (m) used to match traversing activities */
+  match_tolerance_meters: Scalars['Float']['output'];
+  /** Human-readable segment name (e.g. "Harlem Hill") */
+  name: Scalars['String']['output'];
+  /** Garmin activity this segment was created from, if any */
+  source_activity_id?: Maybe<Scalars['String']['output']>;
+  /** Zero-based ClimbPro split index the segment was created from, if any */
+  source_climb_index?: Maybe<Scalars['Int']['output']>;
+  /** Zero-based lap index the segment was created from, if any */
+  source_lap_index?: Maybe<Scalars['Int']['output']>;
+  /** Sport this segment applies to (e.g. cycling); null matches all sports */
+  sport?: Maybe<Scalars['String']['output']>;
+  /** Segment start latitude */
+  start_latitude: Scalars['Float']['output'];
+  /** Segment start longitude */
+  start_longitude: Scalars['Float']['output'];
+  /** UTC timestamp when the segment was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+}
+
+/** The start→end corridor a segment-efforts query was matched against. */
+export interface GarminSegmentDefinition {
+  __typename?: 'GarminSegmentDefinition';
+  /** Corridor end latitude */
+  end_lat: Scalars['Float']['output'];
+  /** Corridor end longitude */
+  end_lon: Scalars['Float']['output'];
+  /** Corridor start latitude */
+  start_lat: Scalars['Float']['output'];
+  /** Corridor start longitude */
+  start_lon: Scalars['Float']['output'];
+  /** Corridor radius in meters used for matching */
+  tolerance_meters: Scalars['Float']['output'];
+}
+
+/** A single activity's best traversal of a segment, ranked against all others. */
+export interface GarminSegmentEffort {
+  __typename?: 'GarminSegmentEffort';
+  /** Garmin activity identifier for this effort */
+  activity_id: Scalars['String']['output'];
+  /** UTC start time of the parent activity */
+  activity_start_time?: Maybe<Scalars['String']['output']>;
+  /** Average heart rate across the segment in bpm */
+  avg_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Average speed across the segment in km/h */
+  avg_speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Distance covered across the segment in km */
+  distance_km?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp reaching the segment end corridor */
+  effort_end: Scalars['String']['output'];
+  /** UTC timestamp entering the segment start corridor */
+  effort_start: Scalars['String']['output'];
+  /** Segment elapsed time in seconds */
+  elapsed_seconds: Scalars['Float']['output'];
+  /** Maximum heart rate across the segment in bpm */
+  max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** 1-based rank by elapsed time (1 = fastest) */
+  rank: Scalars['Int']['output'];
+  /** Sport type (e.g. cycling) */
+  sport?: Maybe<Scalars['String']['output']>;
+}
+
+/** Ranked efforts for a segment across all matching activities (fastest first). */
+export interface GarminSegmentEffortsConnection {
+  __typename?: 'GarminSegmentEffortsConnection';
+  /** Efforts ordered fastest-first */
+  items: Array<GarminSegmentEffort>;
+  /** The corridor the efforts were matched against */
+  segment: GarminSegmentDefinition;
+  /** Total number of matching efforts */
+  total: Scalars['Int']['output'];
+}
+
 /** Result payload returned when triggering an on-demand Garmin sync. */
 export interface GarminSyncTriggerResult {
   __typename?: 'GarminSyncTriggerResult';
@@ -776,10 +891,26 @@ export interface LocationDetail {
 
 export interface Mutation {
   __typename?: 'Mutation';
+  /**
+   * Create a saved Garmin segment (requires authentication). Typically called with
+   * the start/end coordinates of an activity lap or ClimbPro split to "save this
+   * lap as a segment".
+   */
+  createGarminSegment: GarminSegment;
+  /** Delete a saved Garmin segment by id (requires authentication). Returns true on success. */
+  deleteGarminSegment: Scalars['Boolean']['output'];
   /** Trigger an on-demand Garmin sync in the upstream API. */
   triggerGarminSync: GarminSyncTriggerResult;
   /** Trigger batch reverse-geocoding of un-geocoded location records. */
   triggerGeocoding: GeocodingTriggerResult;
+}
+
+export interface MutationCreateGarminSegmentArgs {
+  input: CreateGarminSegmentInput;
+}
+
+export interface MutationDeleteGarminSegmentArgs {
+  id: Scalars['Int']['input'];
 }
 
 export interface MutationTriggerGarminSyncArgs {
@@ -850,6 +981,12 @@ export interface Query {
   garminDeviceCounts: Array<GarminDeviceCount>;
   /** Batch laps across activities for cross-activity comparison (matrix of activities x lap_index). */
   garminLapsComparison: GarminLapsComparisonConnection;
+  /** Fetch a single saved Garmin segment by id. Returns null if it does not exist. */
+  garminSegment?: Maybe<GarminSegment>;
+  /** Rank all historical activity efforts over a saved segment (fastest first). */
+  garminSegmentEfforts: GarminSegmentEffortsConnection;
+  /** List saved Garmin segments, optionally filtered by sport. */
+  garminSegments: Array<GarminSegment>;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
@@ -936,6 +1073,22 @@ export interface QueryGarminLapsComparisonArgs {
   date_to?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+}
+
+export interface QueryGarminSegmentArgs {
+  id: Scalars['Int']['input'];
+}
+
+export interface QueryGarminSegmentEffortsArgs {
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['Int']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  max_effort_seconds?: InputMaybe<Scalars['Int']['input']>;
+}
+
+export interface QueryGarminSegmentsArgs {
   sport?: InputMaybe<Scalars['String']['input']>;
 }
 

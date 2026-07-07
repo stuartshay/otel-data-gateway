@@ -286,6 +286,114 @@ describe('garmin resolvers', () => {
   });
 });
 
+describe('garmin segment resolvers', () => {
+  const segment = {
+    id: 1,
+    name: 'Harlem Hill',
+    sport: 'cycling',
+    start_latitude: 40.79366846,
+    start_longitude: -73.96104321,
+    end_latitude: 40.79002409,
+    end_longitude: -73.96422816,
+    distance_meters: 508.1,
+    match_tolerance_meters: 35,
+    source_activity_id: '23493313338',
+    source_lap_index: null,
+    source_climb_index: 0,
+    created_at: '2026-07-07T05:00:11Z',
+    updated_at: '2026-07-07T05:00:11Z',
+  };
+
+  it('proxies garminSegments with sport filter', async () => {
+    const ctx = contextWith({ getGarminSegments: mockAsync([segment]) });
+    const args = { sport: 'cycling' };
+
+    const result = await runResolver(garminResolvers.Query.garminSegments, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGarminSegments).toHaveBeenCalledWith(args);
+    expect(result).toEqual([segment]);
+  });
+
+  it('proxies garminSegment by id', async () => {
+    const ctx = contextWith({ getGarminSegment: mockAsync(segment) });
+
+    const result = await runResolver(garminResolvers.Query.garminSegment, { id: 1 }, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGarminSegment).toHaveBeenCalledWith(1);
+    expect(result).toEqual(segment);
+  });
+
+  it('extracts id before calling garminSegmentEfforts', async () => {
+    const connection = {
+      segment: {
+        start_lat: 40.79366846,
+        start_lon: -73.96104321,
+        end_lat: 40.79002409,
+        end_lon: -73.96422816,
+        tolerance_meters: 35,
+      },
+      items: [
+        { rank: 1, activity_id: 'a', effort_start: 't', effort_end: 't', elapsed_seconds: 79 },
+      ],
+      total: 1,
+    };
+    const ctx = contextWith({ getGarminSegmentEfforts: mockAsync(connection) });
+    const args = {
+      id: 1,
+      date_from: '2010-01-01',
+      date_to: '2026-06-30',
+      max_effort_seconds: 400,
+      limit: 25,
+    };
+
+    const result = await runResolver(garminResolvers.Query.garminSegmentEfforts, args, ctx);
+
+    expect(ctx.dataSources.otelAPI.getGarminSegmentEfforts).toHaveBeenCalledWith(1, {
+      date_from: '2010-01-01',
+      date_to: '2026-06-30',
+      max_effort_seconds: 400,
+      limit: 25,
+    });
+    expect(result).toEqual(connection);
+  });
+
+  it('forwards input and auth token to createGarminSegment', async () => {
+    const otelAPI = { createGarminSegment: mockAsync(segment) };
+    const ctx = {
+      dataSources: { otelAPI },
+      token: 'Bearer jwt-123',
+    } as unknown as GatewayContext;
+    const input = {
+      name: 'Harlem Hill',
+      sport: 'cycling',
+      start_latitude: 40.79366846,
+      start_longitude: -73.96104321,
+      end_latitude: 40.79002409,
+      end_longitude: -73.96422816,
+      source_activity_id: '23493313338',
+      source_climb_index: 0,
+    };
+
+    const result = await runResolver(garminResolvers.Mutation.createGarminSegment, { input }, ctx);
+
+    expect(otelAPI.createGarminSegment).toHaveBeenCalledWith(input, 'Bearer jwt-123');
+    expect(result).toEqual(segment);
+  });
+
+  it('forwards id and auth token to deleteGarminSegment', async () => {
+    const otelAPI = { deleteGarminSegment: mockAsync(true) };
+    const ctx = {
+      dataSources: { otelAPI },
+      token: 'Bearer jwt-123',
+    } as unknown as GatewayContext;
+
+    const result = await runResolver(garminResolvers.Mutation.deleteGarminSegment, { id: 1 }, ctx);
+
+    expect(otelAPI.deleteGarminSegment).toHaveBeenCalledWith(1, 'Bearer jwt-123');
+    expect(result).toBe(true);
+  });
+});
+
 describe('gps resolvers', () => {
   it('delegates unifiedGps and dailySummary queries', async () => {
     const ctx = contextWith({

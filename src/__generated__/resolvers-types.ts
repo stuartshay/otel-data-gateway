@@ -14,6 +14,32 @@ export type Scalars = {
   JSON: { input: Record<string, unknown>; output: Record<string, unknown>; }
 };
 
+/** Input for creating a saved Garmin segment (e.g. from an activity lap or climb). */
+export type CreateGarminSegmentInput = {
+  /** Segment length in meters (optional metadata) */
+  distance_meters?: InputMaybe<Scalars['Float']['input']>;
+  /** Segment end latitude */
+  end_latitude: Scalars['Float']['input'];
+  /** Segment end longitude */
+  end_longitude: Scalars['Float']['input'];
+  /** Corridor radius (m) used to match traversing activities (default 35) */
+  match_tolerance_meters?: InputMaybe<Scalars['Float']['input']>;
+  /** Human-readable segment name */
+  name: Scalars['String']['input'];
+  /** Garmin activity this segment is created from, if any */
+  source_activity_id?: InputMaybe<Scalars['String']['input']>;
+  /** Zero-based ClimbPro split index the segment is created from, if any */
+  source_climb_index?: InputMaybe<Scalars['Int']['input']>;
+  /** Zero-based lap index the segment is created from, if any */
+  source_lap_index?: InputMaybe<Scalars['Int']['input']>;
+  /** Sport this segment applies to (e.g. cycling); null matches all sports */
+  sport?: InputMaybe<Scalars['String']['input']>;
+  /** Segment start latitude */
+  start_latitude: Scalars['Float']['input'];
+  /** Segment start longitude */
+  start_longitude: Scalars['Float']['input'];
+};
+
 /** Per-day aggregate combining OwnTracks location stats and Garmin activity metrics. */
 export type DailyActivitySummary = {
   __typename?: 'DailyActivitySummary';
@@ -472,6 +498,95 @@ export type GarminLapsComparisonConnection = {
   total: Scalars['Int']['output'];
 };
 
+/**
+ * A saved (named) Garmin segment: a start→end corridor used to compare efforts
+ * across all activities that traverse the same route.
+ */
+export type GarminSegment = {
+  __typename?: 'GarminSegment';
+  /** UTC timestamp when the segment was created */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** Segment length in meters (optional metadata) */
+  distance_meters?: Maybe<Scalars['Float']['output']>;
+  /** Segment end latitude */
+  end_latitude: Scalars['Float']['output'];
+  /** Segment end longitude */
+  end_longitude: Scalars['Float']['output'];
+  /** Unique segment identifier */
+  id: Scalars['Int']['output'];
+  /** Corridor radius (m) used to match traversing activities */
+  match_tolerance_meters: Scalars['Float']['output'];
+  /** Human-readable segment name (e.g. "Harlem Hill") */
+  name: Scalars['String']['output'];
+  /** Garmin activity this segment was created from, if any */
+  source_activity_id?: Maybe<Scalars['String']['output']>;
+  /** Zero-based ClimbPro split index the segment was created from, if any */
+  source_climb_index?: Maybe<Scalars['Int']['output']>;
+  /** Zero-based lap index the segment was created from, if any */
+  source_lap_index?: Maybe<Scalars['Int']['output']>;
+  /** Sport this segment applies to (e.g. cycling); null matches all sports */
+  sport?: Maybe<Scalars['String']['output']>;
+  /** Segment start latitude */
+  start_latitude: Scalars['Float']['output'];
+  /** Segment start longitude */
+  start_longitude: Scalars['Float']['output'];
+  /** UTC timestamp when the segment was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+};
+
+/** The start→end corridor a segment-efforts query was matched against. */
+export type GarminSegmentDefinition = {
+  __typename?: 'GarminSegmentDefinition';
+  /** Corridor end latitude */
+  end_lat: Scalars['Float']['output'];
+  /** Corridor end longitude */
+  end_lon: Scalars['Float']['output'];
+  /** Corridor start latitude */
+  start_lat: Scalars['Float']['output'];
+  /** Corridor start longitude */
+  start_lon: Scalars['Float']['output'];
+  /** Corridor radius in meters used for matching */
+  tolerance_meters: Scalars['Float']['output'];
+};
+
+/** A single activity's best traversal of a segment, ranked against all others. */
+export type GarminSegmentEffort = {
+  __typename?: 'GarminSegmentEffort';
+  /** Garmin activity identifier for this effort */
+  activity_id: Scalars['String']['output'];
+  /** UTC start time of the parent activity */
+  activity_start_time?: Maybe<Scalars['String']['output']>;
+  /** Average heart rate across the segment in bpm */
+  avg_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** Average speed across the segment in km/h */
+  avg_speed_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Distance covered across the segment in km */
+  distance_km?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp reaching the segment end corridor */
+  effort_end: Scalars['String']['output'];
+  /** UTC timestamp entering the segment start corridor */
+  effort_start: Scalars['String']['output'];
+  /** Segment elapsed time in seconds */
+  elapsed_seconds: Scalars['Float']['output'];
+  /** Maximum heart rate across the segment in bpm */
+  max_heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** 1-based rank by elapsed time (1 = fastest) */
+  rank: Scalars['Int']['output'];
+  /** Sport type (e.g. cycling) */
+  sport?: Maybe<Scalars['String']['output']>;
+};
+
+/** Ranked efforts for a segment across all matching activities (fastest first). */
+export type GarminSegmentEffortsConnection = {
+  __typename?: 'GarminSegmentEffortsConnection';
+  /** Efforts ordered fastest-first */
+  items: Array<GarminSegmentEffort>;
+  /** The corridor the efforts were matched against */
+  segment: GarminSegmentDefinition;
+  /** Total number of matching efforts */
+  total: Scalars['Int']['output'];
+};
+
 /** Result payload returned when triggering an on-demand Garmin sync. */
 export type GarminSyncTriggerResult = {
   __typename?: 'GarminSyncTriggerResult';
@@ -779,10 +894,28 @@ export type LocationDetail = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * Create a saved Garmin segment (requires authentication). Typically called with
+   * the start/end coordinates of an activity lap or ClimbPro split to "save this
+   * lap as a segment".
+   */
+  createGarminSegment: GarminSegment;
+  /** Delete a saved Garmin segment by id (requires authentication). Returns true on success. */
+  deleteGarminSegment: Scalars['Boolean']['output'];
   /** Trigger an on-demand Garmin sync in the upstream API. */
   triggerGarminSync: GarminSyncTriggerResult;
   /** Trigger batch reverse-geocoding of un-geocoded location records. */
   triggerGeocoding: GeocodingTriggerResult;
+};
+
+
+export type MutationCreateGarminSegmentArgs = {
+  input: CreateGarminSegmentInput;
+};
+
+
+export type MutationDeleteGarminSegmentArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -855,6 +988,12 @@ export type Query = {
   garminDeviceCounts: Array<GarminDeviceCount>;
   /** Batch laps across activities for cross-activity comparison (matrix of activities x lap_index). */
   garminLapsComparison: GarminLapsComparisonConnection;
+  /** Fetch a single saved Garmin segment by id. Returns null if it does not exist. */
+  garminSegment?: Maybe<GarminSegment>;
+  /** Rank all historical activity efforts over a saved segment (fastest first). */
+  garminSegmentEfforts: GarminSegmentEffortsConnection;
+  /** List saved Garmin segments, optionally filtered by sport. */
+  garminSegments: Array<GarminSegment>;
   /** List all distinct sport types with activity counts. */
   garminSports: Array<SportInfo>;
   /** Retrieve paginated GPS track points for a Garmin activity. */
@@ -951,6 +1090,25 @@ export type QueryGarminLapsComparisonArgs = {
   date_to?: InputMaybe<Scalars['String']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  sport?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGarminSegmentArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryGarminSegmentEffortsArgs = {
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['Int']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  max_effort_seconds?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryGarminSegmentsArgs = {
   sport?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -1194,6 +1352,7 @@ export type DirectiveResolverFn<TResult = Record<PropertyKey, never>, TParent = 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CreateGarminSegmentInput: CreateGarminSegmentInput;
   DailyActivitySummary: ResolverTypeWrapper<DailyActivitySummary>;
   DailySummaryConnection: ResolverTypeWrapper<DailySummaryConnection>;
   DailySummaryDateRange: ResolverTypeWrapper<DailySummaryDateRange>;
@@ -1214,6 +1373,10 @@ export type ResolversTypes = ResolversObject<{
   GarminDeviceCount: ResolverTypeWrapper<GarminDeviceCount>;
   GarminLapsActivity: ResolverTypeWrapper<GarminLapsActivity>;
   GarminLapsComparisonConnection: ResolverTypeWrapper<GarminLapsComparisonConnection>;
+  GarminSegment: ResolverTypeWrapper<GarminSegment>;
+  GarminSegmentDefinition: ResolverTypeWrapper<GarminSegmentDefinition>;
+  GarminSegmentEffort: ResolverTypeWrapper<GarminSegmentEffort>;
+  GarminSegmentEffortsConnection: ResolverTypeWrapper<GarminSegmentEffortsConnection>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
@@ -1248,6 +1411,7 @@ export type ResolversTypes = ResolversObject<{
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
   Boolean: Scalars['Boolean']['output'];
+  CreateGarminSegmentInput: CreateGarminSegmentInput;
   DailyActivitySummary: DailyActivitySummary;
   DailySummaryConnection: DailySummaryConnection;
   DailySummaryDateRange: DailySummaryDateRange;
@@ -1268,6 +1432,10 @@ export type ResolversParentTypes = ResolversObject<{
   GarminDeviceCount: GarminDeviceCount;
   GarminLapsActivity: GarminLapsActivity;
   GarminLapsComparisonConnection: GarminLapsComparisonConnection;
+  GarminSegment: GarminSegment;
+  GarminSegmentDefinition: GarminSegmentDefinition;
+  GarminSegmentEffort: GarminSegmentEffort;
+  GarminSegmentEffortsConnection: GarminSegmentEffortsConnection;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
   GarminTrackPointConnection: GarminTrackPointConnection;
@@ -1540,6 +1708,51 @@ export type GarminLapsComparisonConnectionResolvers<ContextType = GatewayContext
   total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
 }>;
 
+export type GarminSegmentResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegment'] = ResolversParentTypes['GarminSegment']> = ResolversObject<{
+  created_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  distance_meters?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  end_latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  end_longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  match_tolerance_meters?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  source_activity_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  source_climb_index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  source_lap_index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  sport?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  start_latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  start_longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
+export type GarminSegmentDefinitionResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentDefinition'] = ResolversParentTypes['GarminSegmentDefinition']> = ResolversObject<{
+  end_lat?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  end_lon?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  start_lat?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  start_lon?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  tolerance_meters?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+}>;
+
+export type GarminSegmentEffortResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentEffort'] = ResolversParentTypes['GarminSegmentEffort']> = ResolversObject<{
+  activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  activity_start_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  avg_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  avg_speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  effort_end?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  effort_start?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  elapsed_seconds?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  max_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  rank?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  sport?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
+export type GarminSegmentEffortsConnectionResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentEffortsConnection'] = ResolversParentTypes['GarminSegmentEffortsConnection']> = ResolversObject<{
+  items?: Resolver<Array<ResolversTypes['GarminSegmentEffort']>, ParentType, ContextType>;
+  segment?: Resolver<ResolversTypes['GarminSegmentDefinition'], ParentType, ContextType>;
+  total?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+}>;
+
 export type GarminSyncTriggerResultResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSyncTriggerResult'] = ResolversParentTypes['GarminSyncTriggerResult']> = ResolversObject<{
   accepted?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   lookback?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -1705,6 +1918,8 @@ export type LocationDetailResolvers<ContextType = GatewayContext, ParentType ext
 }>;
 
 export type MutationResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  createGarminSegment?: Resolver<ResolversTypes['GarminSegment'], ParentType, ContextType, RequireFields<MutationCreateGarminSegmentArgs, 'input'>>;
+  deleteGarminSegment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteGarminSegmentArgs, 'id'>>;
   triggerGarminSync?: Resolver<ResolversTypes['GarminSyncTriggerResult'], ParentType, ContextType, Partial<MutationTriggerGarminSyncArgs>>;
   triggerGeocoding?: Resolver<ResolversTypes['GeocodingTriggerResult'], ParentType, ContextType, Partial<MutationTriggerGeocodingArgs>>;
 }>;
@@ -1739,6 +1954,9 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
   garminDeviceCounts?: Resolver<Array<ResolversTypes['GarminDeviceCount']>, ParentType, ContextType>;
   garminLapsComparison?: Resolver<ResolversTypes['GarminLapsComparisonConnection'], ParentType, ContextType, Partial<QueryGarminLapsComparisonArgs>>;
+  garminSegment?: Resolver<Maybe<ResolversTypes['GarminSegment']>, ParentType, ContextType, RequireFields<QueryGarminSegmentArgs, 'id'>>;
+  garminSegmentEfforts?: Resolver<ResolversTypes['GarminSegmentEffortsConnection'], ParentType, ContextType, RequireFields<QueryGarminSegmentEffortsArgs, 'id'>>;
+  garminSegments?: Resolver<Array<ResolversTypes['GarminSegment']>, ParentType, ContextType, Partial<QueryGarminSegmentsArgs>>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
   garminTrackPoints?: Resolver<ResolversTypes['GarminTrackPointConnection'], ParentType, ContextType, RequireFields<QueryGarminTrackPointsArgs, 'activity_id'>>;
   geocodingStatus?: Resolver<ResolversTypes['GeocodingStatus'], ParentType, ContextType>;
@@ -1824,6 +2042,10 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminDeviceCount?: GarminDeviceCountResolvers<ContextType>;
   GarminLapsActivity?: GarminLapsActivityResolvers<ContextType>;
   GarminLapsComparisonConnection?: GarminLapsComparisonConnectionResolvers<ContextType>;
+  GarminSegment?: GarminSegmentResolvers<ContextType>;
+  GarminSegmentDefinition?: GarminSegmentDefinitionResolvers<ContextType>;
+  GarminSegmentEffort?: GarminSegmentEffortResolvers<ContextType>;
+  GarminSegmentEffortsConnection?: GarminSegmentEffortsConnectionResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;
