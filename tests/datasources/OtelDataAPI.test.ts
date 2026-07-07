@@ -556,4 +556,79 @@ describe('OtelDataAPI', () => {
 
     nowSpy.mockRestore();
   });
+
+  describe('garmin segments', () => {
+    it('lists segments with sport filter', async () => {
+      fetchMock.mockResolvedValueOnce(await jsonResponse([{ id: 1, name: 'Harlem Hill' }]));
+      const api = new OtelDataAPI('https://example.test');
+
+      const result = await api.getGarminSegments({ sport: 'cycling' });
+
+      const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const parsed = new URL(url);
+      expect(parsed.pathname).toBe('/api/v1/garmin/segments');
+      expect(parsed.searchParams.get('sport')).toBe('cycling');
+      expect(options.method ?? 'GET').toBe('GET');
+      expect(result).toEqual([{ id: 1, name: 'Harlem Hill' }]);
+    });
+
+    it('returns null when a segment is not found (404)', async () => {
+      fetchMock.mockResolvedValueOnce(await jsonResponse({ detail: 'Segment not found' }, 404));
+      const api = new OtelDataAPI('https://example.test');
+
+      const result = await api.getGarminSegment(999);
+
+      expect(result).toBeNull();
+    });
+
+    it('fetches efforts for a segment by id with filters', async () => {
+      fetchMock.mockResolvedValueOnce(await jsonResponse({ segment: {}, items: [], total: 0 }));
+      const api = new OtelDataAPI('https://example.test');
+
+      await api.getGarminSegmentEfforts(1, { limit: 25, max_effort_seconds: 400 });
+
+      const [url] = fetchMock.mock.calls[0] as [string];
+      const parsed = new URL(url);
+      expect(parsed.pathname).toBe('/api/v1/garmin/segments/1/efforts');
+      expect(parsed.searchParams.get('limit')).toBe('25');
+      expect(parsed.searchParams.get('max_effort_seconds')).toBe('400');
+    });
+
+    it('creates a segment with a JSON body and forwards the auth token', async () => {
+      fetchMock.mockResolvedValueOnce(await jsonResponse({ id: 5, name: 'New Segment' }, 201));
+      const api = new OtelDataAPI('https://example.test');
+      const input = {
+        name: 'New Segment',
+        start_latitude: 1,
+        start_longitude: 2,
+        end_latitude: 3,
+        end_longitude: 4,
+      };
+
+      const result = await api.createGarminSegment(input, 'Bearer jwt-123');
+
+      const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe('https://example.test/api/v1/garmin/segments');
+      expect(options.method).toBe('POST');
+      expect(options.body).toBe(JSON.stringify(input));
+      expect(options.headers).toMatchObject({
+        Authorization: 'Bearer jwt-123',
+        'Content-Type': 'application/json',
+      });
+      expect(result).toEqual({ id: 5, name: 'New Segment' });
+    });
+
+    it('deletes a segment (204) and forwards the auth token', async () => {
+      fetchMock.mockResolvedValueOnce(new Response(null, { status: 204 }));
+      const api = new OtelDataAPI('https://example.test');
+
+      const result = await api.deleteGarminSegment(1, 'Bearer jwt-123');
+
+      const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe('https://example.test/api/v1/garmin/segments/1');
+      expect(options.method).toBe('DELETE');
+      expect(options.headers).toMatchObject({ Authorization: 'Bearer jwt-123' });
+      expect(result).toBe(true);
+    });
+  });
 });

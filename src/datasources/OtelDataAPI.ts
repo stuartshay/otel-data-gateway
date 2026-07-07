@@ -33,7 +33,9 @@ interface UpstreamReadyStatus {
 interface FetchParams {
   path: string;
   query?: Record<string, string | number | boolean | undefined | null>;
-  method?: 'GET' | 'POST';
+  method?: 'GET' | 'POST' | 'DELETE';
+  /** JSON request body (serialized for POST/PUT-style writes). */
+  body?: unknown;
   /** TTL in milliseconds. When set, responses are cached and deduplicated. */
   cacheTtlMs?: number;
   /** Non-2xx statuses to handle as structured responses instead of throwing. */
@@ -119,6 +121,25 @@ interface GarminLapsComparisonConnection {
   offset: number;
 }
 
+/**
+ * Payload for creating a saved Garmin segment. Mirrors the REST
+ * `GarminSegmentCreate` schema but tolerates omitted (`undefined`) optional
+ * fields as produced by the GraphQL input type.
+ */
+interface CreateGarminSegmentPayload {
+  name: string;
+  sport?: string | null;
+  start_latitude: number;
+  start_longitude: number;
+  end_latitude: number;
+  end_longitude: number;
+  distance_meters?: number | null;
+  match_tolerance_meters?: number | null;
+  source_activity_id?: string | null;
+  source_lap_index?: number | null;
+  source_climb_index?: number | null;
+}
+
 /** Map that evicts expired entries on access, preventing unbounded growth. */
 class ExpiringCache<K, V extends { expiry: number }> extends Map<K, V> {
   override get(key: K): V | undefined {
@@ -182,6 +203,7 @@ export class OtelDataAPI {
     path,
     query,
     method = 'GET',
+    body,
     cacheTtlMs,
     acceptStatusCodes,
     headers,
@@ -208,6 +230,7 @@ export class OtelDataAPI {
 
     const request = this.doFetch<T>(urlString, {
       method,
+      body,
       cacheKey,
       cacheTtlMs,
       acceptStatusCodes,
@@ -228,7 +251,8 @@ export class OtelDataAPI {
   private async doFetch<T>(
     urlString: string,
     options: {
-      method: 'GET' | 'POST';
+      method: 'GET' | 'POST' | 'DELETE';
+      body?: unknown;
       cacheKey: string;
       cacheTtlMs?: number;
       acceptStatusCodes?: number[];
@@ -238,21 +262,33 @@ export class OtelDataAPI {
   ): Promise<T> {
     const {
       method,
+      body,
       cacheKey,
       cacheTtlMs,
       acceptStatusCodes,
       headers: extraHeaders,
       timeoutMs,
     } = options;
+    const hasBody = body !== undefined && body !== null;
     const response = await fetch(urlString, {
       method,
       signal: AbortSignal.timeout(timeoutMs ?? 30_000),
-      headers: { ...extraHeaders, Accept: 'application/json' },
+      headers: {
+        ...extraHeaders,
+        Accept: 'application/json',
+        ...(hasBody ? { 'Content-Type': 'application/json' } : {}),
+      },
+      body: hasBody ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok && !(acceptStatusCodes ?? []).includes(response.status)) {
-      const body = await response.text().catch(() => '');
-      throw new Error(`REST API error ${response.status}: ${response.statusText} - ${body}`);
+      const errorBody = await response.text().catch(() => '');
+      throw new Error(`REST API error ${response.status}: ${response.statusText} - ${errorBody}`);
+    }
+
+    // No-content responses (e.g. 204 from DELETE) have no JSON body to parse.
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return undefined as T;
     }
 
     const data = (await response.json()) as T;
@@ -448,6 +484,66 @@ export class OtelDataAPI {
       path: `/api/v1/garmin/activities/${activityId}/addresses`,
       cacheTtlMs: 30_000,
     });
+  }
+
+  // ── Garmin Segments ─────────────────────────────────
+  async getGarminSegments(
+    params?: Nullable<{ sport?: string }>,
+  ): Promise<Schemas['GarminSegment'][]> {
+    return this.fetch<Schemas['GarminSegment'][]>({
+      path: '/api/v1/garmin/segments',
+      query: params,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminSegment(id: number): Promise<Schemas['GarminSegment'] | null> {
+    const result = await this.fetch<Schemas['GarminSegment'] | { detail: string }>({
+      path: `/api/v1/garmin/segments/${id}`,
+      cacheTtlMs: 30_000,
+      acceptStatusCodes: [404],
+    });
+    if (!result || 'detail' in result) {
+      return null;
+    }
+    return result;
+  }
+
+  async getGarminSegmentEfforts(
+    id: number,
+    params?: Nullable<{
+      date_from?: string;
+      date_to?: string;
+      max_effort_seconds?: number;
+      limit?: number;
+    }>,
+  ): Promise<Schemas['SegmentEffortsResponse']> {
+    return this.fetch<Schemas['SegmentEffortsResponse']>({
+      path: `/api/v1/garmin/segments/${id}/efforts`,
+      query: params,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async createGarminSegment(
+    input: CreateGarminSegmentPayload,
+    token?: string,
+  ): Promise<Schemas['GarminSegment']> {
+    return this.fetch<Schemas['GarminSegment']>({
+      path: '/api/v1/garmin/segments',
+      method: 'POST',
+      body: input,
+      headers: token ? { Authorization: token } : undefined,
+    });
+  }
+
+  async deleteGarminSegment(id: number, token?: string): Promise<boolean> {
+    await this.fetch<unknown>({
+      path: `/api/v1/garmin/segments/${id}`,
+      method: 'DELETE',
+      headers: token ? { Authorization: token } : undefined,
+    });
+    return true;
   }
 
   async getGarminActivityTotals(

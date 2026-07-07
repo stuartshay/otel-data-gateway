@@ -13,10 +13,16 @@ export const garminResolvers: {
     | 'garminActivityClimbs'
     | 'garminActivityLaps'
     | 'garminLapsComparison'
+    | 'garminSegments'
+    | 'garminSegment'
+    | 'garminSegmentEfforts'
     | 'garminActivityTotals'
     | 'garminActivityAddresses'
   >;
-  Mutation: Pick<MutationResolvers, 'triggerGarminSync'>;
+  Mutation: Pick<
+    MutationResolvers,
+    'triggerGarminSync' | 'createGarminSegment' | 'deleteGarminSegment'
+  >;
 } = {
   Query: {
     garminDateRange: async (_parent, _args, { dataSources }) => {
@@ -85,6 +91,19 @@ export const garminResolvers: {
       return dataSources.otelAPI.getGarminLapsComparison(args);
     },
 
+    garminSegments: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminSegments(args);
+    },
+
+    garminSegment: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminSegment(args.id);
+    },
+
+    garminSegmentEfforts: async (_parent, args, { dataSources }) => {
+      const { id, ...params } = args;
+      return dataSources.otelAPI.getGarminSegmentEfforts(id, params);
+    },
+
     garminActivityTotals: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminActivityTotals(args);
     },
@@ -96,6 +115,14 @@ export const garminResolvers: {
   Mutation: {
     triggerGarminSync: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.triggerGarminSync(args);
+    },
+
+    createGarminSegment: async (_parent, args, { dataSources, token }) => {
+      return dataSources.otelAPI.createGarminSegment(args.input, token);
+    },
+
+    deleteGarminSegment: async (_parent, args, { dataSources, token }) => {
+      return dataSources.otelAPI.deleteGarminSegment(args.id, token);
     },
   },
 };
