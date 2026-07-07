@@ -10,6 +10,11 @@ on:
         required: true
         default: true
         type: boolean
+      publish_types:
+        description: 'Regenerate and force-publish @stuartshay/otel-graphql-types'
+        required: false
+        default: false
+        type: boolean
   pull_request:
     branches: [master, develop]
 
@@ -199,4 +204,151 @@ jobs:
             echo "\`\`\`"
             echo "${{ steps.meta.outputs.tags }}"
             echo "\`\`\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # Schema detection and npm publishing
+  # Only runs on master pushes (after a successful Docker build). Publishes
+  # @stuartshay/otel-graphql-types at the SAME version as the image whenever the
+  # generated GraphQL types change, and dispatches the otel-data-ui update.
+  # Mirrors the otel-data-api docker.yml pattern.
+  schema-check:
+    name: Check GraphQL Schema Changes
+    runs-on: ubuntu-latest
+    needs: build
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_types))
+
+    outputs:
+      schema_changed: ${{ steps.detect.outputs.changed }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Detect schema changes
+        id: detect
+        env:
+          FORCE_PUBLISH_TYPES: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_types }}
+        run: |
+          # Regenerate the published type artifacts from the GraphQL schema.
+          npm run build:types-package
+
+          # Compare regenerated artifacts against the committed versions. This
+          # catches cases where the schema changed but generated artifacts were
+          # not committed, and where the committed artifacts changed in the push.
+          SHOULD_PUBLISH=false
+
+          if [ "$FORCE_PUBLISH_TYPES" = "true" ]; then
+            echo "✓ Manual publish requested via workflow_dispatch"
+            SHOULD_PUBLISH=true
+          elif ! git diff --quiet -- packages/graphql-types/index.d.ts packages/graphql-types/schema.graphql 2>/dev/null; then
+            echo "✓ Generated types differ from committed versions"
+            SHOULD_PUBLISH=true
+          elif git rev-parse HEAD^ >/dev/null 2>&1 && \
+               ! git diff --quiet HEAD^ HEAD -- packages/graphql-types/index.d.ts packages/graphql-types/schema.graphql src/schema/schema.graphql 2>/dev/null; then
+            echo "✓ Committed schema/type artifacts changed in this push"
+            SHOULD_PUBLISH=true
+          else
+            echo "No changes affecting types detected"
+          fi
+
+          if [ "$SHOULD_PUBLISH" = true ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "GraphQL types changed — will publish"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload generated types
+        if: steps.detect.outputs.changed == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: generated-graphql-types
+          path: |
+            packages/graphql-types/index.d.ts
+            packages/graphql-types/schema.graphql
+          retention-days: 7
+
+  publish-types:
+    name: Publish Types to npm
+    runs-on: ubuntu-latest
+    needs: schema-check
+    if: needs.schema-check.outputs.schema_changed == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download generated types
+        uses: actions/download-artifact@v8
+        with:
+          name: generated-graphql-types
+          path: packages/graphql-types
+
+      - name: Update package version
+        run: |
+          cd packages/graphql-types
+          BASE_VERSION=$(cat ../../VERSION)
+          PKG_VERSION="${BASE_VERSION}.${{ github.run_number }}"
+          npm version "$PKG_VERSION" --no-git-tag-version --allow-same-version
+          echo "Updated package.json to version: $PKG_VERSION"
+
+      - name: Publish to npm
+        run: |
+          cd packages/graphql-types
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Get published version
+        id: types_version
+        run: |
+          PKG_VERSION=$(jq -r '.version' packages/graphql-types/package.json)
+          echo "version=${PKG_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger otel-data-ui types update
+        id: ui_dispatch
+        uses: peter-evans/repository-dispatch@v4
+        with:
+          token: ${{ secrets.GITOPS_PAT }}
+          repository: stuartshay/otel-data-ui
+          event-type: otel-graphql-types-release
+          client-payload: '{"version": "${{ steps.types_version.outputs.version }}"}'
+        continue-on-error: true
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.ui_dispatch.outcome }}" = "success" ]; then
+            DISPATCH_STATUS="✅"
+          else
+            DISPATCH_STATUS="❌ (${{ steps.ui_dispatch.outcome }})"
+          fi
+          {
+            echo "## npm Package Published"
+            echo ""
+            echo "| Property | Value |"
+            echo "|----------|-------|"
+            echo "| Package | \`@stuartshay/otel-graphql-types\` |"
+            echo "| Version | \`${{ steps.types_version.outputs.version }}\` |"
+            echo "| Run # | \`${{ github.run_number }}\` |"
+            echo "| UI Dispatch | ${DISPATCH_STATUS} |"
           } >> "$GITHUB_STEP_SUMMARY"
