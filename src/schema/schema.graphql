@@ -1039,6 +1039,12 @@ type GarminSegment {
   UTC timestamp when the segment was last updated
   """
   updated_at: String
+  """
+  Ordered [latitude, longitude] pairs tracing the segment path, recovered and
+  simplified from the source activity's GPS track. Null when no source activity
+  track can be matched (clients fall back to a straight start→end line).
+  """
+  route: [[Float!]!]
 }
 
 """

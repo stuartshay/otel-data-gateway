@@ -518,6 +518,12 @@ export type GarminSegment = {
   match_tolerance_meters: Scalars['Float']['output'];
   /** Human-readable segment name (e.g. "Harlem Hill") */
   name: Scalars['String']['output'];
+  /**
+   * Ordered [latitude, longitude] pairs tracing the segment path, recovered and
+   * simplified from the source activity's GPS track. Null when no source activity
+   * track can be matched (clients fall back to a straight start→end line).
+   */
+  route?: Maybe<Array<Array<Scalars['Float']['output']>>>;
   /** Garmin activity this segment was created from, if any */
   source_activity_id?: Maybe<Scalars['String']['output']>;
   /** Zero-based ClimbPro split index the segment was created from, if any */
@@ -1716,6 +1722,7 @@ export type GarminSegmentResolvers<ContextType = GatewayContext, ParentType exte
   id?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   match_tolerance_meters?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  route?: Resolver<Maybe<Array<Array<ResolversTypes['Float']>>>, ParentType, ContextType>;
   source_activity_id?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   source_climb_index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   source_lap_index?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
