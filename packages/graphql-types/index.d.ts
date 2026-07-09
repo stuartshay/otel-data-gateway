@@ -515,6 +515,12 @@ export interface GarminSegment {
   match_tolerance_meters: Scalars['Float']['output'];
   /** Human-readable segment name (e.g. "Harlem Hill") */
   name: Scalars['String']['output'];
+  /**
+   * Ordered [latitude, longitude] pairs tracing the segment path, recovered and
+   * simplified from the source activity's GPS track. Null when no source activity
+   * track can be matched (clients fall back to a straight start→end line).
+   */
+  route?: Maybe<Array<Array<Scalars['Float']['output']>>>;
   /** Garmin activity this segment was created from, if any */
   source_activity_id?: Maybe<Scalars['String']['output']>;
   /** Zero-based ClimbPro split index the segment was created from, if any */

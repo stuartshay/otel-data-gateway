@@ -302,6 +302,10 @@ describe('garmin segment resolvers', () => {
     source_climb_index: 0,
     created_at: '2026-07-07T05:00:11Z',
     updated_at: '2026-07-07T05:00:11Z',
+    route: [
+      [40.79366846, -73.96104321],
+      [40.79002409, -73.96422816],
+    ],
   };
 
   it('proxies garminSegments with sport filter', async () => {
