@@ -25,6 +25,10 @@ npm-debug.log*
 # Coverage
 coverage/
 
+# SonarQube scanner output
+.scannerwork/
+.sonnarwork/
+
 # Temp
 tmp/
 

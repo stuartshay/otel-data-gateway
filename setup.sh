@@ -17,6 +17,16 @@ echo ""
 
 REQUIRED_NODE_VERSION="24"
 
+ensure_env_entry() {
+    local key="$1"
+    local value="$2"
+
+    if ! grep -q "^${key}=" .env; then
+        printf "%s=%s\n" "$key" "$value" >> .env
+        echo -e "${GREEN}✓ Added ${key} to .env${NC}"
+    fi
+}
+
 # Check git
 echo -e "${YELLOW}Checking git...${NC}"
 if ! command -v git &> /dev/null; then
@@ -97,11 +107,20 @@ if [ ! -f .env ]; then
 PORT=4000
 OTEL_DATA_API_URL=https://api.lab.informationcart.com
 NODE_ENV=development
+SONAR_HOST_URL=https://sonar.lab.informationcart.com
+SONAR_PROJECT_KEY=otel-data-gateway
+SONAR_PROJECT_NAME=otel-data-gateway
+SONAR_TOKEN=
 EOF
     echo -e "${GREEN}✓ Created .env${NC}"
 else
     echo -e "${GREEN}✓ .env already exists${NC}"
 fi
+
+ensure_env_entry "SONAR_HOST_URL" "https://sonar.lab.informationcart.com"
+ensure_env_entry "SONAR_PROJECT_KEY" "otel-data-gateway"
+ensure_env_entry "SONAR_PROJECT_NAME" "otel-data-gateway"
+ensure_env_entry "SONAR_TOKEN" ""
 echo ""
 
 # Build
@@ -130,4 +149,5 @@ echo "  npm run build     - Build for production"
 echo "  npm run start     - Start production server"
 echo "  npm run lint      - Run ESLint"
 echo "  npm run test      - Run tests"
+echo "  make sonar        - Run SonarQube analysis"
 echo ""
