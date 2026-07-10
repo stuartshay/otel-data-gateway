@@ -143,11 +143,15 @@ mutation TriggerGarminSync($window_hours: Int, $lookback: Int) {
 
 ## Environment Variables
 
-| Variable            | Default                               | Description |
-| ------------------- | ------------------------------------- | ----------- |
-| `PORT`              | `4000`                                | Server port |
-| `OTEL_DATA_API_URL` | `https://api.lab.informationcart.com` | API URL     |
-| `NODE_ENV`          | `production`                          | Environment |
+| Variable             | Default                                 | Description              |
+| -------------------- | --------------------------------------- | ------------------------ |
+| `PORT`               | `4000`                                  | Server port              |
+| `OTEL_DATA_API_URL`  | `https://api.lab.informationcart.com`   | API URL                  |
+| `NODE_ENV`           | `production`                            | Environment              |
+| `SONAR_HOST_URL`     | `https://sonar.lab.informationcart.com` | SonarQube URL            |
+| `SONAR_PROJECT_KEY`  | `otel-data-gateway`                     | SonarQube project key    |
+| `SONAR_PROJECT_NAME` | `otel-data-gateway`                     | SonarQube project name   |
+| `SONAR_TOKEN`        |                                         | SonarQube analysis token |
 
 ## Commands
 
@@ -160,8 +164,13 @@ make lint          # Run all linters
 make format        # Format code
 make type-check    # TypeScript type checking
 make test          # Run tests
+make sonar         # Coverage + SonarQube analysis
 make docker-build  # Build Docker image
 ```
+
+`make sonar` loads `.env` and `.env.local`, requires `SONAR_TOKEN`, generates
+Jest coverage, and runs the local `@sonar/scan` CLI against
+`https://sonar.lab.informationcart.com`.
 
 ## Docker
 

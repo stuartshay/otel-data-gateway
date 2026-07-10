@@ -2,7 +2,8 @@
 # otel-data-gateway Makefile
 # =============================================================================
 
-.PHONY: help setup install dev build clean lint format test docker-build docker-run docker-push all
+.PHONY: help setup install dev build clean lint format test sonar sonar-scan \
+        sonar-check-token sonar-coverage docker-build docker-run docker-push all
 
 .DEFAULT_GOAL := help
 
@@ -10,6 +11,28 @@
 DOCKER_IMAGE := stuartshay/otel-data-gateway
 DOCKER_TAG := latest
 NODE_VERSION := 24
+SONAR_TOKEN_FROM_ENV := $(SONAR_TOKEN)
+
+ifneq (,$(wildcard .env))
+include .env
+endif
+
+ifneq (,$(wildcard .env.local))
+include .env.local
+endif
+
+ifneq ($(SONAR_TOKEN_FROM_ENV),)
+SONAR_TOKEN := $(SONAR_TOKEN_FROM_ENV)
+endif
+
+SONAR_HOST_URL ?= https://sonar.lab.informationcart.com
+SONAR_PROJECT_KEY ?= otel-data-gateway
+SONAR_PROJECT_NAME ?= otel-data-gateway
+SONAR_SOURCES ?= src
+SONAR_TESTS ?= tests
+SONAR_EXCLUSIONS ?= src/__generated__/**,node_modules/**,dist/**,coverage/**,packages/**,loadtest/**
+SONAR_COVERAGE_REPORT ?= coverage/lcov.info
+export SONAR_HOST_URL SONAR_PROJECT_KEY SONAR_PROJECT_NAME SONAR_TOKEN
 
 # Colors for output
 RED := \033[0;31m
@@ -20,7 +43,7 @@ NC := \033[0m
 help: ## Show this help message
 	@echo "$(GREEN)otel-data-gateway Makefile Commands$(NC)"
 	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
+	@grep -hE '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(YELLOW)%-20s$(NC) %s\n", $$1, $$2}'
 	@echo ""
 
 # =============================================================================
@@ -85,6 +108,30 @@ type-check: ## Run TypeScript type checking
 	@echo "$(YELLOW)Running type check...$(NC)"
 	@npm run type-check
 	@echo "$(GREEN)✓ Type check complete$(NC)"
+
+sonar: sonar-scan ## Run SonarQube analysis
+
+sonar-check-token: ## Validate SonarQube token configuration
+	@if [ -z "$${SONAR_TOKEN:-}" ]; then \
+		echo "SONAR_TOKEN is required. Add it to .env, .env.local, or export it before running make sonar."; \
+		exit 1; \
+	fi
+
+sonar-coverage: ## Generate coverage for SonarQube
+	@echo "$(YELLOW)Generating SonarQube coverage...$(NC)"
+	@npm run test -- --coverage --coverageReporters=lcov
+	@echo "$(GREEN)✓ Coverage report: $(SONAR_COVERAGE_REPORT)$(NC)"
+
+sonar-scan: sonar-check-token sonar-coverage ## Run SonarQube scanner CLI
+	npx sonar \
+		-Dsonar.host.url="$(SONAR_HOST_URL)" \
+		-Dsonar.token="$${SONAR_TOKEN}" \
+		-Dsonar.projectKey="$(SONAR_PROJECT_KEY)" \
+		-Dsonar.projectName="$(SONAR_PROJECT_NAME)" \
+		-Dsonar.sources="$(SONAR_SOURCES)" \
+		-Dsonar.tests="$(SONAR_TESTS)" \
+		-Dsonar.exclusions="$(SONAR_EXCLUSIONS)" \
+		-Dsonar.javascript.lcov.reportPaths="$(SONAR_COVERAGE_REPORT)"
 
 # =============================================================================
 # Testing
