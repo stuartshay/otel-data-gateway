@@ -5,6 +5,7 @@
     "buildx",
     "codegen",
     "dedup",
+    "Meteo",
     "dockerhub",
     "Dsonar",
     "elif",

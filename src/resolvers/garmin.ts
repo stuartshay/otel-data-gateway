@@ -12,6 +12,7 @@ export const garminResolvers: {
     | 'garminChartData'
     | 'garminActivityClimbs'
     | 'garminActivityLaps'
+    | 'garminActivityWeather'
     | 'garminLapsComparison'
     | 'garminSegments'
     | 'garminSegment'
@@ -85,6 +86,10 @@ export const garminResolvers: {
 
     garminActivityLaps: async (_parent, args, { dataSources }) => {
       return dataSources.otelAPI.getGarminActivityLaps(args.activity_id);
+    },
+
+    garminActivityWeather: async (_parent, args, { dataSources }) => {
+      return dataSources.otelAPI.getGarminActivityWeather(args.activity_id);
     },
 
     garminLapsComparison: async (_parent, args, { dataSources }) => {

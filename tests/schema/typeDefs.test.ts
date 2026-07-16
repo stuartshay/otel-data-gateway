@@ -278,6 +278,76 @@ describe('typeDefs', () => {
     });
   });
 
+  it('exposes Garmin activity weather', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminActivityWeather(activity_id: "activity-1") {
+            activity_id
+            observed_at
+            latitude
+            longitude
+            temperature_c
+            wind_speed_kmh
+            weather_code
+            source
+            is_provisional
+          }
+        }
+      `,
+      rootValue: {
+        garminActivityWeather: () => ({
+          activity_id: 'activity-1',
+          observed_at: '2026-03-08T20:00:00+00:00',
+          latitude: 40.7937,
+          longitude: -73.961,
+          temperature_c: 18.4,
+          wind_speed_kmh: 12.0,
+          weather_code: 1,
+          source: 'archive',
+          is_provisional: false,
+        }),
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({
+      garminActivityWeather: {
+        activity_id: 'activity-1',
+        observed_at: '2026-03-08T20:00:00+00:00',
+        latitude: 40.7937,
+        longitude: -73.961,
+        temperature_c: 18.4,
+        wind_speed_kmh: 12.0,
+        weather_code: 1,
+        source: 'archive',
+        is_provisional: false,
+      },
+    });
+  });
+
+  it('returns null Garmin activity weather when not backfilled yet', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminActivityWeather(activity_id: "activity-1") {
+            activity_id
+          }
+        }
+      `,
+      rootValue: {
+        garminActivityWeather: () => null,
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({ garminActivityWeather: null });
+  });
+
   it('exposes Garmin laps comparison across activities', async () => {
     const schema = buildSchema(typeDefs);
     const result = await graphql({

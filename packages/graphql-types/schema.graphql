@@ -897,6 +897,92 @@ type GarminActivityLap {
 }
 
 """
+Open-Meteo weather conditions matched to an activity's start location/time.
+"""
+type GarminActivityWeather {
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  UTC hourly bucket the reading was taken from
+  """
+  observed_at: String!
+  """
+  Latitude the weather was looked up for
+  """
+  latitude: Float!
+  """
+  Longitude the weather was looked up for
+  """
+  longitude: Float!
+  """
+  Air temperature in degrees C
+  """
+  temperature_c: Float
+  """
+  Feels-like temperature in degrees C
+  """
+  apparent_temperature_c: Float
+  """
+  Relative humidity percent
+  """
+  relative_humidity_pct: Float
+  """
+  Total precipitation in millimeters
+  """
+  precipitation_mm: Float
+  """
+  Rainfall in millimeters
+  """
+  rain_mm: Float
+  """
+  Snowfall in centimeters
+  """
+  snowfall_cm: Float
+  """
+  Total cloud cover percent
+  """
+  cloud_cover_pct: Float
+  """
+  Wind speed in km/h
+  """
+  wind_speed_kmh: Float
+  """
+  Wind gust speed in km/h
+  """
+  wind_gusts_kmh: Float
+  """
+  Wind direction in degrees
+  """
+  wind_direction_deg: Float
+  """
+  Surface pressure in hPa
+  """
+  surface_pressure_hpa: Float
+  """
+  WMO weather interpretation code
+  """
+  weather_code: Int
+  """
+  Open-Meteo API the row came from: archive or forecast
+  """
+  source: String!
+  """
+  True when sourced from the forecast API pending ERA5 archive settlement
+  """
+  is_provisional: Boolean!
+  """
+  UTC timestamp when the row was inserted
+  """
+  created_at: String
+  """
+  UTC timestamp when the row was last updated
+  """
+  updated_at: String
+}
+
+"""
 Activity summary metadata for a batch laps comparison item.
 """
 type GarminLapsActivity {
@@ -976,6 +1062,219 @@ type GarminLapsComparisonConnection {
   Number of activities skipped from the start
   """
   offset: Int!
+}
+
+"""
+A saved (named) Garmin segment: a start→end corridor used to compare efforts
+across all activities that traverse the same route.
+"""
+type GarminSegment {
+  """
+  Unique segment identifier
+  """
+  id: Int!
+  """
+  Human-readable segment name (e.g. "Harlem Hill")
+  """
+  name: String!
+  """
+  Sport this segment applies to (e.g. cycling); null matches all sports
+  """
+  sport: String
+  """
+  Segment start latitude
+  """
+  start_latitude: Float!
+  """
+  Segment start longitude
+  """
+  start_longitude: Float!
+  """
+  Segment end latitude
+  """
+  end_latitude: Float!
+  """
+  Segment end longitude
+  """
+  end_longitude: Float!
+  """
+  Segment length in meters (optional metadata)
+  """
+  distance_meters: Float
+  """
+  Corridor radius (m) used to match traversing activities
+  """
+  match_tolerance_meters: Float!
+  """
+  Garmin activity this segment was created from, if any
+  """
+  source_activity_id: String
+  """
+  Zero-based lap index the segment was created from, if any
+  """
+  source_lap_index: Int
+  """
+  Zero-based ClimbPro split index the segment was created from, if any
+  """
+  source_climb_index: Int
+  """
+  UTC timestamp when the segment was created
+  """
+  created_at: String
+  """
+  UTC timestamp when the segment was last updated
+  """
+  updated_at: String
+  """
+  Ordered [latitude, longitude] pairs tracing the segment path, recovered and
+  simplified from the source activity's GPS track. Null when no source activity
+  track can be matched (clients fall back to a straight start→end line).
+  """
+  route: [[Float!]!]
+}
+
+"""
+The start→end corridor a segment-efforts query was matched against.
+"""
+type GarminSegmentDefinition {
+  """
+  Corridor start latitude
+  """
+  start_lat: Float!
+  """
+  Corridor start longitude
+  """
+  start_lon: Float!
+  """
+  Corridor end latitude
+  """
+  end_lat: Float!
+  """
+  Corridor end longitude
+  """
+  end_lon: Float!
+  """
+  Corridor radius in meters used for matching
+  """
+  tolerance_meters: Float!
+}
+
+"""
+A single activity's best traversal of a segment, ranked against all others.
+"""
+type GarminSegmentEffort {
+  """
+  1-based rank by elapsed time (1 = fastest)
+  """
+  rank: Int!
+  """
+  Garmin activity identifier for this effort
+  """
+  activity_id: String!
+  """
+  Sport type (e.g. cycling)
+  """
+  sport: String
+  """
+  UTC start time of the parent activity
+  """
+  activity_start_time: String
+  """
+  UTC timestamp entering the segment start corridor
+  """
+  effort_start: String!
+  """
+  UTC timestamp reaching the segment end corridor
+  """
+  effort_end: String!
+  """
+  Segment elapsed time in seconds
+  """
+  elapsed_seconds: Float!
+  """
+  Distance covered across the segment in km
+  """
+  distance_km: Float
+  """
+  Average speed across the segment in km/h
+  """
+  avg_speed_kmh: Float
+  """
+  Average heart rate across the segment in bpm
+  """
+  avg_heart_rate: Int
+  """
+  Maximum heart rate across the segment in bpm
+  """
+  max_heart_rate: Int
+}
+
+"""
+Ranked efforts for a segment across all matching activities (fastest first).
+"""
+type GarminSegmentEffortsConnection {
+  """
+  The corridor the efforts were matched against
+  """
+  segment: GarminSegmentDefinition!
+  """
+  Efforts ordered fastest-first
+  """
+  items: [GarminSegmentEffort!]!
+  """
+  Total number of matching efforts
+  """
+  total: Int!
+}
+
+"""
+Input for creating a saved Garmin segment (e.g. from an activity lap or climb).
+"""
+input CreateGarminSegmentInput {
+  """
+  Human-readable segment name
+  """
+  name: String!
+  """
+  Sport this segment applies to (e.g. cycling); null matches all sports
+  """
+  sport: String
+  """
+  Segment start latitude
+  """
+  start_latitude: Float!
+  """
+  Segment start longitude
+  """
+  start_longitude: Float!
+  """
+  Segment end latitude
+  """
+  end_latitude: Float!
+  """
+  Segment end longitude
+  """
+  end_longitude: Float!
+  """
+  Segment length in meters (optional metadata)
+  """
+  distance_meters: Float
+  """
+  Corridor radius (m) used to match traversing activities (default 35)
+  """
+  match_tolerance_meters: Float
+  """
+  Garmin activity this segment is created from, if any
+  """
+  source_activity_id: String
+  """
+  Zero-based lap index the segment is created from, if any
+  """
+  source_lap_index: Int
+  """
+  Zero-based ClimbPro split index the segment is created from, if any
+  """
+  source_climb_index: Int
 }
 
 """
@@ -1852,6 +2151,17 @@ type Query {
   ): [GarminActivityLap!]!
 
   """
+  Retrieve Open-Meteo weather conditions for a Garmin activity's start location/time.
+  Returns null if the activity exists but hasn't been weather-backfilled yet.
+  """
+  garminActivityWeather(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): GarminActivityWeather
+
+  """
   Batch laps across activities for cross-activity comparison (matrix of activities x lap_index).
   """
   garminLapsComparison(
@@ -1876,6 +2186,52 @@ type Query {
     """
     offset: Int
   ): GarminLapsComparisonConnection!
+
+  """
+  List saved Garmin segments, optionally filtered by sport.
+  """
+  garminSegments(
+    """
+    Filter by sport type (e.g. cycling, running)
+    """
+    sport: String
+  ): [GarminSegment!]!
+
+  """
+  Fetch a single saved Garmin segment by id. Returns null if it does not exist.
+  """
+  garminSegment(
+    """
+    Segment identifier
+    """
+    id: Int!
+  ): GarminSegment
+
+  """
+  Rank all historical activity efforts over a saved segment (fastest first).
+  """
+  garminSegmentEfforts(
+    """
+    Segment identifier
+    """
+    id: Int!
+    """
+    Start date filter (YYYY-MM-DD), inclusive on activity start_time
+    """
+    date_from: String
+    """
+    End date filter (YYYY-MM-DD), inclusive on activity start_time
+    """
+    date_to: String
+    """
+    Ignore traversals longer than this many seconds (filters loop/return mismatches)
+    """
+    max_effort_seconds: Int
+    """
+    Maximum number of efforts to return
+    """
+    limit: Int
+  ): GarminSegmentEffortsConnection!
 
   """
   Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end).
@@ -2095,4 +2451,26 @@ type Mutation {
     """
     retry_failed: Boolean
   ): GeocodingTriggerResult!
+
+  """
+  Create a saved Garmin segment (requires authentication). Typically called with
+  the start/end coordinates of an activity lap or ClimbPro split to "save this
+  lap as a segment".
+  """
+  createGarminSegment(
+    """
+    Segment definition
+    """
+    input: CreateGarminSegmentInput!
+  ): GarminSegment!
+
+  """
+  Delete a saved Garmin segment by id (requires authentication). Returns true on success.
+  """
+  deleteGarminSegment(
+    """
+    Segment identifier
+    """
+    id: Int!
+  ): Boolean!
 }
