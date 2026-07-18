@@ -442,6 +442,58 @@ export interface GarminActivityWeather {
   wind_speed_kmh?: Maybe<Scalars['Float']['output']>;
 }
 
+/**
+ * Route-sampled, hour-by-hour Open-Meteo weather for an activity. Unlike
+ * GarminActivityWeather (a single "conditions at the start" snapshot), each
+ * row is sampled at the GPS location the athlete was actually at during that
+ * hour.
+ */
+export interface GarminActivityWeatherHourly {
+  __typename?: 'GarminActivityWeatherHourly';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Feels-like temperature in degrees C */
+  apparent_temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** Total cloud cover percent */
+  cloud_cover_pct?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** Zero-based hour offset from the activity start */
+  hour_index: Scalars['Int']['output'];
+  /** True when sourced from the forecast API pending ERA5 archive settlement */
+  is_provisional: Scalars['Boolean']['output'];
+  /** Latitude sampled from the nearest track point for this hour */
+  latitude: Scalars['Float']['output'];
+  /** Longitude sampled from the nearest track point for this hour */
+  longitude: Scalars['Float']['output'];
+  /** UTC hourly bucket the reading was taken from */
+  observed_at: Scalars['String']['output'];
+  /** Total precipitation in millimeters */
+  precipitation_mm?: Maybe<Scalars['Float']['output']>;
+  /** Rainfall in millimeters */
+  rain_mm?: Maybe<Scalars['Float']['output']>;
+  /** Relative humidity percent */
+  relative_humidity_pct?: Maybe<Scalars['Float']['output']>;
+  /** Snowfall in centimeters */
+  snowfall_cm?: Maybe<Scalars['Float']['output']>;
+  /** Open-Meteo API the row came from: archive or forecast */
+  source: Scalars['String']['output'];
+  /** Surface pressure in hPa */
+  surface_pressure_hpa?: Maybe<Scalars['Float']['output']>;
+  /** Air temperature in degrees C */
+  temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+  /** WMO weather interpretation code */
+  weather_code?: Maybe<Scalars['Int']['output']>;
+  /** Wind direction in degrees */
+  wind_direction_deg?: Maybe<Scalars['Float']['output']>;
+  /** Wind gust speed in km/h */
+  wind_gusts_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Wind speed in km/h */
+  wind_speed_kmh?: Maybe<Scalars['Float']['output']>;
+}
+
 /** Lightweight track point optimised for time-series chart rendering. */
 export interface GarminChartPoint {
   __typename?: 'GarminChartPoint';
@@ -1029,6 +1081,13 @@ export interface Query {
    * Returns null if the activity exists but hasn't been weather-backfilled yet.
    */
   garminActivityWeather?: Maybe<GarminActivityWeather>;
+  /**
+   * Retrieve route-sampled, hour-by-hour Open-Meteo weather for a Garmin activity.
+   * Unlike garminActivityWeather (a single "conditions at the start" snapshot), each
+   * row is sampled at the GPS location the athlete was actually at during that hour.
+   * Returns an empty list if the activity exists but hasn't been hourly-backfilled yet.
+   */
+  garminActivityWeatherHourly: Array<GarminActivityWeatherHourly>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
@@ -1121,6 +1180,10 @@ export interface QueryGarminActivityTotalsArgs {
 }
 
 export interface QueryGarminActivityWeatherArgs {
+  activity_id: Scalars['String']['input'];
+}
+
+export interface QueryGarminActivityWeatherHourlyArgs {
   activity_id: Scalars['String']['input'];
 }
 

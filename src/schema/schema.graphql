@@ -983,6 +983,99 @@ type GarminActivityWeather {
 }
 
 """
+Route-sampled, hour-by-hour Open-Meteo weather for an activity. Unlike
+GarminActivityWeather (a single "conditions at the start" snapshot), each
+row is sampled at the GPS location the athlete was actually at during that
+hour.
+"""
+type GarminActivityWeatherHourly {
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  Zero-based hour offset from the activity start
+  """
+  hour_index: Int!
+  """
+  UTC hourly bucket the reading was taken from
+  """
+  observed_at: String!
+  """
+  Latitude sampled from the nearest track point for this hour
+  """
+  latitude: Float!
+  """
+  Longitude sampled from the nearest track point for this hour
+  """
+  longitude: Float!
+  """
+  Air temperature in degrees C
+  """
+  temperature_c: Float
+  """
+  Feels-like temperature in degrees C
+  """
+  apparent_temperature_c: Float
+  """
+  Relative humidity percent
+  """
+  relative_humidity_pct: Float
+  """
+  Total precipitation in millimeters
+  """
+  precipitation_mm: Float
+  """
+  Rainfall in millimeters
+  """
+  rain_mm: Float
+  """
+  Snowfall in centimeters
+  """
+  snowfall_cm: Float
+  """
+  Total cloud cover percent
+  """
+  cloud_cover_pct: Float
+  """
+  Wind speed in km/h
+  """
+  wind_speed_kmh: Float
+  """
+  Wind gust speed in km/h
+  """
+  wind_gusts_kmh: Float
+  """
+  Wind direction in degrees
+  """
+  wind_direction_deg: Float
+  """
+  Surface pressure in hPa
+  """
+  surface_pressure_hpa: Float
+  """
+  WMO weather interpretation code
+  """
+  weather_code: Int
+  """
+  Open-Meteo API the row came from: archive or forecast
+  """
+  source: String!
+  """
+  True when sourced from the forecast API pending ERA5 archive settlement
+  """
+  is_provisional: Boolean!
+  """
+  UTC timestamp when the row was inserted
+  """
+  created_at: String
+  """
+  UTC timestamp when the row was last updated
+  """
+  updated_at: String
+}
+
+"""
 Activity summary metadata for a batch laps comparison item.
 """
 type GarminLapsActivity {
@@ -2160,6 +2253,19 @@ type Query {
     """
     activity_id: String!
   ): GarminActivityWeather
+
+  """
+  Retrieve route-sampled, hour-by-hour Open-Meteo weather for a Garmin activity.
+  Unlike garminActivityWeather (a single "conditions at the start" snapshot), each
+  row is sampled at the GPS location the athlete was actually at during that hour.
+  Returns an empty list if the activity exists but hasn't been hourly-backfilled yet.
+  """
+  garminActivityWeatherHourly(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): [GarminActivityWeatherHourly!]!
 
   """
   Batch laps across activities for cross-activity comparison (matrix of activities x lap_index).

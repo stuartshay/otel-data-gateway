@@ -348,6 +348,98 @@ describe('typeDefs', () => {
     expect(result.data).toEqual({ garminActivityWeather: null });
   });
 
+  it('exposes Garmin activity hourly weather', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminActivityWeatherHourly(activity_id: "activity-1") {
+            activity_id
+            hour_index
+            observed_at
+            latitude
+            longitude
+            temperature_c
+            source
+            is_provisional
+          }
+        }
+      `,
+      rootValue: {
+        garminActivityWeatherHourly: () => [
+          {
+            activity_id: 'activity-1',
+            hour_index: 0,
+            observed_at: '2026-03-08T20:00:00+00:00',
+            latitude: 40.7937,
+            longitude: -73.961,
+            temperature_c: 18.4,
+            source: 'archive',
+            is_provisional: false,
+          },
+          {
+            activity_id: 'activity-1',
+            hour_index: 1,
+            observed_at: '2026-03-08T21:00:00+00:00',
+            latitude: 40.71,
+            longitude: -74.05,
+            temperature_c: 17.1,
+            source: 'forecast',
+            is_provisional: true,
+          },
+        ],
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data?.garminActivityWeatherHourly).toHaveLength(2);
+    expect(result.data).toEqual({
+      garminActivityWeatherHourly: [
+        {
+          activity_id: 'activity-1',
+          hour_index: 0,
+          observed_at: '2026-03-08T20:00:00+00:00',
+          latitude: 40.7937,
+          longitude: -73.961,
+          temperature_c: 18.4,
+          source: 'archive',
+          is_provisional: false,
+        },
+        {
+          activity_id: 'activity-1',
+          hour_index: 1,
+          observed_at: '2026-03-08T21:00:00+00:00',
+          latitude: 40.71,
+          longitude: -74.05,
+          temperature_c: 17.1,
+          source: 'forecast',
+          is_provisional: true,
+        },
+      ],
+    });
+  });
+
+  it('returns an empty list for Garmin activity hourly weather when not backfilled yet', async () => {
+    const schema = buildSchema(typeDefs);
+    const result = await graphql({
+      schema,
+      source: `
+        query {
+          garminActivityWeatherHourly(activity_id: "activity-1") {
+            activity_id
+          }
+        }
+      `,
+      rootValue: {
+        garminActivityWeatherHourly: () => [],
+      },
+    });
+
+    expect(result.errors).toBeUndefined();
+    expect(result.data).toEqual({ garminActivityWeatherHourly: [] });
+  });
+
   it('exposes Garmin laps comparison across activities', async () => {
     const schema = buildSchema(typeDefs);
     const result = await graphql({
