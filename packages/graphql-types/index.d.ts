@@ -397,6 +397,51 @@ export interface GarminActivityTotal {
   total_duration_seconds?: Maybe<Scalars['Int']['output']>;
 }
 
+/** Open-Meteo weather conditions matched to an activity's start location/time. */
+export interface GarminActivityWeather {
+  __typename?: 'GarminActivityWeather';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Feels-like temperature in degrees C */
+  apparent_temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** Total cloud cover percent */
+  cloud_cover_pct?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** True when sourced from the forecast API pending ERA5 archive settlement */
+  is_provisional: Scalars['Boolean']['output'];
+  /** Latitude the weather was looked up for */
+  latitude: Scalars['Float']['output'];
+  /** Longitude the weather was looked up for */
+  longitude: Scalars['Float']['output'];
+  /** UTC hourly bucket the reading was taken from */
+  observed_at: Scalars['String']['output'];
+  /** Total precipitation in millimeters */
+  precipitation_mm?: Maybe<Scalars['Float']['output']>;
+  /** Rainfall in millimeters */
+  rain_mm?: Maybe<Scalars['Float']['output']>;
+  /** Relative humidity percent */
+  relative_humidity_pct?: Maybe<Scalars['Float']['output']>;
+  /** Snowfall in centimeters */
+  snowfall_cm?: Maybe<Scalars['Float']['output']>;
+  /** Open-Meteo API the row came from: archive or forecast */
+  source: Scalars['String']['output'];
+  /** Surface pressure in hPa */
+  surface_pressure_hpa?: Maybe<Scalars['Float']['output']>;
+  /** Air temperature in degrees C */
+  temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+  /** WMO weather interpretation code */
+  weather_code?: Maybe<Scalars['Int']['output']>;
+  /** Wind direction in degrees */
+  wind_direction_deg?: Maybe<Scalars['Float']['output']>;
+  /** Wind gust speed in km/h */
+  wind_gusts_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Wind speed in km/h */
+  wind_speed_kmh?: Maybe<Scalars['Float']['output']>;
+}
+
 /** Lightweight track point optimised for time-series chart rendering. */
 export interface GarminChartPoint {
   __typename?: 'GarminChartPoint';
@@ -979,6 +1024,11 @@ export interface Query {
   garminActivityLaps: Array<GarminActivityLap>;
   /** Aggregate Garmin activity totals grouped by week, month, or year. */
   garminActivityTotals: Array<GarminActivityTotal>;
+  /**
+   * Retrieve Open-Meteo weather conditions for a Garmin activity's start location/time.
+   * Returns null if the activity exists but hasn't been weather-backfilled yet.
+   */
+  garminActivityWeather?: Maybe<GarminActivityWeather>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
@@ -1068,6 +1118,10 @@ export interface QueryGarminActivityTotalsArgs {
   date_to?: InputMaybe<Scalars['String']['input']>;
   period: Scalars['String']['input'];
   sport?: InputMaybe<Scalars['String']['input']>;
+}
+
+export interface QueryGarminActivityWeatherArgs {
+  activity_id: Scalars['String']['input'];
 }
 
 export interface QueryGarminChartDataArgs {

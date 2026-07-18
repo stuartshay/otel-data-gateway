@@ -400,6 +400,51 @@ export type GarminActivityTotal = {
   total_duration_seconds?: Maybe<Scalars['Int']['output']>;
 };
 
+/** Open-Meteo weather conditions matched to an activity's start location/time. */
+export type GarminActivityWeather = {
+  __typename?: 'GarminActivityWeather';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Feels-like temperature in degrees C */
+  apparent_temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** Total cloud cover percent */
+  cloud_cover_pct?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** True when sourced from the forecast API pending ERA5 archive settlement */
+  is_provisional: Scalars['Boolean']['output'];
+  /** Latitude the weather was looked up for */
+  latitude: Scalars['Float']['output'];
+  /** Longitude the weather was looked up for */
+  longitude: Scalars['Float']['output'];
+  /** UTC hourly bucket the reading was taken from */
+  observed_at: Scalars['String']['output'];
+  /** Total precipitation in millimeters */
+  precipitation_mm?: Maybe<Scalars['Float']['output']>;
+  /** Rainfall in millimeters */
+  rain_mm?: Maybe<Scalars['Float']['output']>;
+  /** Relative humidity percent */
+  relative_humidity_pct?: Maybe<Scalars['Float']['output']>;
+  /** Snowfall in centimeters */
+  snowfall_cm?: Maybe<Scalars['Float']['output']>;
+  /** Open-Meteo API the row came from: archive or forecast */
+  source: Scalars['String']['output'];
+  /** Surface pressure in hPa */
+  surface_pressure_hpa?: Maybe<Scalars['Float']['output']>;
+  /** Air temperature in degrees C */
+  temperature_c?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+  /** WMO weather interpretation code */
+  weather_code?: Maybe<Scalars['Int']['output']>;
+  /** Wind direction in degrees */
+  wind_direction_deg?: Maybe<Scalars['Float']['output']>;
+  /** Wind gust speed in km/h */
+  wind_gusts_kmh?: Maybe<Scalars['Float']['output']>;
+  /** Wind speed in km/h */
+  wind_speed_kmh?: Maybe<Scalars['Float']['output']>;
+};
+
 /** Lightweight track point optimised for time-series chart rendering. */
 export type GarminChartPoint = {
   __typename?: 'GarminChartPoint';
@@ -986,6 +1031,11 @@ export type Query = {
   garminActivityLaps: Array<GarminActivityLap>;
   /** Aggregate Garmin activity totals grouped by week, month, or year. */
   garminActivityTotals: Array<GarminActivityTotal>;
+  /**
+   * Retrieve Open-Meteo weather conditions for a Garmin activity's start location/time.
+   * Returns null if the activity exists but hasn't been weather-backfilled yet.
+   */
+  garminActivityWeather?: Maybe<GarminActivityWeather>;
   /** Retrieve chart-optimised track points for a Garmin activity. */
   garminChartData: Array<GarminChartPoint>;
   /** Get the earliest and latest Garmin activity timestamps. */
@@ -1083,6 +1133,11 @@ export type QueryGarminActivityTotalsArgs = {
   date_to?: InputMaybe<Scalars['String']['input']>;
   period: Scalars['String']['input'];
   sport?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGarminActivityWeatherArgs = {
+  activity_id: Scalars['String']['input'];
 };
 
 
@@ -1373,6 +1428,7 @@ export type ResolversTypes = ResolversObject<{
   GarminActivityLap: ResolverTypeWrapper<GarminActivityLap>;
   GarminActivityLapsGroup: ResolverTypeWrapper<GarminActivityLapsGroup>;
   GarminActivityTotal: ResolverTypeWrapper<GarminActivityTotal>;
+  GarminActivityWeather: ResolverTypeWrapper<GarminActivityWeather>;
   GarminChartPoint: ResolverTypeWrapper<GarminChartPoint>;
   GarminDateRange: ResolverTypeWrapper<GarminDateRange>;
   GarminDevice: ResolverTypeWrapper<GarminDevice>;
@@ -1432,6 +1488,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminActivityLap: GarminActivityLap;
   GarminActivityLapsGroup: GarminActivityLapsGroup;
   GarminActivityTotal: GarminActivityTotal;
+  GarminActivityWeather: GarminActivityWeather;
   GarminChartPoint: GarminChartPoint;
   GarminDateRange: GarminDateRange;
   GarminDevice: GarminDevice;
@@ -1660,6 +1717,29 @@ export type GarminActivityTotalResolvers<ContextType = GatewayContext, ParentTyp
   total_calories?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   total_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   total_duration_seconds?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+}>;
+
+export type GarminActivityWeatherResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityWeather'] = ResolversParentTypes['GarminActivityWeather']> = ResolversObject<{
+  activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  apparent_temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  cloud_cover_pct?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  is_provisional?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  observed_at?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  precipitation_mm?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  rain_mm?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  relative_humidity_pct?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  snowfall_cm?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  source?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  surface_pressure_hpa?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  temperature_c?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  weather_code?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  wind_direction_deg?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  wind_gusts_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  wind_speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
 }>;
 
 export type GarminChartPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminChartPoint'] = ResolversParentTypes['GarminChartPoint']> = ResolversObject<{
@@ -1957,6 +2037,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminActivityClimbs?: Resolver<Array<ResolversTypes['GarminActivityClimb']>, ParentType, ContextType, RequireFields<QueryGarminActivityClimbsArgs, 'activity_id'>>;
   garminActivityLaps?: Resolver<Array<ResolversTypes['GarminActivityLap']>, ParentType, ContextType, RequireFields<QueryGarminActivityLapsArgs, 'activity_id'>>;
   garminActivityTotals?: Resolver<Array<ResolversTypes['GarminActivityTotal']>, ParentType, ContextType, RequireFields<QueryGarminActivityTotalsArgs, 'period'>>;
+  garminActivityWeather?: Resolver<Maybe<ResolversTypes['GarminActivityWeather']>, ParentType, ContextType, RequireFields<QueryGarminActivityWeatherArgs, 'activity_id'>>;
   garminChartData?: Resolver<Array<ResolversTypes['GarminChartPoint']>, ParentType, ContextType, RequireFields<QueryGarminChartDataArgs, 'activity_id'>>;
   garminDateRange?: Resolver<ResolversTypes['GarminDateRange'], ParentType, ContextType>;
   garminDeviceCounts?: Resolver<Array<ResolversTypes['GarminDeviceCount']>, ParentType, ContextType>;
@@ -2043,6 +2124,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminActivityLap?: GarminActivityLapResolvers<ContextType>;
   GarminActivityLapsGroup?: GarminActivityLapsGroupResolvers<ContextType>;
   GarminActivityTotal?: GarminActivityTotalResolvers<ContextType>;
+  GarminActivityWeather?: GarminActivityWeatherResolvers<ContextType>;
   GarminChartPoint?: GarminChartPointResolvers<ContextType>;
   GarminDateRange?: GarminDateRangeResolvers<ContextType>;
   GarminDevice?: GarminDeviceResolvers<ContextType>;

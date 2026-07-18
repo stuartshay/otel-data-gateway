@@ -897,6 +897,92 @@ type GarminActivityLap {
 }
 
 """
+Open-Meteo weather conditions matched to an activity's start location/time.
+"""
+type GarminActivityWeather {
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  UTC hourly bucket the reading was taken from
+  """
+  observed_at: String!
+  """
+  Latitude the weather was looked up for
+  """
+  latitude: Float!
+  """
+  Longitude the weather was looked up for
+  """
+  longitude: Float!
+  """
+  Air temperature in degrees C
+  """
+  temperature_c: Float
+  """
+  Feels-like temperature in degrees C
+  """
+  apparent_temperature_c: Float
+  """
+  Relative humidity percent
+  """
+  relative_humidity_pct: Float
+  """
+  Total precipitation in millimeters
+  """
+  precipitation_mm: Float
+  """
+  Rainfall in millimeters
+  """
+  rain_mm: Float
+  """
+  Snowfall in centimeters
+  """
+  snowfall_cm: Float
+  """
+  Total cloud cover percent
+  """
+  cloud_cover_pct: Float
+  """
+  Wind speed in km/h
+  """
+  wind_speed_kmh: Float
+  """
+  Wind gust speed in km/h
+  """
+  wind_gusts_kmh: Float
+  """
+  Wind direction in degrees
+  """
+  wind_direction_deg: Float
+  """
+  Surface pressure in hPa
+  """
+  surface_pressure_hpa: Float
+  """
+  WMO weather interpretation code
+  """
+  weather_code: Int
+  """
+  Open-Meteo API the row came from: archive or forecast
+  """
+  source: String!
+  """
+  True when sourced from the forecast API pending ERA5 archive settlement
+  """
+  is_provisional: Boolean!
+  """
+  UTC timestamp when the row was inserted
+  """
+  created_at: String
+  """
+  UTC timestamp when the row was last updated
+  """
+  updated_at: String
+}
+
+"""
 Activity summary metadata for a batch laps comparison item.
 """
 type GarminLapsActivity {
@@ -2063,6 +2149,17 @@ type Query {
     """
     activity_id: String!
   ): [GarminActivityLap!]!
+
+  """
+  Retrieve Open-Meteo weather conditions for a Garmin activity's start location/time.
+  Returns null if the activity exists but hasn't been weather-backfilled yet.
+  """
+  garminActivityWeather(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): GarminActivityWeather
 
   """
   Batch laps across activities for cross-activity comparison (matrix of activities x lap_index).
