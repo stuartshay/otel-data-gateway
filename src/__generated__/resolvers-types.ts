@@ -819,6 +819,39 @@ export type GeocodedAddressSummary = {
   waypoint_kind?: Maybe<Scalars['String']['output']>;
 };
 
+/** Reverse-geocoded address for a 4-decimal coordinate cell. */
+export type GeocodedPointAddress = {
+  __typename?: 'GeocodedPointAddress';
+  /** Pelias confidence score from 0 to 1. */
+  confidence?: Maybe<Scalars['Float']['output']>;
+  /** Country name. */
+  country?: Maybe<Scalars['String']['output']>;
+  /** Full formatted address label. */
+  display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed. */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number. */
+  housenumber?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell latitude. */
+  latitude: Scalars['Float']['output'];
+  /** City or town. */
+  locality?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell longitude. */
+  longitude: Scalars['Float']['output'];
+  /** Neighbourhood name. */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code. */
+  postalcode?: Maybe<Scalars['String']['output']>;
+  /** State or province. */
+  region?: Maybe<Scalars['String']['output']>;
+  /** Whether the address came from the cache or Pelias fallback. */
+  resolution_source: PointAddressSource;
+  /** Geocoding status: success, no_coverage, error, or pending. */
+  status: Scalars['String']['output'];
+  /** Street name. */
+  street?: Maybe<Scalars['String']['output']>;
+};
+
 /** Coverage statistics for a single geocoding source (owntracks or garmin). */
 export type GeocodingSourceStatus = {
   __typename?: 'GeocodingSourceStatus';
@@ -1061,6 +1094,14 @@ export type PaginationInfo = {
   total: Scalars['Int']['output'];
 };
 
+/** Source used to resolve a point address. */
+export enum PointAddressSource {
+  /** Address was returned from the persisted dense-cell cache. */
+  Database = 'database',
+  /** Address was resolved through the Pelias fallback and persisted. */
+  Pelias = 'pelias'
+}
+
 export type Query = {
   __typename?: 'Query';
   /** Calculate the geodesic distance between two geographic points. */
@@ -1133,6 +1174,11 @@ export type Query = {
   referenceLocation?: Maybe<ReferenceLocation>;
   /** List all named reference locations. */
   referenceLocations: Array<ReferenceLocation>;
+  /**
+   * Resolve an address from the dense point-cell cache, with Pelias fallback.
+   * Requires the caller's Authorization header because a fallback can persist data.
+   */
+  reverseGeocodePoint: GeocodedPointAddress;
   /** Retrieve a paginated list of unified GPS points from all sources. */
   unifiedGps: UnifiedGpsConnection;
   /** Find GPS points within a named reference location's geofence. */
@@ -1281,6 +1327,12 @@ export type QueryNearbyPointsArgs = {
 
 export type QueryReferenceLocationArgs = {
   id: Scalars['Int']['input'];
+};
+
+
+export type QueryReverseGeocodePointArgs = {
+  latitude: Scalars['Float']['input'];
+  longitude: Scalars['Float']['input'];
 };
 
 
@@ -1509,6 +1561,7 @@ export type ResolversTypes = ResolversObject<{
   GarminTrackPointConnection: ResolverTypeWrapper<GarminTrackPointConnection>;
   GeocodedAddress: ResolverTypeWrapper<GeocodedAddress>;
   GeocodedAddressSummary: ResolverTypeWrapper<GeocodedAddressSummary>;
+  GeocodedPointAddress: ResolverTypeWrapper<GeocodedPointAddress>;
   GeocodingSourceStatus: ResolverTypeWrapper<GeocodingSourceStatus>;
   GeocodingStatus: ResolverTypeWrapper<GeocodingStatus>;
   GeocodingStatusBySource: ResolverTypeWrapper<GeocodingStatusBySource>;
@@ -1524,6 +1577,7 @@ export type ResolversTypes = ResolversObject<{
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
   NearbyPoint: ResolverTypeWrapper<NearbyPoint>;
   PaginationInfo: ResolverTypeWrapper<PaginationInfo>;
+  PointAddressSource: PointAddressSource;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   ReadyStatus: ResolverTypeWrapper<ReadyStatus>;
   ReferenceLocation: ResolverTypeWrapper<ReferenceLocation>;
@@ -1570,6 +1624,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminTrackPointConnection: GarminTrackPointConnection;
   GeocodedAddress: GeocodedAddress;
   GeocodedAddressSummary: GeocodedAddressSummary;
+  GeocodedPointAddress: GeocodedPointAddress;
   GeocodingSourceStatus: GeocodingSourceStatus;
   GeocodingStatus: GeocodingStatus;
   GeocodingStatusBySource: GeocodingStatusBySource;
@@ -1997,6 +2052,23 @@ export type GeocodedAddressSummaryResolvers<ContextType = GatewayContext, Parent
   waypoint_kind?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
+export type GeocodedPointAddressResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GeocodedPointAddress'] = ResolversParentTypes['GeocodedPointAddress']> = ResolversObject<{
+  confidence?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  display_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  geocoded_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  housenumber?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  locality?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  neighbourhood?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  postalcode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  region?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  resolution_source?: Resolver<ResolversTypes['PointAddressSource'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  street?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
 export type GeocodingSourceStatusResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GeocodingSourceStatus'] = ResolversParentTypes['GeocodingSourceStatus']> = ResolversObject<{
   errors?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   no_coverage?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
@@ -2148,6 +2220,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   ready?: Resolver<ResolversTypes['ReadyStatus'], ParentType, ContextType>;
   referenceLocation?: Resolver<Maybe<ResolversTypes['ReferenceLocation']>, ParentType, ContextType, RequireFields<QueryReferenceLocationArgs, 'id'>>;
   referenceLocations?: Resolver<Array<ResolversTypes['ReferenceLocation']>, ParentType, ContextType>;
+  reverseGeocodePoint?: Resolver<ResolversTypes['GeocodedPointAddress'], ParentType, ContextType, RequireFields<QueryReverseGeocodePointArgs, 'latitude' | 'longitude'>>;
   unifiedGps?: Resolver<ResolversTypes['UnifiedGpsConnection'], ParentType, ContextType, Partial<QueryUnifiedGpsArgs>>;
   withinReference?: Resolver<ResolversTypes['WithinReferenceResult'], ParentType, ContextType, RequireFields<QueryWithinReferenceArgs, 'name'>>;
 }>;
@@ -2232,6 +2305,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminTrackPointConnection?: GarminTrackPointConnectionResolvers<ContextType>;
   GeocodedAddress?: GeocodedAddressResolvers<ContextType>;
   GeocodedAddressSummary?: GeocodedAddressSummaryResolvers<ContextType>;
+  GeocodedPointAddress?: GeocodedPointAddressResolvers<ContextType>;
   GeocodingSourceStatus?: GeocodingSourceStatusResolvers<ContextType>;
   GeocodingStatus?: GeocodingStatusResolvers<ContextType>;
   GeocodingStatusBySource?: GeocodingStatusBySourceResolvers<ContextType>;

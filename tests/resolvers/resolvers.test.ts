@@ -520,6 +520,29 @@ describe('geocoding resolvers', () => {
     expect(response).toEqual(result);
   });
 
+  it.each(['database', 'pelias'] as const)(
+    'delegates reverseGeocodePoint and maps the %s source',
+    async (resolutionSource) => {
+      const args = { latitude: 40.758, longitude: -73.9855 };
+      const result = {
+        ...args,
+        display_address: 'New York Marriott Marquis Times Square, New York, NY, USA',
+        status: 'success',
+        resolution_source: resolutionSource,
+      };
+      const ctx = contextWith({ reverseGeocodePoint: mockAsync(result) });
+      ctx.token = 'Bearer test-token';
+
+      const response = await runResolver(geocodingResolvers.Query.reverseGeocodePoint, args, ctx);
+
+      expect(ctx.dataSources.otelAPI.reverseGeocodePoint).toHaveBeenCalledWith(
+        args,
+        'Bearer test-token',
+      );
+      expect(response).toEqual(result);
+    },
+  );
+
   it('delegates triggerGeocoding mutation with args', async () => {
     const args = { batch_size: 50, retry_failed: true };
     const result = { processed: 50, remaining: 25, skipped_dedup: 5 };
@@ -563,6 +586,7 @@ describe('resolver index', () => {
         'calculateDistance',
         'withinReference',
         'geocodingStatus',
+        'reverseGeocodePoint',
       ]),
     );
   });

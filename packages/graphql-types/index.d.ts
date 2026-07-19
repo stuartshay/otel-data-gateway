@@ -816,6 +816,39 @@ export interface GeocodedAddressSummary {
   waypoint_kind?: Maybe<Scalars['String']['output']>;
 }
 
+/** Reverse-geocoded address for a 4-decimal coordinate cell. */
+export interface GeocodedPointAddress {
+  __typename?: 'GeocodedPointAddress';
+  /** Pelias confidence score from 0 to 1. */
+  confidence?: Maybe<Scalars['Float']['output']>;
+  /** Country name. */
+  country?: Maybe<Scalars['String']['output']>;
+  /** Full formatted address label. */
+  display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed. */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number. */
+  housenumber?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell latitude. */
+  latitude: Scalars['Float']['output'];
+  /** City or town. */
+  locality?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell longitude. */
+  longitude: Scalars['Float']['output'];
+  /** Neighbourhood name. */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code. */
+  postalcode?: Maybe<Scalars['String']['output']>;
+  /** State or province. */
+  region?: Maybe<Scalars['String']['output']>;
+  /** Whether the address came from the cache or Pelias fallback. */
+  resolution_source: PointAddressSource;
+  /** Geocoding status: success, no_coverage, error, or pending. */
+  status: Scalars['String']['output'];
+  /** Street name. */
+  street?: Maybe<Scalars['String']['output']>;
+}
+
 /** Coverage statistics for a single geocoding source (owntracks or garmin). */
 export interface GeocodingSourceStatus {
   __typename?: 'GeocodingSourceStatus';
@@ -1054,6 +1087,13 @@ export interface PaginationInfo {
   total: Scalars['Int']['output'];
 }
 
+/** Source used to resolve a point address. */
+export type PointAddressSource =
+  /** Address was returned from the persisted dense-cell cache. */
+  | 'database'
+  /** Address was resolved through the Pelias fallback and persisted. */
+  | 'pelias';
+
 export interface Query {
   __typename?: 'Query';
   /** Calculate the geodesic distance between two geographic points. */
@@ -1126,6 +1166,11 @@ export interface Query {
   referenceLocation?: Maybe<ReferenceLocation>;
   /** List all named reference locations. */
   referenceLocations: Array<ReferenceLocation>;
+  /**
+   * Resolve an address from the dense point-cell cache, with Pelias fallback.
+   * Requires the caller's Authorization header because a fallback can persist data.
+   */
+  reverseGeocodePoint: GeocodedPointAddress;
   /** Retrieve a paginated list of unified GPS points from all sources. */
   unifiedGps: UnifiedGpsConnection;
   /** Find GPS points within a named reference location's geofence. */
@@ -1253,6 +1298,11 @@ export interface QueryNearbyPointsArgs {
 
 export interface QueryReferenceLocationArgs {
   id: Scalars['Int']['input'];
+}
+
+export interface QueryReverseGeocodePointArgs {
+  latitude: Scalars['Float']['input'];
+  longitude: Scalars['Float']['input'];
 }
 
 export interface QueryUnifiedGpsArgs {

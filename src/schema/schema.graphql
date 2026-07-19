@@ -254,6 +254,82 @@ type GeocodedAddress {
 }
 
 """
+Source used to resolve a point address.
+"""
+enum PointAddressSource {
+  """
+  Address was returned from the persisted dense-cell cache.
+  """
+  database
+  """
+  Address was resolved through the Pelias fallback and persisted.
+  """
+  pelias
+}
+
+"""
+Reverse-geocoded address for a 4-decimal coordinate cell.
+"""
+type GeocodedPointAddress {
+  """
+  Resolved 4-decimal cell latitude.
+  """
+  latitude: Float!
+  """
+  Resolved 4-decimal cell longitude.
+  """
+  longitude: Float!
+  """
+  Full formatted address label.
+  """
+  display_address: String
+  """
+  Street name.
+  """
+  street: String
+  """
+  House or building number.
+  """
+  housenumber: String
+  """
+  Neighbourhood name.
+  """
+  neighbourhood: String
+  """
+  City or town.
+  """
+  locality: String
+  """
+  State or province.
+  """
+  region: String
+  """
+  Country name.
+  """
+  country: String
+  """
+  Postal or ZIP code.
+  """
+  postalcode: String
+  """
+  Pelias confidence score from 0 to 1.
+  """
+  confidence: Float
+  """
+  Geocoding status: success, no_coverage, error, or pending.
+  """
+  status: String!
+  """
+  UTC timestamp when geocoding was performed.
+  """
+  geocoded_at: String
+  """
+  Whether the address came from the cache or Pelias fallback.
+  """
+  resolution_source: PointAddressSource!
+}
+
+"""
 Coverage statistics for geocoded location records.
 """
 type GeocodingStatus {
@@ -2524,6 +2600,21 @@ type Query {
   Get geocoding coverage statistics.
   """
   geocodingStatus: GeocodingStatus!
+
+  """
+  Resolve an address from the dense point-cell cache, with Pelias fallback.
+  Requires the caller's Authorization header because a fallback can persist data.
+  """
+  reverseGeocodePoint(
+    """
+    Latitude in decimal degrees.
+    """
+    latitude: Float!
+    """
+    Longitude in decimal degrees.
+    """
+    longitude: Float!
+  ): GeocodedPointAddress!
 }
 
 # -------------------------------------------------------
