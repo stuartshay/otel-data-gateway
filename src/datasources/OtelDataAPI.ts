@@ -750,6 +750,14 @@ export class OtelDataAPI {
 
   // ── Geocoding ───────────────────────────────────────
 
+  async reverseGeocodePoint(params: { latitude: number; longitude: number }, token?: string) {
+    return this.fetch<Schemas['GeocodedPointAddress']>({
+      path: '/api/v1/geocoding/reverse',
+      query: params,
+      ...(token ? { headers: { Authorization: token } } : {}),
+    });
+  }
+
   async getGeocodingStatus() {
     return this.fetch<{
       total_locations: number;

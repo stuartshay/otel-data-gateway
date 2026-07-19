@@ -288,6 +288,56 @@ describe('OtelDataAPI', () => {
     expect(options.headers).not.toHaveProperty('Authorization');
   });
 
+  it('resolves a point address and forwards the Authorization header', async () => {
+    const result = {
+      latitude: 40.758,
+      longitude: -73.9855,
+      display_address: 'New York Marriott Marquis Times Square, New York, NY, USA',
+      street: 'Broadway',
+      housenumber: '1535',
+      neighbourhood: 'Theater District',
+      locality: 'New York',
+      region: 'New York',
+      country: 'United States',
+      postalcode: '10036',
+      confidence: 0.9,
+      status: 'success',
+      geocoded_at: '2026-07-19T18:03:38Z',
+      resolution_source: 'database',
+    };
+    fetchMock.mockResolvedValueOnce(jsonResponse(result));
+    const api = new OtelDataAPI('https://example.test');
+
+    const response = await api.reverseGeocodePoint(
+      { latitude: 40.758, longitude: -73.9855 },
+      'Bearer test-token',
+    );
+
+    expect(response).toEqual(result);
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe(
+      'https://example.test/api/v1/geocoding/reverse?latitude=40.758&longitude=-73.9855',
+    );
+    expect(options.headers).toMatchObject({ Authorization: 'Bearer test-token' });
+  });
+
+  it('does not add Authorization when resolving a point without a token', async () => {
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse({
+        latitude: 40.758,
+        longitude: -73.9855,
+        status: 'success',
+        resolution_source: 'database',
+      }),
+    );
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.reverseGeocodePoint({ latitude: 40.758, longitude: -73.9855 });
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(options.headers).not.toHaveProperty('Authorization');
+  });
+
   it('caches getGeocodingStatus within TTL', async () => {
     fetchMock.mockImplementation(() =>
       jsonResponse({ total_locations: 100, geocoded: 50, coverage_percent: 50.0 }),
@@ -336,6 +386,7 @@ describe('OtelDataAPI', () => {
     await api.getWithinReference('Home', { source: 'gps', limit: 2 });
     await api.getGarminDateRange();
     await api.getGeocodingStatus();
+    await api.reverseGeocodePoint({ latitude: 40.758, longitude: -73.9855 });
     await api.triggerGeocoding({ batch_size: 100 });
 
     const paths = fetchMock.mock.calls.map(([url]) => new URL(url as string).pathname);
@@ -369,6 +420,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/spatial/within-reference/Home',
       '/api/v1/garmin/date-range',
       '/api/v1/geocoding/status',
+      '/api/v1/geocoding/reverse',
       '/api/v1/geocoding/trigger',
     ]);
   });
