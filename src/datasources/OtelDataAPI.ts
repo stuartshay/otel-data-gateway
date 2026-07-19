@@ -119,6 +119,30 @@ interface GarminActivityWeather {
   updated_at: string | null;
 }
 
+interface GarminActivityWeatherHourly {
+  activity_id: string;
+  hour_index: number;
+  observed_at: string;
+  latitude: number;
+  longitude: number;
+  temperature_c: number | null;
+  apparent_temperature_c: number | null;
+  relative_humidity_pct: number | null;
+  precipitation_mm: number | null;
+  rain_mm: number | null;
+  snowfall_cm: number | null;
+  cloud_cover_pct: number | null;
+  wind_speed_kmh: number | null;
+  wind_gusts_kmh: number | null;
+  wind_direction_deg: number | null;
+  surface_pressure_hpa: number | null;
+  weather_code: number | null;
+  source: string;
+  is_provisional: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
 interface GarminLapsActivity {
   activity_id: string;
   sport: string | null;
@@ -469,6 +493,13 @@ export class OtelDataAPI {
   async getGarminActivityWeather(activityId: string): Promise<GarminActivityWeather | null> {
     return this.fetch<GarminActivityWeather | null>({
       path: `/api/v1/garmin/activities/${activityId}/weather`,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminActivityWeatherHourly(activityId: string): Promise<GarminActivityWeatherHourly[]> {
+    return this.fetch<GarminActivityWeatherHourly[]>({
+      path: `/api/v1/garmin/activities/${activityId}/weather-hourly`,
       cacheTtlMs: 30_000,
     });
   }
