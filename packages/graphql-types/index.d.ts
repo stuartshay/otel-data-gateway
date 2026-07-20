@@ -380,6 +380,45 @@ export interface GarminActivityLapsGroup {
   laps: Array<GarminActivityLap>;
 }
 
+/** A FIT device_info record (head unit or paired sensor) for a Garmin activity. */
+export interface GarminActivitySensor {
+  __typename?: 'GarminActivitySensor';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** ANT network the sensor was paired on */
+  ant_network?: Maybe<Scalars['String']['output']>;
+  /** FIT battery_status: new, good, ok, low, critical, charging, unknown */
+  battery_status?: Maybe<Scalars['String']['output']>;
+  /** Sensor battery voltage */
+  battery_voltage?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** FIT device_index: 0 for the head unit, 1+ for each paired sensor */
+  device_index: Scalars['Int']['output'];
+  /** FIT antplus_device_type (e.g. heart_rate, bike_power) */
+  device_type?: Maybe<Scalars['String']['output']>;
+  /** Raw Garmin product enum id from the FIT file */
+  garmin_product?: Maybe<Scalars['Int']['output']>;
+  /** Sensor hardware revision */
+  hardware_version?: Maybe<Scalars['Int']['output']>;
+  /** Unique sensor row identifier */
+  id: Scalars['Float']['output'];
+  /** True for the recording device (head unit / FIT creator record) */
+  is_primary: Scalars['Boolean']['output'];
+  /** Sensor manufacturer (e.g. garmin) */
+  manufacturer?: Maybe<Scalars['String']['output']>;
+  /** Friendly product name (e.g. Edge 540 Solar, HRM-Pro) */
+  product_name?: Maybe<Scalars['String']['output']>;
+  /** Sensor serial number, when reported */
+  serial_number?: Maybe<Scalars['Float']['output']>;
+  /** Sensor firmware/software version */
+  software_version?: Maybe<Scalars['String']['output']>;
+  /** Sensor connection type (ant, antplus, bluetooth_low_energy, ...) */
+  source_type?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+}
+
 /** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
 export interface GarminActivityTotal {
   __typename?: 'GarminActivityTotal';
@@ -1114,6 +1153,8 @@ export interface Query {
   garminActivityClimbs: Array<GarminActivityClimb>;
   /** Retrieve Garmin-native or derived laps for a Garmin activity. */
   garminActivityLaps: Array<GarminActivityLap>;
+  /** Retrieve the sensors (head unit + paired ANT+/BLE devices) recorded for a Garmin activity. */
+  garminActivitySensors: Array<GarminActivitySensor>;
   /** Aggregate Garmin activity totals grouped by week, month, or year. */
   garminActivityTotals: Array<GarminActivityTotal>;
   /**
@@ -1214,6 +1255,10 @@ export interface QueryGarminActivityClimbsArgs {
 }
 
 export interface QueryGarminActivityLapsArgs {
+  activity_id: Scalars['String']['input'];
+}
+
+export interface QueryGarminActivitySensorsArgs {
   activity_id: Scalars['String']['input'];
 }
 

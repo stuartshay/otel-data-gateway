@@ -96,6 +96,8 @@ interface GarminActivityClimb {
 
 type GarminActivityLap = Schemas['GarminActivityLap'];
 
+type GarminActivitySensor = Schemas['GarminActivitySensor'];
+
 interface GarminActivityWeather {
   activity_id: string;
   observed_at: string;
@@ -486,6 +488,13 @@ export class OtelDataAPI {
   async getGarminActivityLaps(activityId: string): Promise<GarminActivityLap[]> {
     return this.fetch<GarminActivityLap[]>({
       path: `/api/v1/garmin/activities/${activityId}/laps`,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminActivitySensors(activityId: string): Promise<GarminActivitySensor[]> {
+    return this.fetch<GarminActivitySensor[]>({
+      path: `/api/v1/garmin/activities/${activityId}/sensors`,
       cacheTtlMs: 30_000,
     });
   }

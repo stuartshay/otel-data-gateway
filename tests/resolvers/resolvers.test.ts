@@ -178,6 +178,9 @@ describe('garmin resolvers', () => {
       getGarminDeviceCounts: mockAsync([{ label: 'Edge 500', activity_count: 2 }]),
       getGarminChartData: mockAsync([{ timestamp: 'now' }]),
       getGarminActivityLaps: mockAsync([{ activity_id: 'abc', lap_index: 1 }]),
+      getGarminActivitySensors: mockAsync([
+        { activity_id: 'abc', device_index: 0, is_primary: true },
+      ]),
       getGarminActivityWeather: mockAsync({ activity_id: 'abc', temperature_c: 18.4 }),
       getGarminActivityWeatherHourly: mockAsync([
         { activity_id: 'abc', hour_index: 0, temperature_c: 18.4 },
@@ -189,6 +192,7 @@ describe('garmin resolvers', () => {
     await runResolver(garminResolvers.Query.garminDeviceCounts, {}, ctx);
     await runResolver(garminResolvers.Query.garminChartData, { activity_id: 'abc' }, ctx);
     await runResolver(garminResolvers.Query.garminActivityLaps, { activity_id: 'abc' }, ctx);
+    await runResolver(garminResolvers.Query.garminActivitySensors, { activity_id: 'abc' }, ctx);
     await runResolver(garminResolvers.Query.garminActivityWeather, { activity_id: 'abc' }, ctx);
     await runResolver(
       garminResolvers.Query.garminActivityWeatherHourly,
@@ -201,6 +205,7 @@ describe('garmin resolvers', () => {
     expect(ctx.dataSources.otelAPI.getGarminDeviceCounts).toHaveBeenCalled();
     expect(ctx.dataSources.otelAPI.getGarminChartData).toHaveBeenCalledWith('abc');
     expect(ctx.dataSources.otelAPI.getGarminActivityLaps).toHaveBeenCalledWith('abc');
+    expect(ctx.dataSources.otelAPI.getGarminActivitySensors).toHaveBeenCalledWith('abc');
     expect(ctx.dataSources.otelAPI.getGarminActivityWeather).toHaveBeenCalledWith('abc');
     expect(ctx.dataSources.otelAPI.getGarminActivityWeatherHourly).toHaveBeenCalledWith('abc');
   });

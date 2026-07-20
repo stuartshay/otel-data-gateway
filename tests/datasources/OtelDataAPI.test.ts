@@ -371,6 +371,7 @@ describe('OtelDataAPI', () => {
     await api.getGarminDeviceCounts();
     await api.getGarminChartData('ga-1');
     await api.getGarminActivityLaps('ga-1');
+    await api.getGarminActivitySensors('ga-1');
     await api.getGarminActivityWeather('ga-1');
     await api.getGarminActivityWeatherHourly('ga-1');
     await api.getGarminLapsComparison({ sport: 'cycling' });
@@ -405,6 +406,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/device-counts',
       '/api/v1/garmin/activities/ga-1/chart-data',
       '/api/v1/garmin/activities/ga-1/laps',
+      '/api/v1/garmin/activities/ga-1/sensors',
       '/api/v1/garmin/activities/ga-1/weather',
       '/api/v1/garmin/activities/ga-1/weather-hourly',
       '/api/v1/garmin/laps',
