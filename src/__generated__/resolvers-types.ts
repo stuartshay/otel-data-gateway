@@ -383,6 +383,45 @@ export type GarminActivityLapsGroup = {
   laps: Array<GarminActivityLap>;
 };
 
+/** A FIT device_info record (head unit or paired sensor) for a Garmin activity. */
+export type GarminActivitySensor = {
+  __typename?: 'GarminActivitySensor';
+  /** Parent Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** ANT network the sensor was paired on */
+  ant_network?: Maybe<Scalars['String']['output']>;
+  /** FIT battery_status: new, good, ok, low, critical, charging, unknown */
+  battery_status?: Maybe<Scalars['String']['output']>;
+  /** Sensor battery voltage */
+  battery_voltage?: Maybe<Scalars['Float']['output']>;
+  /** UTC timestamp when the row was inserted */
+  created_at?: Maybe<Scalars['String']['output']>;
+  /** FIT device_index: 0 for the head unit, 1+ for each paired sensor */
+  device_index: Scalars['Int']['output'];
+  /** FIT antplus_device_type (e.g. heart_rate, bike_power) */
+  device_type?: Maybe<Scalars['String']['output']>;
+  /** Raw Garmin product enum id from the FIT file */
+  garmin_product?: Maybe<Scalars['Int']['output']>;
+  /** Sensor hardware revision */
+  hardware_version?: Maybe<Scalars['Int']['output']>;
+  /** Unique sensor row identifier */
+  id: Scalars['Float']['output'];
+  /** True for the recording device (head unit / FIT creator record) */
+  is_primary: Scalars['Boolean']['output'];
+  /** Sensor manufacturer (e.g. garmin) */
+  manufacturer?: Maybe<Scalars['String']['output']>;
+  /** Friendly product name (e.g. Edge 540 Solar, HRM-Pro) */
+  product_name?: Maybe<Scalars['String']['output']>;
+  /** Sensor serial number, when reported */
+  serial_number?: Maybe<Scalars['Float']['output']>;
+  /** Sensor firmware/software version */
+  software_version?: Maybe<Scalars['String']['output']>;
+  /** Sensor connection type (ant, antplus, bluetooth_low_energy, ...) */
+  source_type?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when the row was last updated */
+  updated_at?: Maybe<Scalars['String']['output']>;
+};
+
 /** Aggregated Garmin activity totals for a single time bucket (week, month, or year). */
 export type GarminActivityTotal = {
   __typename?: 'GarminActivityTotal';
@@ -1122,6 +1161,8 @@ export type Query = {
   garminActivityClimbs: Array<GarminActivityClimb>;
   /** Retrieve Garmin-native or derived laps for a Garmin activity. */
   garminActivityLaps: Array<GarminActivityLap>;
+  /** Retrieve the sensors (head unit + paired ANT+/BLE devices) recorded for a Garmin activity. */
+  garminActivitySensors: Array<GarminActivitySensor>;
   /** Aggregate Garmin activity totals grouped by week, month, or year. */
   garminActivityTotals: Array<GarminActivityTotal>;
   /**
@@ -1229,6 +1270,11 @@ export type QueryGarminActivityClimbsArgs = {
 
 
 export type QueryGarminActivityLapsArgs = {
+  activity_id: Scalars['String']['input'];
+};
+
+
+export type QueryGarminActivitySensorsArgs = {
   activity_id: Scalars['String']['input'];
 };
 
@@ -1543,6 +1589,7 @@ export type ResolversTypes = ResolversObject<{
   GarminActivityConnection: ResolverTypeWrapper<GarminActivityConnection>;
   GarminActivityLap: ResolverTypeWrapper<GarminActivityLap>;
   GarminActivityLapsGroup: ResolverTypeWrapper<GarminActivityLapsGroup>;
+  GarminActivitySensor: ResolverTypeWrapper<GarminActivitySensor>;
   GarminActivityTotal: ResolverTypeWrapper<GarminActivityTotal>;
   GarminActivityWeather: ResolverTypeWrapper<GarminActivityWeather>;
   GarminActivityWeatherHourly: ResolverTypeWrapper<GarminActivityWeatherHourly>;
@@ -1606,6 +1653,7 @@ export type ResolversParentTypes = ResolversObject<{
   GarminActivityConnection: GarminActivityConnection;
   GarminActivityLap: GarminActivityLap;
   GarminActivityLapsGroup: GarminActivityLapsGroup;
+  GarminActivitySensor: GarminActivitySensor;
   GarminActivityTotal: GarminActivityTotal;
   GarminActivityWeather: GarminActivityWeather;
   GarminActivityWeatherHourly: GarminActivityWeatherHourly;
@@ -1829,6 +1877,26 @@ export type GarminActivityLapResolvers<ContextType = GatewayContext, ParentType 
 export type GarminActivityLapsGroupResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityLapsGroup'] = ResolversParentTypes['GarminActivityLapsGroup']> = ResolversObject<{
   activity?: Resolver<ResolversTypes['GarminLapsActivity'], ParentType, ContextType>;
   laps?: Resolver<Array<ResolversTypes['GarminActivityLap']>, ParentType, ContextType>;
+}>;
+
+export type GarminActivitySensorResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivitySensor'] = ResolversParentTypes['GarminActivitySensor']> = ResolversObject<{
+  activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  ant_network?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  battery_status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  battery_voltage?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  device_index?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  device_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  garmin_product?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  hardware_version?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  is_primary?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  manufacturer?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  product_name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  serial_number?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  software_version?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  source_type?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  updated_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
 export type GarminActivityTotalResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminActivityTotal'] = ResolversParentTypes['GarminActivityTotal']> = ResolversObject<{
@@ -2198,6 +2266,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminActivityAddresses?: Resolver<Array<ResolversTypes['GarminActivityAddress']>, ParentType, ContextType, RequireFields<QueryGarminActivityAddressesArgs, 'activity_id'>>;
   garminActivityClimbs?: Resolver<Array<ResolversTypes['GarminActivityClimb']>, ParentType, ContextType, RequireFields<QueryGarminActivityClimbsArgs, 'activity_id'>>;
   garminActivityLaps?: Resolver<Array<ResolversTypes['GarminActivityLap']>, ParentType, ContextType, RequireFields<QueryGarminActivityLapsArgs, 'activity_id'>>;
+  garminActivitySensors?: Resolver<Array<ResolversTypes['GarminActivitySensor']>, ParentType, ContextType, RequireFields<QueryGarminActivitySensorsArgs, 'activity_id'>>;
   garminActivityTotals?: Resolver<Array<ResolversTypes['GarminActivityTotal']>, ParentType, ContextType, RequireFields<QueryGarminActivityTotalsArgs, 'period'>>;
   garminActivityWeather?: Resolver<Maybe<ResolversTypes['GarminActivityWeather']>, ParentType, ContextType, RequireFields<QueryGarminActivityWeatherArgs, 'activity_id'>>;
   garminActivityWeatherHourly?: Resolver<Array<ResolversTypes['GarminActivityWeatherHourly']>, ParentType, ContextType, RequireFields<QueryGarminActivityWeatherHourlyArgs, 'activity_id'>>;
@@ -2287,6 +2356,7 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminActivityConnection?: GarminActivityConnectionResolvers<ContextType>;
   GarminActivityLap?: GarminActivityLapResolvers<ContextType>;
   GarminActivityLapsGroup?: GarminActivityLapsGroupResolvers<ContextType>;
+  GarminActivitySensor?: GarminActivitySensorResolvers<ContextType>;
   GarminActivityTotal?: GarminActivityTotalResolvers<ContextType>;
   GarminActivityWeather?: GarminActivityWeatherResolvers<ContextType>;
   GarminActivityWeatherHourly?: GarminActivityWeatherHourlyResolvers<ContextType>;

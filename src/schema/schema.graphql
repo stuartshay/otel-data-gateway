@@ -973,6 +973,80 @@ type GarminActivityLap {
 }
 
 """
+A FIT device_info record (head unit or paired sensor) for a Garmin activity.
+"""
+type GarminActivitySensor {
+  """
+  Unique sensor row identifier
+  """
+  id: Float!
+  """
+  Parent Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  FIT device_index: 0 for the head unit, 1+ for each paired sensor
+  """
+  device_index: Int!
+  """
+  True for the recording device (head unit / FIT creator record)
+  """
+  is_primary: Boolean!
+  """
+  FIT antplus_device_type (e.g. heart_rate, bike_power)
+  """
+  device_type: String
+  """
+  Sensor manufacturer (e.g. garmin)
+  """
+  manufacturer: String
+  """
+  Raw Garmin product enum id from the FIT file
+  """
+  garmin_product: Int
+  """
+  Friendly product name (e.g. Edge 540 Solar, HRM-Pro)
+  """
+  product_name: String
+  """
+  Sensor serial number, when reported
+  """
+  serial_number: Float
+  """
+  Sensor firmware/software version
+  """
+  software_version: String
+  """
+  Sensor hardware revision
+  """
+  hardware_version: Int
+  """
+  FIT battery_status: new, good, ok, low, critical, charging, unknown
+  """
+  battery_status: String
+  """
+  Sensor battery voltage
+  """
+  battery_voltage: Float
+  """
+  ANT network the sensor was paired on
+  """
+  ant_network: String
+  """
+  Sensor connection type (ant, antplus, bluetooth_low_energy, ...)
+  """
+  source_type: String
+  """
+  UTC timestamp when the row was inserted
+  """
+  created_at: String
+  """
+  UTC timestamp when the row was last updated
+  """
+  updated_at: String
+}
+
+"""
 Open-Meteo weather conditions matched to an activity's start location/time.
 """
 type GarminActivityWeather {
@@ -2318,6 +2392,16 @@ type Query {
     """
     activity_id: String!
   ): [GarminActivityLap!]!
+
+  """
+  Retrieve the sensors (head unit + paired ANT+/BLE devices) recorded for a Garmin activity.
+  """
+  garminActivitySensors(
+    """
+    Garmin Connect activity identifier
+    """
+    activity_id: String!
+  ): [GarminActivitySensor!]!
 
   """
   Retrieve Open-Meteo weather conditions for a Garmin activity's start location/time.
