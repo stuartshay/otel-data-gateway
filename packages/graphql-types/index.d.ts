@@ -734,6 +734,26 @@ export interface GarminSegmentEffortSeries {
   effort_start: Scalars['String']['output'];
 }
 
+/**
+ * Multiple efforts' speed/HR series, binned by normalized distance along a
+ * segment and returned in the same order as requested.
+ */
+export interface GarminSegmentEffortSeriesBatch {
+  __typename?: 'GarminSegmentEffortSeriesBatch';
+  /** Effort series in request order */
+  items: Array<GarminSegmentEffortSeries>;
+}
+
+/** One effort window requested as part of a batch series lookup. */
+export interface GarminSegmentEffortSeriesBatchItemInput {
+  /** Garmin activity identifier of the effort */
+  activity_id: Scalars['String']['input'];
+  /** Effort end timestamp, exactly as returned by garminSegmentEfforts */
+  effort_end: Scalars['String']['input'];
+  /** Effort start timestamp, exactly as returned by garminSegmentEfforts */
+  effort_start: Scalars['String']['input'];
+}
+
 /** One distance bin of an effort's speed/heart-rate series along a segment. */
 export interface GarminSegmentEffortSeriesBin {
   __typename?: 'GarminSegmentEffortSeriesBin';
@@ -1216,6 +1236,12 @@ export interface Query {
    * segment, for comparing efforts at the same point on the course.
    */
   garminSegmentEffortSeries: GarminSegmentEffortSeries;
+  /**
+   * Multiple efforts' speed/HR series binned by normalized distance along a
+   * saved segment, computed with one database query and returned in request
+   * order. Accepts 1-50 effort windows.
+   */
+  garminSegmentEffortSeriesBatch: GarminSegmentEffortSeriesBatch;
   /** Rank all historical activity efforts over a saved segment (fastest first). */
   garminSegmentEfforts: GarminSegmentEffortsConnection;
   /** List saved Garmin segments, optionally filtered by sport. */
@@ -1335,6 +1361,12 @@ export interface QueryGarminSegmentEffortSeriesArgs {
   bins?: InputMaybe<Scalars['Int']['input']>;
   effort_end: Scalars['String']['input'];
   effort_start: Scalars['String']['input'];
+  id: Scalars['Int']['input'];
+}
+
+export interface QueryGarminSegmentEffortSeriesBatchArgs {
+  bins?: InputMaybe<Scalars['Int']['input']>;
+  efforts: Array<GarminSegmentEffortSeriesBatchItemInput>;
   id: Scalars['Int']['input'];
 }
 

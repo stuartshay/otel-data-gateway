@@ -190,6 +190,18 @@ interface SegmentEffortSeriesResponse {
 }
 
 /**
+ * Multiple efforts' speed/HR series, returned in request order. Mirrors the
+ * REST `SegmentEffortSeriesBatchResponse` schema from POST
+ * /segments/{id}/effort-series/batch; swap to
+ * `Schemas['SegmentEffortSeriesBatchResponse']` once
+ * @stuartshay/otel-data-types is bumped past the API release that
+ * introduced it.
+ */
+interface SegmentEffortSeriesBatchResponse {
+  items: SegmentEffortSeriesResponse[];
+}
+
+/**
  * Payload for creating a saved Garmin segment. Mirrors the REST
  * `GarminSegmentCreate` schema but tolerates omitted (`undefined`) optional
  * fields as produced by the GraphQL input type.
@@ -627,6 +639,23 @@ export class OtelDataAPI {
       path: `/api/v1/garmin/segments/${id}/effort-series`,
       query: params,
       cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminSegmentEffortSeriesBatch(
+    id: number,
+    body: {
+      efforts: { activity_id: string; effort_start: string; effort_end: string }[];
+      bins?: number | null;
+    },
+  ): Promise<SegmentEffortSeriesBatchResponse> {
+    // POST requests bypass this datasource's cache (isCacheable requires
+    // method === 'GET'); caching for this call happens client-side instead
+    // (Apollo's normalized cache on the GraphQL operation/variables).
+    return this.fetch<SegmentEffortSeriesBatchResponse>({
+      path: `/api/v1/garmin/segments/${id}/effort-series/batch`,
+      method: 'POST',
+      body,
     });
   }
 

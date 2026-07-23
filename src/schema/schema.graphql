@@ -1521,6 +1521,35 @@ type GarminSegmentEffortSeries {
 }
 
 """
+One effort window requested as part of a batch series lookup.
+"""
+input GarminSegmentEffortSeriesBatchItemInput {
+  """
+  Garmin activity identifier of the effort
+  """
+  activity_id: String!
+  """
+  Effort start timestamp, exactly as returned by garminSegmentEfforts
+  """
+  effort_start: String!
+  """
+  Effort end timestamp, exactly as returned by garminSegmentEfforts
+  """
+  effort_end: String!
+}
+
+"""
+Multiple efforts' speed/HR series, binned by normalized distance along a
+segment and returned in the same order as requested.
+"""
+type GarminSegmentEffortSeriesBatch {
+  """
+  Effort series in request order
+  """
+  items: [GarminSegmentEffortSeries!]!
+}
+
+"""
 Input for creating a saved Garmin segment (e.g. from an activity lap or climb).
 """
 input CreateGarminSegmentInput {
@@ -2575,6 +2604,26 @@ type Query {
     """
     bins: Int
   ): GarminSegmentEffortSeries!
+
+  """
+  Multiple efforts' speed/HR series binned by normalized distance along a
+  saved segment, computed with one database query and returned in request
+  order. Accepts 1-50 effort windows.
+  """
+  garminSegmentEffortSeriesBatch(
+    """
+    Segment identifier
+    """
+    id: Int!
+    """
+    Effort windows to bin, processed and returned in request order (1-50)
+    """
+    efforts: [GarminSegmentEffortSeriesBatchItemInput!]!
+    """
+    Number of distance bins per effort (10-400, default 100)
+    """
+    bins: Int
+  ): GarminSegmentEffortSeriesBatch!
 
   """
   Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end).

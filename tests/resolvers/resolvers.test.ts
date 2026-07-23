@@ -406,6 +406,67 @@ describe('garmin segment resolvers', () => {
     expect(result).toEqual(series);
   });
 
+  it('extracts id before calling garminSegmentEffortSeriesBatch', async () => {
+    const batch = {
+      items: [
+        {
+          activity_id: 'a',
+          effort_start: '2026-07-05T10:30:00',
+          effort_end: '2026-07-05T10:32:00',
+          bin_count: 10,
+          bins: [{ index: 0, fraction: 0.05, speed_kmh: 18.4, heart_rate: 132 }],
+        },
+        {
+          activity_id: 'b',
+          effort_start: '2026-07-05T11:00:00',
+          effort_end: '2026-07-05T11:03:00',
+          bin_count: 10,
+          bins: [{ index: 0, fraction: 0.05, speed_kmh: 20.1, heart_rate: 140 }],
+        },
+      ],
+    };
+    const ctx = contextWith({ getGarminSegmentEffortSeriesBatch: mockAsync(batch) });
+    const args = {
+      id: 1,
+      efforts: [
+        {
+          activity_id: 'a',
+          effort_start: '2026-07-05T10:30:00',
+          effort_end: '2026-07-05T10:32:00',
+        },
+        {
+          activity_id: 'b',
+          effort_start: '2026-07-05T11:00:00',
+          effort_end: '2026-07-05T11:03:00',
+        },
+      ],
+      bins: 10,
+    };
+
+    const result = await runResolver(
+      garminResolvers.Query.garminSegmentEffortSeriesBatch,
+      args,
+      ctx,
+    );
+
+    expect(ctx.dataSources.otelAPI.getGarminSegmentEffortSeriesBatch).toHaveBeenCalledWith(1, {
+      efforts: [
+        {
+          activity_id: 'a',
+          effort_start: '2026-07-05T10:30:00',
+          effort_end: '2026-07-05T10:32:00',
+        },
+        {
+          activity_id: 'b',
+          effort_start: '2026-07-05T11:00:00',
+          effort_end: '2026-07-05T11:03:00',
+        },
+      ],
+      bins: 10,
+    });
+    expect(result).toEqual(batch);
+  });
+
   it('forwards input and auth token to createGarminSegment', async () => {
     const otelAPI = { createGarminSegment: mockAsync(segment) };
     const ctx = {
