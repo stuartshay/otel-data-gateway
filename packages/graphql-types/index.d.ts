@@ -715,6 +715,38 @@ export interface GarminSegmentEffort {
   sport?: Maybe<Scalars['String']['output']>;
 }
 
+/**
+ * A single effort's speed/HR series binned by normalized distance along the
+ * segment. bins always contains exactly bin_count entries ordered by index;
+ * bins with no samples carry null metrics.
+ */
+export interface GarminSegmentEffortSeries {
+  __typename?: 'GarminSegmentEffortSeries';
+  /** Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Number of distance bins in the series */
+  bin_count: Scalars['Int']['output'];
+  /** Distance-ordered bins spanning the traversal */
+  bins: Array<GarminSegmentEffortSeriesBin>;
+  /** UTC timestamp reaching the segment end corridor */
+  effort_end: Scalars['String']['output'];
+  /** UTC timestamp entering the segment start corridor */
+  effort_start: Scalars['String']['output'];
+}
+
+/** One distance bin of an effort's speed/heart-rate series along a segment. */
+export interface GarminSegmentEffortSeriesBin {
+  __typename?: 'GarminSegmentEffortSeriesBin';
+  /** Bin midpoint as a 0..1 fraction of the effort's traversal distance */
+  fraction: Scalars['Float']['output'];
+  /** Average heart rate within the bin in bpm (null for empty bins) */
+  heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** 0-based bin index from segment start */
+  index: Scalars['Int']['output'];
+  /** Average speed within the bin in km/h (null for empty bins) */
+  speed_kmh?: Maybe<Scalars['Float']['output']>;
+}
+
 /** Ranked efforts for a segment across all matching activities (fastest first). */
 export interface GarminSegmentEffortsConnection {
   __typename?: 'GarminSegmentEffortsConnection';
@@ -1179,6 +1211,11 @@ export interface Query {
   garminLapsComparison: GarminLapsComparisonConnection;
   /** Fetch a single saved Garmin segment by id. Returns null if it does not exist. */
   garminSegment?: Maybe<GarminSegment>;
+  /**
+   * One effort's speed/HR series binned by normalized distance along a saved
+   * segment, for comparing efforts at the same point on the course.
+   */
+  garminSegmentEffortSeries: GarminSegmentEffortSeries;
   /** Rank all historical activity efforts over a saved segment (fastest first). */
   garminSegmentEfforts: GarminSegmentEffortsConnection;
   /** List saved Garmin segments, optionally filtered by sport. */
@@ -1290,6 +1327,14 @@ export interface QueryGarminLapsComparisonArgs {
 }
 
 export interface QueryGarminSegmentArgs {
+  id: Scalars['Int']['input'];
+}
+
+export interface QueryGarminSegmentEffortSeriesArgs {
+  activity_id: Scalars['String']['input'];
+  bins?: InputMaybe<Scalars['Int']['input']>;
+  effort_end: Scalars['String']['input'];
+  effort_start: Scalars['String']['input'];
   id: Scalars['Int']['input'];
 }
 

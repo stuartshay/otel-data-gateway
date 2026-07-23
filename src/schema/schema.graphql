@@ -1471,6 +1471,56 @@ type GarminSegmentEffortsConnection {
 }
 
 """
+One distance bin of an effort's speed/heart-rate series along a segment.
+"""
+type GarminSegmentEffortSeriesBin {
+  """
+  0-based bin index from segment start
+  """
+  index: Int!
+  """
+  Bin midpoint as a 0..1 fraction of the effort's traversal distance
+  """
+  fraction: Float!
+  """
+  Average speed within the bin in km/h (null for empty bins)
+  """
+  speed_kmh: Float
+  """
+  Average heart rate within the bin in bpm (null for empty bins)
+  """
+  heart_rate: Int
+}
+
+"""
+A single effort's speed/HR series binned by normalized distance along the
+segment. bins always contains exactly bin_count entries ordered by index;
+bins with no samples carry null metrics.
+"""
+type GarminSegmentEffortSeries {
+  """
+  Garmin activity identifier
+  """
+  activity_id: String!
+  """
+  UTC timestamp entering the segment start corridor
+  """
+  effort_start: String!
+  """
+  UTC timestamp reaching the segment end corridor
+  """
+  effort_end: String!
+  """
+  Number of distance bins in the series
+  """
+  bin_count: Int!
+  """
+  Distance-ordered bins spanning the traversal
+  """
+  bins: [GarminSegmentEffortSeriesBin!]!
+}
+
+"""
 Input for creating a saved Garmin segment (e.g. from an activity lap or climb).
 """
 input CreateGarminSegmentInput {
@@ -2498,6 +2548,33 @@ type Query {
     """
     limit: Int
   ): GarminSegmentEffortsConnection!
+
+  """
+  One effort's speed/HR series binned by normalized distance along a saved
+  segment, for comparing efforts at the same point on the course.
+  """
+  garminSegmentEffortSeries(
+    """
+    Segment identifier
+    """
+    id: Int!
+    """
+    Garmin activity identifier of the effort
+    """
+    activity_id: String!
+    """
+    Effort start timestamp, exactly as returned by garminSegmentEfforts
+    """
+    effort_start: String!
+    """
+    Effort end timestamp, exactly as returned by garminSegmentEfforts
+    """
+    effort_end: String!
+    """
+    Number of distance bins in the series (10-400, default 100)
+    """
+    bins: Int
+  ): GarminSegmentEffortSeries!
 
   """
   Retrieve all reverse-geocoded addresses for a Garmin activity (start, mid-route waypoints, and end).

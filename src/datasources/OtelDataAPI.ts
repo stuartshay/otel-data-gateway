@@ -171,6 +171,25 @@ interface GarminLapsComparisonConnection {
 }
 
 /**
+ * One effort's speed/HR series binned by normalized distance along a segment.
+ * Mirrors the REST `SegmentEffortSeriesResponse` schema; swap to
+ * `Schemas['SegmentEffortSeriesResponse']` once @stuartshay/otel-data-types
+ * is bumped past the API release that introduced it.
+ */
+interface SegmentEffortSeriesResponse {
+  activity_id: string;
+  effort_start: string;
+  effort_end: string;
+  bin_count: number;
+  bins: {
+    index: number;
+    fraction: number;
+    speed_kmh?: number | null;
+    heart_rate?: number | null;
+  }[];
+}
+
+/**
  * Payload for creating a saved Garmin segment. Mirrors the REST
  * `GarminSegmentCreate` schema but tolerates omitted (`undefined`) optional
  * fields as produced by the GraphQL input type.
@@ -590,6 +609,22 @@ export class OtelDataAPI {
   ): Promise<Schemas['SegmentEffortsResponse']> {
     return this.fetch<Schemas['SegmentEffortsResponse']>({
       path: `/api/v1/garmin/segments/${id}/efforts`,
+      query: params,
+      cacheTtlMs: 30_000,
+    });
+  }
+
+  async getGarminSegmentEffortSeries(
+    id: number,
+    params: Nullable<{
+      activity_id: string;
+      effort_start: string;
+      effort_end: string;
+      bins?: number;
+    }>,
+  ): Promise<SegmentEffortSeriesResponse> {
+    return this.fetch<SegmentEffortSeriesResponse>({
+      path: `/api/v1/garmin/segments/${id}/effort-series`,
       query: params,
       cacheTtlMs: 30_000,
     });
