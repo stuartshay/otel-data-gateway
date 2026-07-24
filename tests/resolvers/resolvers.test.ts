@@ -637,6 +637,35 @@ describe('geocoding resolvers', () => {
     },
   );
 
+  it('delegates reverseGeocodePointsBatch and forwards the token', async () => {
+    const args = {
+      points: [
+        { latitude: 40.758, longitude: -73.9855 },
+        { latitude: 40.7, longitude: -74.0 },
+      ],
+    };
+    const result = {
+      items: [
+        { latitude: 40.758, longitude: -73.9855, status: 'success' },
+        { latitude: 40.7, longitude: -74.0, status: 'pending' },
+      ],
+    };
+    const ctx = contextWith({ reverseGeocodePointsBatch: mockAsync(result) });
+    ctx.token = 'Bearer test-token';
+
+    const response = await runResolver(
+      geocodingResolvers.Query.reverseGeocodePointsBatch,
+      args,
+      ctx,
+    );
+
+    expect(ctx.dataSources.otelAPI.reverseGeocodePointsBatch).toHaveBeenCalledWith(
+      args,
+      'Bearer test-token',
+    );
+    expect(response).toEqual(result);
+  });
+
   it('delegates triggerGeocoding mutation with args', async () => {
     const args = { batch_size: 50, retry_failed: true };
     const result = { processed: 50, remaining: 25, skipped_dedup: 5 };
@@ -681,6 +710,7 @@ describe('resolver index', () => {
         'withinReference',
         'geocodingStatus',
         'reverseGeocodePoint',
+        'reverseGeocodePointsBatch',
       ]),
     );
   });

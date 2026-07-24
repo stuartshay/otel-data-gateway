@@ -330,6 +330,90 @@ type GeocodedPointAddress {
 }
 
 """
+One coordinate requested as part of a batch reverse-geocode lookup.
+"""
+input ReverseGeocodePointInput {
+  """
+  Latitude in decimal degrees.
+  """
+  latitude: Float!
+  """
+  Longitude in decimal degrees.
+  """
+  longitude: Float!
+}
+
+"""
+One coordinate's cached address, or a cache miss, from a batch lookup. Unlike
+GeocodedPointAddress, this never triggers a Pelias fallback: an unresolved
+cell reports status "pending" rather than being resolved synchronously.
+"""
+type ReverseGeocodeBatchItem {
+  """
+  Resolved 4-decimal cell latitude.
+  """
+  latitude: Float!
+  """
+  Resolved 4-decimal cell longitude.
+  """
+  longitude: Float!
+  """
+  Full formatted address label.
+  """
+  display_address: String
+  """
+  Street name.
+  """
+  street: String
+  """
+  House or building number.
+  """
+  housenumber: String
+  """
+  Neighbourhood name.
+  """
+  neighbourhood: String
+  """
+  City or town.
+  """
+  locality: String
+  """
+  State or province.
+  """
+  region: String
+  """
+  Country name.
+  """
+  country: String
+  """
+  Postal or ZIP code.
+  """
+  postalcode: String
+  """
+  Pelias confidence score from 0 to 1.
+  """
+  confidence: Float
+  """
+  Geocoding status: success, no_coverage, error, or pending.
+  """
+  status: String!
+  """
+  UTC timestamp when geocoding was performed.
+  """
+  geocoded_at: String
+}
+
+"""
+Multiple coordinates' cached addresses, returned in request order.
+"""
+type ReverseGeocodeBatchResponse {
+  """
+  Resolved addresses in request order.
+  """
+  items: [ReverseGeocodeBatchItem!]!
+}
+
+"""
 Coverage statistics for geocoded location records.
 """
 type GeocodingStatus {
@@ -2825,6 +2909,19 @@ type Query {
     """
     longitude: Float!
   ): GeocodedPointAddress!
+
+  """
+  Resolve up to 300 coordinates from the dense point-cell cache in one
+  database query, with no Pelias fallback. Requires the caller's
+  Authorization header. Intended to prefetch addresses for a whole route
+  once instead of one live lookup per point.
+  """
+  reverseGeocodePointsBatch(
+    """
+    Coordinates to resolve, processed and returned in request order (1-300).
+    """
+    points: [ReverseGeocodePointInput!]!
+  ): ReverseGeocodeBatchResponse!
 }
 
 # -------------------------------------------------------
