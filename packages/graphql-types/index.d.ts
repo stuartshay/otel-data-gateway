@@ -1275,6 +1275,13 @@ export interface Query {
    * Requires the caller's Authorization header because a fallback can persist data.
    */
   reverseGeocodePoint: GeocodedPointAddress;
+  /**
+   * Resolve up to 300 coordinates from the dense point-cell cache in one
+   * database query, with no Pelias fallback. Requires the caller's
+   * Authorization header. Intended to prefetch addresses for a whole route
+   * once instead of one live lookup per point.
+   */
+  reverseGeocodePointsBatch: ReverseGeocodeBatchResponse;
   /** Retrieve a paginated list of unified GPS points from all sources. */
   unifiedGps: UnifiedGpsConnection;
   /** Find GPS points within a named reference location's geofence. */
@@ -1427,6 +1434,10 @@ export interface QueryReverseGeocodePointArgs {
   longitude: Scalars['Float']['input'];
 }
 
+export interface QueryReverseGeocodePointsBatchArgs {
+  points: Array<ReverseGeocodePointInput>;
+}
+
 export interface QueryUnifiedGpsArgs {
   date_from?: InputMaybe<Scalars['String']['input']>;
   date_to?: InputMaybe<Scalars['String']['input']>;
@@ -1474,6 +1485,56 @@ export interface ReferenceLocation {
   radius_meters: Scalars['Float']['output'];
   /** UTC timestamp when the record was last updated */
   updated_at?: Maybe<Scalars['String']['output']>;
+}
+
+/**
+ * One coordinate's cached address, or a cache miss, from a batch lookup. Unlike
+ * GeocodedPointAddress, this never triggers a Pelias fallback: an unresolved
+ * cell reports status "pending" rather than being resolved synchronously.
+ */
+export interface ReverseGeocodeBatchItem {
+  __typename?: 'ReverseGeocodeBatchItem';
+  /** Pelias confidence score from 0 to 1. */
+  confidence?: Maybe<Scalars['Float']['output']>;
+  /** Country name. */
+  country?: Maybe<Scalars['String']['output']>;
+  /** Full formatted address label. */
+  display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed. */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number. */
+  housenumber?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell latitude. */
+  latitude: Scalars['Float']['output'];
+  /** City or town. */
+  locality?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell longitude. */
+  longitude: Scalars['Float']['output'];
+  /** Neighbourhood name. */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code. */
+  postalcode?: Maybe<Scalars['String']['output']>;
+  /** State or province. */
+  region?: Maybe<Scalars['String']['output']>;
+  /** Geocoding status: success, no_coverage, error, or pending. */
+  status: Scalars['String']['output'];
+  /** Street name. */
+  street?: Maybe<Scalars['String']['output']>;
+}
+
+/** Multiple coordinates' cached addresses, returned in request order. */
+export interface ReverseGeocodeBatchResponse {
+  __typename?: 'ReverseGeocodeBatchResponse';
+  /** Resolved addresses in request order. */
+  items: Array<ReverseGeocodeBatchItem>;
+}
+
+/** One coordinate requested as part of a batch reverse-geocode lookup. */
+export interface ReverseGeocodePointInput {
+  /** Latitude in decimal degrees. */
+  latitude: Scalars['Float']['input'];
+  /** Longitude in decimal degrees. */
+  longitude: Scalars['Float']['input'];
 }
 
 /** Sort direction for query results. */

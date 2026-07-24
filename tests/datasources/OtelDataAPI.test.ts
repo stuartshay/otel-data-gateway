@@ -338,6 +338,50 @@ describe('OtelDataAPI', () => {
     expect(options.headers).not.toHaveProperty('Authorization');
   });
 
+  it('posts a batch reverse-geocode request and forwards the Authorization header', async () => {
+    const result = {
+      items: [
+        {
+          latitude: 40.758,
+          longitude: -73.9855,
+          display_address: 'New York Marriott Marquis Times Square, New York, NY, USA',
+          status: 'success',
+        },
+        { latitude: 40.7, longitude: -74.0, status: 'pending' },
+      ],
+    };
+    fetchMock.mockResolvedValueOnce(jsonResponse(result));
+    const api = new OtelDataAPI('https://example.test');
+    const body = {
+      points: [
+        { latitude: 40.758, longitude: -73.9855 },
+        { latitude: 40.7, longitude: -74.0 },
+      ],
+    };
+
+    const response = await api.reverseGeocodePointsBatch(body, 'Bearer test-token');
+
+    expect(response).toEqual(result);
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toBe('https://example.test/api/v1/geocoding/reverse/batch');
+    expect(options.method).toBe('POST');
+    expect(options.body).toBe(JSON.stringify(body));
+    expect(options.headers).toMatchObject({
+      Authorization: 'Bearer test-token',
+      'Content-Type': 'application/json',
+    });
+  });
+
+  it('does not add Authorization to the batch reverse-geocode request without a token', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse({ items: [] }));
+    const api = new OtelDataAPI('https://example.test');
+
+    await api.reverseGeocodePointsBatch({ points: [{ latitude: 40.758, longitude: -73.9855 }] });
+
+    const [, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(options.headers).not.toHaveProperty('Authorization');
+  });
+
   it('caches getGeocodingStatus within TTL', async () => {
     fetchMock.mockImplementation(() =>
       jsonResponse({ total_locations: 100, geocoded: 50, coverage_percent: 50.0 }),
@@ -388,6 +432,7 @@ describe('OtelDataAPI', () => {
     await api.getGarminDateRange();
     await api.getGeocodingStatus();
     await api.reverseGeocodePoint({ latitude: 40.758, longitude: -73.9855 });
+    await api.reverseGeocodePointsBatch({ points: [{ latitude: 40.758, longitude: -73.9855 }] });
     await api.triggerGeocoding({ batch_size: 100 });
 
     const paths = fetchMock.mock.calls.map(([url]) => new URL(url as string).pathname);
@@ -423,6 +468,7 @@ describe('OtelDataAPI', () => {
       '/api/v1/garmin/date-range',
       '/api/v1/geocoding/status',
       '/api/v1/geocoding/reverse',
+      '/api/v1/geocoding/reverse/batch',
       '/api/v1/geocoding/trigger',
     ]);
   });

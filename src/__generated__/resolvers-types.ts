@@ -1283,6 +1283,13 @@ export type Query = {
    * Requires the caller's Authorization header because a fallback can persist data.
    */
   reverseGeocodePoint: GeocodedPointAddress;
+  /**
+   * Resolve up to 300 coordinates from the dense point-cell cache in one
+   * database query, with no Pelias fallback. Requires the caller's
+   * Authorization header. Intended to prefetch addresses for a whole route
+   * once instead of one live lookup per point.
+   */
+  reverseGeocodePointsBatch: ReverseGeocodeBatchResponse;
   /** Retrieve a paginated list of unified GPS points from all sources. */
   unifiedGps: UnifiedGpsConnection;
   /** Find GPS points within a named reference location's geofence. */
@@ -1461,6 +1468,11 @@ export type QueryReverseGeocodePointArgs = {
 };
 
 
+export type QueryReverseGeocodePointsBatchArgs = {
+  points: Array<ReverseGeocodePointInput>;
+};
+
+
 export type QueryUnifiedGpsArgs = {
   date_from?: InputMaybe<Scalars['String']['input']>;
   date_to?: InputMaybe<Scalars['String']['input']>;
@@ -1509,6 +1521,56 @@ export type ReferenceLocation = {
   radius_meters: Scalars['Float']['output'];
   /** UTC timestamp when the record was last updated */
   updated_at?: Maybe<Scalars['String']['output']>;
+};
+
+/**
+ * One coordinate's cached address, or a cache miss, from a batch lookup. Unlike
+ * GeocodedPointAddress, this never triggers a Pelias fallback: an unresolved
+ * cell reports status "pending" rather than being resolved synchronously.
+ */
+export type ReverseGeocodeBatchItem = {
+  __typename?: 'ReverseGeocodeBatchItem';
+  /** Pelias confidence score from 0 to 1. */
+  confidence?: Maybe<Scalars['Float']['output']>;
+  /** Country name. */
+  country?: Maybe<Scalars['String']['output']>;
+  /** Full formatted address label. */
+  display_address?: Maybe<Scalars['String']['output']>;
+  /** UTC timestamp when geocoding was performed. */
+  geocoded_at?: Maybe<Scalars['String']['output']>;
+  /** House or building number. */
+  housenumber?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell latitude. */
+  latitude: Scalars['Float']['output'];
+  /** City or town. */
+  locality?: Maybe<Scalars['String']['output']>;
+  /** Resolved 4-decimal cell longitude. */
+  longitude: Scalars['Float']['output'];
+  /** Neighbourhood name. */
+  neighbourhood?: Maybe<Scalars['String']['output']>;
+  /** Postal or ZIP code. */
+  postalcode?: Maybe<Scalars['String']['output']>;
+  /** State or province. */
+  region?: Maybe<Scalars['String']['output']>;
+  /** Geocoding status: success, no_coverage, error, or pending. */
+  status: Scalars['String']['output'];
+  /** Street name. */
+  street?: Maybe<Scalars['String']['output']>;
+};
+
+/** Multiple coordinates' cached addresses, returned in request order. */
+export type ReverseGeocodeBatchResponse = {
+  __typename?: 'ReverseGeocodeBatchResponse';
+  /** Resolved addresses in request order. */
+  items: Array<ReverseGeocodeBatchItem>;
+};
+
+/** One coordinate requested as part of a batch reverse-geocode lookup. */
+export type ReverseGeocodePointInput = {
+  /** Latitude in decimal degrees. */
+  latitude: Scalars['Float']['input'];
+  /** Longitude in decimal degrees. */
+  longitude: Scalars['Float']['input'];
 };
 
 /** Sort direction for query results. */
@@ -1711,6 +1773,9 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   ReadyStatus: ResolverTypeWrapper<ReadyStatus>;
   ReferenceLocation: ResolverTypeWrapper<ReferenceLocation>;
+  ReverseGeocodeBatchItem: ResolverTypeWrapper<ReverseGeocodeBatchItem>;
+  ReverseGeocodeBatchResponse: ResolverTypeWrapper<ReverseGeocodeBatchResponse>;
+  ReverseGeocodePointInput: ReverseGeocodePointInput;
   SortOrder: SortOrder;
   SportInfo: ResolverTypeWrapper<SportInfo>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -1778,6 +1843,9 @@ export type ResolversParentTypes = ResolversObject<{
   Query: Record<PropertyKey, never>;
   ReadyStatus: ReadyStatus;
   ReferenceLocation: ReferenceLocation;
+  ReverseGeocodeBatchItem: ReverseGeocodeBatchItem;
+  ReverseGeocodeBatchResponse: ReverseGeocodeBatchResponse;
+  ReverseGeocodePointInput: ReverseGeocodePointInput;
   SportInfo: SportInfo;
   String: Scalars['String']['output'];
   UnifiedGpsConnection: UnifiedGpsConnection;
@@ -2398,6 +2466,7 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   referenceLocation?: Resolver<Maybe<ResolversTypes['ReferenceLocation']>, ParentType, ContextType, RequireFields<QueryReferenceLocationArgs, 'id'>>;
   referenceLocations?: Resolver<Array<ResolversTypes['ReferenceLocation']>, ParentType, ContextType>;
   reverseGeocodePoint?: Resolver<ResolversTypes['GeocodedPointAddress'], ParentType, ContextType, RequireFields<QueryReverseGeocodePointArgs, 'latitude' | 'longitude'>>;
+  reverseGeocodePointsBatch?: Resolver<ResolversTypes['ReverseGeocodeBatchResponse'], ParentType, ContextType, RequireFields<QueryReverseGeocodePointsBatchArgs, 'points'>>;
   unifiedGps?: Resolver<ResolversTypes['UnifiedGpsConnection'], ParentType, ContextType, Partial<QueryUnifiedGpsArgs>>;
   withinReference?: Resolver<ResolversTypes['WithinReferenceResult'], ParentType, ContextType, RequireFields<QueryWithinReferenceArgs, 'name'>>;
 }>;
@@ -2417,6 +2486,26 @@ export type ReferenceLocationResolvers<ContextType = GatewayContext, ParentType 
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   radius_meters?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   updated_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
+export type ReverseGeocodeBatchItemResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['ReverseGeocodeBatchItem'] = ResolversParentTypes['ReverseGeocodeBatchItem']> = ResolversObject<{
+  confidence?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+  country?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  display_address?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  geocoded_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  housenumber?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  latitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  locality?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  longitude?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  neighbourhood?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  postalcode?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  region?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  street?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+}>;
+
+export type ReverseGeocodeBatchResponseResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['ReverseGeocodeBatchResponse'] = ResolversParentTypes['ReverseGeocodeBatchResponse']> = ResolversObject<{
+  items?: Resolver<Array<ResolversTypes['ReverseGeocodeBatchItem']>, ParentType, ContextType>;
 }>;
 
 export type SportInfoResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['SportInfo'] = ResolversParentTypes['SportInfo']> = ResolversObject<{
@@ -2504,6 +2593,8 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   Query?: QueryResolvers<ContextType>;
   ReadyStatus?: ReadyStatusResolvers<ContextType>;
   ReferenceLocation?: ReferenceLocationResolvers<ContextType>;
+  ReverseGeocodeBatchItem?: ReverseGeocodeBatchItemResolvers<ContextType>;
+  ReverseGeocodeBatchResponse?: ReverseGeocodeBatchResponseResolvers<ContextType>;
   SportInfo?: SportInfoResolvers<ContextType>;
   UnifiedGpsConnection?: UnifiedGpsConnectionResolvers<ContextType>;
   UnifiedGpsPoint?: UnifiedGpsPointResolvers<ContextType>;
