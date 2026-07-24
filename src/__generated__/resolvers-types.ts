@@ -718,6 +718,58 @@ export type GarminSegmentEffort = {
   sport?: Maybe<Scalars['String']['output']>;
 };
 
+/**
+ * A single effort's speed/HR series binned by normalized distance along the
+ * segment. bins always contains exactly bin_count entries ordered by index;
+ * bins with no samples carry null metrics.
+ */
+export type GarminSegmentEffortSeries = {
+  __typename?: 'GarminSegmentEffortSeries';
+  /** Garmin activity identifier */
+  activity_id: Scalars['String']['output'];
+  /** Number of distance bins in the series */
+  bin_count: Scalars['Int']['output'];
+  /** Distance-ordered bins spanning the traversal */
+  bins: Array<GarminSegmentEffortSeriesBin>;
+  /** UTC timestamp reaching the segment end corridor */
+  effort_end: Scalars['String']['output'];
+  /** UTC timestamp entering the segment start corridor */
+  effort_start: Scalars['String']['output'];
+};
+
+/**
+ * Multiple efforts' speed/HR series, binned by normalized distance along a
+ * segment and returned in the same order as requested.
+ */
+export type GarminSegmentEffortSeriesBatch = {
+  __typename?: 'GarminSegmentEffortSeriesBatch';
+  /** Effort series in request order */
+  items: Array<GarminSegmentEffortSeries>;
+};
+
+/** One effort window requested as part of a batch series lookup. */
+export type GarminSegmentEffortSeriesBatchItemInput = {
+  /** Garmin activity identifier of the effort */
+  activity_id: Scalars['String']['input'];
+  /** Effort end timestamp, exactly as returned by garminSegmentEfforts */
+  effort_end: Scalars['String']['input'];
+  /** Effort start timestamp, exactly as returned by garminSegmentEfforts */
+  effort_start: Scalars['String']['input'];
+};
+
+/** One distance bin of an effort's speed/heart-rate series along a segment. */
+export type GarminSegmentEffortSeriesBin = {
+  __typename?: 'GarminSegmentEffortSeriesBin';
+  /** Bin midpoint as a 0..1 fraction of the effort's traversal distance */
+  fraction: Scalars['Float']['output'];
+  /** Average heart rate within the bin in bpm (null for empty bins) */
+  heart_rate?: Maybe<Scalars['Int']['output']>;
+  /** 0-based bin index from segment start */
+  index: Scalars['Int']['output'];
+  /** Average speed within the bin in km/h (null for empty bins) */
+  speed_kmh?: Maybe<Scalars['Float']['output']>;
+};
+
 /** Ranked efforts for a segment across all matching activities (fastest first). */
 export type GarminSegmentEffortsConnection = {
   __typename?: 'GarminSegmentEffortsConnection';
@@ -1187,6 +1239,17 @@ export type Query = {
   garminLapsComparison: GarminLapsComparisonConnection;
   /** Fetch a single saved Garmin segment by id. Returns null if it does not exist. */
   garminSegment?: Maybe<GarminSegment>;
+  /**
+   * One effort's speed/HR series binned by normalized distance along a saved
+   * segment, for comparing efforts at the same point on the course.
+   */
+  garminSegmentEffortSeries: GarminSegmentEffortSeries;
+  /**
+   * Multiple efforts' speed/HR series binned by normalized distance along a
+   * saved segment, computed with one database query and returned in request
+   * order. Accepts 1-50 effort windows.
+   */
+  garminSegmentEffortSeriesBatch: GarminSegmentEffortSeriesBatch;
   /** Rank all historical activity efforts over a saved segment (fastest first). */
   garminSegmentEfforts: GarminSegmentEffortsConnection;
   /** List saved Garmin segments, optionally filtered by sport. */
@@ -1312,6 +1375,22 @@ export type QueryGarminLapsComparisonArgs = {
 
 
 export type QueryGarminSegmentArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryGarminSegmentEffortSeriesArgs = {
+  activity_id: Scalars['String']['input'];
+  bins?: InputMaybe<Scalars['Int']['input']>;
+  effort_end: Scalars['String']['input'];
+  effort_start: Scalars['String']['input'];
+  id: Scalars['Int']['input'];
+};
+
+
+export type QueryGarminSegmentEffortSeriesBatchArgs = {
+  bins?: InputMaybe<Scalars['Int']['input']>;
+  efforts: Array<GarminSegmentEffortSeriesBatchItemInput>;
   id: Scalars['Int']['input'];
 };
 
@@ -1602,6 +1681,10 @@ export type ResolversTypes = ResolversObject<{
   GarminSegment: ResolverTypeWrapper<GarminSegment>;
   GarminSegmentDefinition: ResolverTypeWrapper<GarminSegmentDefinition>;
   GarminSegmentEffort: ResolverTypeWrapper<GarminSegmentEffort>;
+  GarminSegmentEffortSeries: ResolverTypeWrapper<GarminSegmentEffortSeries>;
+  GarminSegmentEffortSeriesBatch: ResolverTypeWrapper<GarminSegmentEffortSeriesBatch>;
+  GarminSegmentEffortSeriesBatchItemInput: GarminSegmentEffortSeriesBatchItemInput;
+  GarminSegmentEffortSeriesBin: ResolverTypeWrapper<GarminSegmentEffortSeriesBin>;
   GarminSegmentEffortsConnection: ResolverTypeWrapper<GarminSegmentEffortsConnection>;
   GarminSyncTriggerResult: ResolverTypeWrapper<GarminSyncTriggerResult>;
   GarminTrackPoint: ResolverTypeWrapper<GarminTrackPoint>;
@@ -1666,6 +1749,10 @@ export type ResolversParentTypes = ResolversObject<{
   GarminSegment: GarminSegment;
   GarminSegmentDefinition: GarminSegmentDefinition;
   GarminSegmentEffort: GarminSegmentEffort;
+  GarminSegmentEffortSeries: GarminSegmentEffortSeries;
+  GarminSegmentEffortSeriesBatch: GarminSegmentEffortSeriesBatch;
+  GarminSegmentEffortSeriesBatchItemInput: GarminSegmentEffortSeriesBatchItemInput;
+  GarminSegmentEffortSeriesBin: GarminSegmentEffortSeriesBin;
   GarminSegmentEffortsConnection: GarminSegmentEffortsConnection;
   GarminSyncTriggerResult: GarminSyncTriggerResult;
   GarminTrackPoint: GarminTrackPoint;
@@ -2047,6 +2134,25 @@ export type GarminSegmentEffortResolvers<ContextType = GatewayContext, ParentTyp
   sport?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
+export type GarminSegmentEffortSeriesResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentEffortSeries'] = ResolversParentTypes['GarminSegmentEffortSeries']> = ResolversObject<{
+  activity_id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  bin_count?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  bins?: Resolver<Array<ResolversTypes['GarminSegmentEffortSeriesBin']>, ParentType, ContextType>;
+  effort_end?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  effort_start?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+}>;
+
+export type GarminSegmentEffortSeriesBatchResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentEffortSeriesBatch'] = ResolversParentTypes['GarminSegmentEffortSeriesBatch']> = ResolversObject<{
+  items?: Resolver<Array<ResolversTypes['GarminSegmentEffortSeries']>, ParentType, ContextType>;
+}>;
+
+export type GarminSegmentEffortSeriesBinResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentEffortSeriesBin'] = ResolversParentTypes['GarminSegmentEffortSeriesBin']> = ResolversObject<{
+  fraction?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  index?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  speed_kmh?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
+}>;
+
 export type GarminSegmentEffortsConnectionResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['GarminSegmentEffortsConnection'] = ResolversParentTypes['GarminSegmentEffortsConnection']> = ResolversObject<{
   items?: Resolver<Array<ResolversTypes['GarminSegmentEffort']>, ParentType, ContextType>;
   segment?: Resolver<ResolversTypes['GarminSegmentDefinition'], ParentType, ContextType>;
@@ -2275,6 +2381,8 @@ export type QueryResolvers<ContextType = GatewayContext, ParentType extends Reso
   garminDeviceCounts?: Resolver<Array<ResolversTypes['GarminDeviceCount']>, ParentType, ContextType>;
   garminLapsComparison?: Resolver<ResolversTypes['GarminLapsComparisonConnection'], ParentType, ContextType, Partial<QueryGarminLapsComparisonArgs>>;
   garminSegment?: Resolver<Maybe<ResolversTypes['GarminSegment']>, ParentType, ContextType, RequireFields<QueryGarminSegmentArgs, 'id'>>;
+  garminSegmentEffortSeries?: Resolver<ResolversTypes['GarminSegmentEffortSeries'], ParentType, ContextType, RequireFields<QueryGarminSegmentEffortSeriesArgs, 'activity_id' | 'effort_end' | 'effort_start' | 'id'>>;
+  garminSegmentEffortSeriesBatch?: Resolver<ResolversTypes['GarminSegmentEffortSeriesBatch'], ParentType, ContextType, RequireFields<QueryGarminSegmentEffortSeriesBatchArgs, 'efforts' | 'id'>>;
   garminSegmentEfforts?: Resolver<ResolversTypes['GarminSegmentEffortsConnection'], ParentType, ContextType, RequireFields<QueryGarminSegmentEffortsArgs, 'id'>>;
   garminSegments?: Resolver<Array<ResolversTypes['GarminSegment']>, ParentType, ContextType, Partial<QueryGarminSegmentsArgs>>;
   garminSports?: Resolver<Array<ResolversTypes['SportInfo']>, ParentType, ContextType>;
@@ -2369,6 +2477,9 @@ export type Resolvers<ContextType = GatewayContext> = ResolversObject<{
   GarminSegment?: GarminSegmentResolvers<ContextType>;
   GarminSegmentDefinition?: GarminSegmentDefinitionResolvers<ContextType>;
   GarminSegmentEffort?: GarminSegmentEffortResolvers<ContextType>;
+  GarminSegmentEffortSeries?: GarminSegmentEffortSeriesResolvers<ContextType>;
+  GarminSegmentEffortSeriesBatch?: GarminSegmentEffortSeriesBatchResolvers<ContextType>;
+  GarminSegmentEffortSeriesBin?: GarminSegmentEffortSeriesBinResolvers<ContextType>;
   GarminSegmentEffortsConnection?: GarminSegmentEffortsConnectionResolvers<ContextType>;
   GarminSyncTriggerResult?: GarminSyncTriggerResultResolvers<ContextType>;
   GarminTrackPoint?: GarminTrackPointResolvers<ContextType>;

@@ -652,6 +652,58 @@ describe('OtelDataAPI', () => {
       expect(parsed.searchParams.get('max_effort_seconds')).toBe('400');
     });
 
+    it('fetches one segment effort series by id with query parameters', async () => {
+      fetchMock.mockResolvedValueOnce(
+        await jsonResponse({
+          activity_id: 'activity-1',
+          effort_start: '2026-07-05T10:30:00Z',
+          effort_end: '2026-07-05T10:32:00Z',
+          bin_count: 100,
+          bins: [],
+        }),
+      );
+      const api = new OtelDataAPI('https://example.test');
+
+      await api.getGarminSegmentEffortSeries(7, {
+        activity_id: 'activity-1',
+        effort_start: '2026-07-05T10:30:00Z',
+        effort_end: '2026-07-05T10:32:00Z',
+        bins: 100,
+      });
+
+      const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const parsed = new URL(url);
+      expect(parsed.pathname).toBe('/api/v1/garmin/segments/7/effort-series');
+      expect(parsed.searchParams.get('activity_id')).toBe('activity-1');
+      expect(parsed.searchParams.get('effort_start')).toBe('2026-07-05T10:30:00Z');
+      expect(parsed.searchParams.get('effort_end')).toBe('2026-07-05T10:32:00Z');
+      expect(parsed.searchParams.get('bins')).toBe('100');
+      expect(options.method ?? 'GET').toBe('GET');
+    });
+
+    it('posts multiple segment effort series by id with a JSON body', async () => {
+      fetchMock.mockResolvedValueOnce(await jsonResponse({ items: [] }));
+      const api = new OtelDataAPI('https://example.test');
+      const body = {
+        efforts: [
+          {
+            activity_id: 'activity-1',
+            effort_start: '2026-07-05T10:30:00Z',
+            effort_end: '2026-07-05T10:32:00Z',
+          },
+        ],
+        bins: 100,
+      };
+
+      await api.getGarminSegmentEffortSeriesBatch(7, body);
+
+      const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe('https://example.test/api/v1/garmin/segments/7/effort-series/batch');
+      expect(options.method).toBe('POST');
+      expect(options.body).toBe(JSON.stringify(body));
+      expect(options.headers).toMatchObject({ 'Content-Type': 'application/json' });
+    });
+
     it('creates a segment with a JSON body and forwards the auth token', async () => {
       fetchMock.mockResolvedValueOnce(await jsonResponse({ id: 5, name: 'New Segment' }, 201));
       const api = new OtelDataAPI('https://example.test');

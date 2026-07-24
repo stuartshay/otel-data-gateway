@@ -19,6 +19,8 @@ export const garminResolvers: {
     | 'garminSegments'
     | 'garminSegment'
     | 'garminSegmentEfforts'
+    | 'garminSegmentEffortSeries'
+    | 'garminSegmentEffortSeriesBatch'
     | 'garminActivityTotals'
     | 'garminActivityAddresses'
   >;
@@ -117,6 +119,16 @@ export const garminResolvers: {
     garminSegmentEfforts: async (_parent, args, { dataSources }) => {
       const { id, ...params } = args;
       return dataSources.otelAPI.getGarminSegmentEfforts(id, params);
+    },
+
+    garminSegmentEffortSeries: async (_parent, args, { dataSources }) => {
+      const { id, ...params } = args;
+      return dataSources.otelAPI.getGarminSegmentEffortSeries(id, params);
+    },
+
+    garminSegmentEffortSeriesBatch: async (_parent, args, { dataSources }) => {
+      const { id, ...body } = args;
+      return dataSources.otelAPI.getGarminSegmentEffortSeriesBatch(id, body);
     },
 
     garminActivityTotals: async (_parent, args, { dataSources }) => {
