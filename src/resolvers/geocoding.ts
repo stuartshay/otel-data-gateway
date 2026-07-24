@@ -5,7 +5,10 @@ import {
 } from '../__generated__/resolvers-types.js';
 
 export const geocodingResolvers: {
-  Query: Pick<QueryResolvers, 'geocodingStatus' | 'reverseGeocodePoint'>;
+  Query: Pick<
+    QueryResolvers,
+    'geocodingStatus' | 'reverseGeocodePoint' | 'reverseGeocodePointsBatch'
+  >;
   Mutation: Pick<MutationResolvers, 'triggerGeocoding'>;
 } = {
   Query: {
@@ -21,6 +24,9 @@ export const geocodingResolvers: {
             ? PointAddressSource.Database
             : PointAddressSource.Pelias,
       };
+    },
+    reverseGeocodePointsBatch: async (_parent, args, { dataSources, token }) => {
+      return dataSources.otelAPI.reverseGeocodePointsBatch(args, token);
     },
   },
 

@@ -202,6 +202,39 @@ interface SegmentEffortSeriesBatchResponse {
 }
 
 /**
+ * One coordinate's cached address, or a cache miss, from a batch reverse-geocode
+ * lookup. Mirrors the REST `ReverseGeocodeBatchItem` schema; swap to
+ * `Schemas['ReverseGeocodeBatchItem']` once @stuartshay/otel-data-types is
+ * bumped past the API release that introduced it.
+ */
+interface ReverseGeocodeBatchItem {
+  latitude: number;
+  longitude: number;
+  display_address?: string | null;
+  street?: string | null;
+  housenumber?: string | null;
+  neighbourhood?: string | null;
+  locality?: string | null;
+  region?: string | null;
+  country?: string | null;
+  postalcode?: string | null;
+  confidence?: number | null;
+  status: string;
+  geocoded_at?: string | null;
+}
+
+/**
+ * Multiple coordinates' cached addresses, returned in request order. Mirrors
+ * the REST `ReverseGeocodeBatchResponse` schema from POST
+ * /geocoding/reverse/batch; swap to `Schemas['ReverseGeocodeBatchResponse']`
+ * once @stuartshay/otel-data-types is bumped past the API release that
+ * introduced it.
+ */
+interface ReverseGeocodeBatchResponse {
+  items: ReverseGeocodeBatchItem[];
+}
+
+/**
  * Payload for creating a saved Garmin segment. Mirrors the REST
  * `GarminSegmentCreate` schema but tolerates omitted (`undefined`) optional
  * fields as produced by the GraphQL input type.
@@ -827,6 +860,21 @@ export class OtelDataAPI {
     return this.fetch<Schemas['GeocodedPointAddress']>({
       path: '/api/v1/geocoding/reverse',
       query: params,
+      ...(token ? { headers: { Authorization: token } } : {}),
+    });
+  }
+
+  async reverseGeocodePointsBatch(
+    body: { points: { latitude: number; longitude: number }[] },
+    token?: string,
+  ): Promise<ReverseGeocodeBatchResponse> {
+    // POST requests bypass this datasource's cache (isCacheable requires
+    // method === 'GET'); the UI prefetches once per route load and caches
+    // the result client-side instead.
+    return this.fetch<ReverseGeocodeBatchResponse>({
+      path: '/api/v1/geocoding/reverse/batch',
+      method: 'POST',
+      body,
       ...(token ? { headers: { Authorization: token } } : {}),
     });
   }
