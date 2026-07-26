@@ -37,7 +37,8 @@
     "SonarQube",
     "stuartshay",
     "tini",
-    "trunc"
+    "trunc",
+    "undici"
   ],
   "ignorePaths": [
     "node_modules",
