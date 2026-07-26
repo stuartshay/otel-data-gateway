@@ -37,10 +37,20 @@ if ((process.env.OTEL_TRACES_ENABLED ?? 'false').toLowerCase() === 'true') {
   sdk.start();
 
   for (const signal of ['SIGTERM', 'SIGINT'] as const) {
+    // Registering a listener at all overrides Node's default
+    // terminate-on-signal behavior, so this handler now owns exiting the
+    // process -- without an explicit process.exit(), the HTTP server keeps
+    // the event loop alive and the container hangs until Kubernetes
+    // force-kills it after the termination grace period.
     process.on(signal, () => {
-      sdk.shutdown().catch(() => {
-        // best-effort flush on shutdown; never block process exit on it
-      });
+      sdk
+        .shutdown()
+        .catch(() => {
+          // best-effort flush; exit regardless of whether it succeeded
+        })
+        .finally(() => {
+          process.exit(0);
+        });
     });
   }
 }
