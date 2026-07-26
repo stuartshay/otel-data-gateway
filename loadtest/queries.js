@@ -117,18 +117,23 @@ export const UNIFIED_GPS = `
 export const DAILY_SUMMARY = `
   query DailySummary($date_from: String, $date_to: String, $limit: Int) {
     dailySummary(date_from: $date_from, date_to: $date_to, limit: $limit) {
-      activity_date
-      owntracks_device
-      owntracks_points
-      min_battery
-      max_battery
-      avg_accuracy
-      garmin_sport
-      garmin_activities
-      total_distance_km
-      total_duration_seconds
-      avg_heart_rate
-      total_calories
+      items {
+        activity_date
+        owntracks_device
+        owntracks_points
+        min_battery
+        max_battery
+        avg_accuracy
+        garmin_sport
+        garmin_activities
+        total_distance_km
+        total_duration_seconds
+        avg_heart_rate
+        total_calories
+      }
+      total
+      limit
+      offset
     }
   }
 `;
