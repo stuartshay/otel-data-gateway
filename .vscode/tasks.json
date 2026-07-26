@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "k6: load test (local dev server)",
+      "type": "shell",
+      "command": "k6 run loadtest/loadtest.js -e BASE_URL=http://localhost:4000 -e USERS=${input:k6Users} -e DURATION=${input:k6Duration}",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "group": "test"
+    },
+    {
+      "label": "k6: load test (live gateway)",
+      "type": "shell",
+      "command": "k6 run loadtest/loadtest.js -e BASE_URL=https://gateway.lab.informationcart.com -e USERS=${input:k6Users} -e DURATION=${input:k6Duration}",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "group": "test"
+    },
+    {
+      "label": "k6: stress test, step-load (live gateway)",
+      "type": "shell",
+      "command": "k6 run loadtest/stress-test.js -e BASE_URL=https://gateway.lab.informationcart.com",
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "group": "test"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "k6Users",
+      "type": "promptString",
+      "description": "Number of virtual users",
+      "default": "10"
+    },
+    {
+      "id": "k6Duration",
+      "type": "promptString",
+      "description": "Test duration (e.g. 3m, 5m)",
+      "default": "3m"
+    }
+  ]
+}
