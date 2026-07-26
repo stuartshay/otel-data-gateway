@@ -31,7 +31,19 @@ if ((process.env.OTEL_TRACES_ENABLED ?? 'false').toLowerCase() === 'true') {
       'deployment.environment': process.env.OTEL_ENVIRONMENT ?? 'development',
     }),
     traceExporter: new OTLPTraceExporter({ url: otlpUrl }),
-    instrumentations: [getNodeAutoInstrumentations()],
+    instrumentations: [
+      getNodeAutoInstrumentations({
+        // Wraps every fs call process-wide, including the fs reads Node's
+        // own module loader does on every require() -- generates a large
+        // volume of low-value spans and was a contributor to the gateway
+        // OOM-aborting under production traffic (contained heap ceiling
+        // from the container memory limit, exhausted by instrumentation
+        // overhead). Not needed: this app's own fs usage is a couple of
+        // one-shot reads at startup (schema/version files), before any
+        // request traffic exists to want a trace for.
+        '@opentelemetry/instrumentation-fs': { enabled: false },
+      }),
+    ],
   });
 
   sdk.start();
