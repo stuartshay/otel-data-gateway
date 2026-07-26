@@ -63,4 +63,10 @@ LABEL org.opencontainers.image.version="${APP_VERSION}"
 LABEL org.opencontainers.image.vendor="homelab"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "dist/index.js"]
+# --import loads the OpenTelemetry SDK bootstrap to completion before the
+# main entry point starts, so http/undici/express instrumentation is
+# registered before those modules are ever imported by dist/index.js. This
+# is the ESM equivalent of the classic `require('newrelic')`-first-line
+# pattern -- that trick itself doesn't apply here since this app is ESM
+# ("type": "module").
+CMD ["node", "--import", "./dist/instrumentation.js", "dist/index.js"]

@@ -17,7 +17,12 @@ const config: Config = {
     ],
   },
   collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.ts', '!src/index.ts', '!src/__generated__/**'],
+  collectCoverageFrom: [
+    'src/**/*.ts',
+    '!src/index.ts',
+    '!src/instrumentation.ts',
+    '!src/__generated__/**',
+  ],
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'text-summary', 'json-summary', 'lcov', 'clover'],
   coverageThreshold: {
