@@ -8,6 +8,7 @@ import resolvers from './resolvers/index.js';
 import { OtelDataAPI } from './datasources/OtelDataAPI.js';
 import { config } from './config.js';
 import { logger } from './logging.js';
+import { requestLoggingPlugin } from './plugins/requestLogging.js';
 import type { GatewayContext } from './resolvers/types.js';
 
 // Safety net: log and survive unhandled rejections instead of crashing
@@ -49,6 +50,7 @@ const server = new ApolloServer<GatewayContext>({
   typeDefs,
   resolvers,
   introspection: true,
+  plugins: [requestLoggingPlugin],
 });
 
 await server.start();
