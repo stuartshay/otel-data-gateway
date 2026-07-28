@@ -5,6 +5,11 @@ on:
     branches: [master, develop]
   pull_request:
     branches: [master, develop]
+    # Explicit types (GitHub's default omits ready_for_review): without
+    # this, marking a draft "ready for review" wouldn't re-trigger the
+    # workflow unless a new commit was also pushed, leaving the required
+    # checks in their draft-skipped (passing) state through a merge.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   lint:
