@@ -42,6 +42,29 @@ if ((process.env.OTEL_TRACES_ENABLED ?? 'false').toLowerCase() === 'true') {
         // one-shot reads at startup (schema/version files), before any
         // request traffic exists to want a trace for.
         '@opentelemetry/instrumentation-fs': { enabled: false },
+        // Default behavior creates one span per resolved field, including
+        // every scalar field GraphQL resolves via its default resolver
+        // (plain property lookup, no custom logic -- none of this codebase's
+        // resolver maps define anything below Query/Mutation, so every field
+        // on every returned object, at any depth, is a trivial lookup).
+        // Verified live via New Relic: a single garminChartData request for
+        // ~200 points produced 2,215 spans (2,199 of them these per-field
+        // ones) and took 6.5s, of which only ~1.9s was the actual DB query +
+        // HTTP call -- the rest was GraphQL/OTel per-field overhead, scaling
+        // linearly with point count (tens of thousands for a large
+        // activity). `ignoreTrivialResolveSpans` looks like the documented
+        // fix but doesn't apply here -- it only affects graphql-js's global
+        // execute() fieldResolver fallback, not resolvers already attached
+        // to the schema by makeExecutableSchema (i.e. every field in any
+        // Apollo/codegen setup, including this one), so it measured zero
+        // reduction in a local before/after span-count comparison. `depth`
+        // works as intended: 1 keeps a span for each root Query/Mutation
+        // field's own resolution (real work: the datasource fetch) while
+        // collapsing everything resolved beneath it onto that same span
+        // instead of creating a new one per field per array item. Confirmed
+        // locally on the same request: 2,560+ spans / 2.5s -> 12 spans /
+        // 0.9s, byte-identical response.
+        '@opentelemetry/instrumentation-graphql': { depth: 1 },
       }),
     ],
   });
