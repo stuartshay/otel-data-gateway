@@ -49,11 +49,14 @@ ENV NODE_ENV=production
 ENV PORT=4000
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:4000/health || exit 1
+  CMD ["wget", "-qO-", "http://localhost:4000/health"]
 
 EXPOSE 4000
 
-USER node
+# 1000 is node:24-alpine's built-in "node" user's UID -- numeric so it
+# resolves without a passwd lookup on hosts that don't share this image's
+# user database.
+USER 1000
 
 ARG APP_VERSION=dev
 ENV APP_VERSION=${APP_VERSION}
