@@ -152,6 +152,8 @@ export type GarminActivity = {
   exercise_load?: Maybe<Scalars['Int']['output']>;
   /** Whether this activity has usable heart-rate data in summary or track points */
   hr_available: Scalars['Boolean']['output'];
+  /** True once this activity has been edited (e.g. trimmed) from Garmin's original */
+  is_modified: Scalars['Boolean']['output'];
   /** Maximum cadence in RPM */
   max_cadence?: Maybe<Scalars['Int']['output']>;
   /** Maximum heart rate in beats per minute */
@@ -170,6 +172,8 @@ export type GarminActivity = {
   min_temperature_c?: Maybe<Scalars['Int']['output']>;
   /** Moderate intensity minutes */
   moderate_intensity_minutes?: Maybe<Scalars['Int']['output']>;
+  /** UTC timestamp of the first modification, if any */
+  modified_at?: Maybe<Scalars['String']['output']>;
   /** Distance over paved surfaces in kilometres */
   paved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** Primary sport type (e.g. cycling, running) */
@@ -196,6 +200,10 @@ export type GarminActivity = {
   total_timer_time?: Maybe<Scalars['Float']['output']>;
   /** Number of GPS track points in this activity */
   track_point_count?: Maybe<Scalars['Int']['output']>;
+  /** Error from the last failed Garmin Connect trim attempt */
+  trim_error?: Maybe<Scalars['String']['output']>;
+  /** NULL under normal operation; trim_pending while Garmin Connect sync is in flight; trim_failed if the last attempt errored (see trim_error) */
+  trim_status?: Maybe<Scalars['String']['output']>;
   /** Distance over unpaved surfaces in kilometres */
   unpaved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp when the FIT file was uploaded */
@@ -1133,6 +1141,14 @@ export type Mutation = {
   triggerGarminSync: GarminSyncTriggerResult;
   /** Trigger batch reverse-geocoding of un-geocoded location records. */
   triggerGeocoding: GeocodingTriggerResult;
+  /**
+   * Trim trailing track points from a Garmin activity (requires authentication).
+   * Deletes local track points at/after cutoff_timestamp, shrinks the activity's
+   * totals to match, and asynchronously hands off to garmin-sync to delete and
+   * re-upload a trimmed FIT file on Garmin Connect. Marks the activity as
+   * permanently modified (is_modified/modified_at).
+   */
+  trimGarminActivity: GarminActivity;
 };
 
 
@@ -1155,6 +1171,12 @@ export type MutationTriggerGarminSyncArgs = {
 export type MutationTriggerGeocodingArgs = {
   batch_size?: InputMaybe<Scalars['Int']['input']>;
   retry_failed?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type MutationTrimGarminActivityArgs = {
+  activityId: Scalars['String']['input'];
+  cutoffTimestamp: Scalars['DateTime']['input'];
 };
 
 /** GPS point found within a spatial proximity search. */
@@ -1915,6 +1937,7 @@ export type GarminActivityResolvers<ContextType = GatewayContext, ParentType ext
   end_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   exercise_load?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   hr_available?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  is_modified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   max_cadence?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   max_heart_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   max_respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -1924,6 +1947,7 @@ export type GarminActivityResolvers<ContextType = GatewayContext, ParentType ext
   min_respiration_rate?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   min_temperature_c?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   moderate_intensity_minutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  modified_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   paved_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   sport?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   start_time?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1937,6 +1961,8 @@ export type GarminActivityResolvers<ContextType = GatewayContext, ParentType ext
   total_strokes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   total_timer_time?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   track_point_count?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  trim_error?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  trim_status?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   unpaved_distance_km?: Resolver<Maybe<ResolversTypes['Float']>, ParentType, ContextType>;
   uploaded_at?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   vigorous_intensity_minutes?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -2413,6 +2439,7 @@ export type MutationResolvers<ContextType = GatewayContext, ParentType extends R
   deleteGarminSegment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeleteGarminSegmentArgs, 'id'>>;
   triggerGarminSync?: Resolver<ResolversTypes['GarminSyncTriggerResult'], ParentType, ContextType, Partial<MutationTriggerGarminSyncArgs>>;
   triggerGeocoding?: Resolver<ResolversTypes['GeocodingTriggerResult'], ParentType, ContextType, Partial<MutationTriggerGeocodingArgs>>;
+  trimGarminActivity?: Resolver<ResolversTypes['GarminActivity'], ParentType, ContextType, RequireFields<MutationTrimGarminActivityArgs, 'activityId' | 'cutoffTimestamp'>>;
 }>;
 
 export type NearbyPointResolvers<ContextType = GatewayContext, ParentType extends ResolversParentTypes['NearbyPoint'] = ResolversParentTypes['NearbyPoint']> = ResolversObject<{

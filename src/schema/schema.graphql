@@ -790,6 +790,22 @@ type GarminActivity {
   Number of GPS track points in this activity
   """
   track_point_count: Int
+  """
+  True once this activity has been edited (e.g. trimmed) from Garmin's original
+  """
+  is_modified: Boolean!
+  """
+  UTC timestamp of the first modification, if any
+  """
+  modified_at: String
+  """
+  NULL under normal operation; trim_pending while Garmin Connect sync is in flight; trim_failed if the last attempt errored (see trim_error)
+  """
+  trim_status: String
+  """
+  Error from the last failed Garmin Connect trim attempt
+  """
+  trim_error: String
 }
 
 """
@@ -2977,4 +2993,22 @@ type Mutation {
     """
     id: Int!
   ): Boolean!
+
+  """
+  Trim trailing track points from a Garmin activity (requires authentication).
+  Deletes local track points at/after cutoff_timestamp, shrinks the activity's
+  totals to match, and asynchronously hands off to garmin-sync to delete and
+  re-upload a trimmed FIT file on Garmin Connect. Marks the activity as
+  permanently modified (is_modified/modified_at).
+  """
+  trimGarminActivity(
+    """
+    Garmin activity identifier
+    """
+    activityId: String!
+    """
+    UTC timestamp; track points at or after this instant are removed
+    """
+    cutoffTimestamp: DateTime!
+  ): GarminActivity!
 }
