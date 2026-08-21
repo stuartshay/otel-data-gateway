@@ -43,7 +43,7 @@
     "@opentelemetry/exporter-trace-otlp-grpc": "^0.221.0",
     "@opentelemetry/resources": "^2.10.0",
     "@opentelemetry/sdk-node": "^0.221.0",
-    "@stuartshay/otel-data-types": "1.0.768",
+    "@stuartshay/otel-data-types": "1.0.770",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "graphql": "^16.14.0",
