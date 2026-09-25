@@ -149,6 +149,8 @@ export interface GarminActivity {
   exercise_load?: Maybe<Scalars['Int']['output']>;
   /** Whether this activity has usable heart-rate data in summary or track points */
   hr_available: Scalars['Boolean']['output'];
+  /** True once this activity has been edited (e.g. trimmed) from Garmin's original */
+  is_modified: Scalars['Boolean']['output'];
   /** Maximum cadence in RPM */
   max_cadence?: Maybe<Scalars['Int']['output']>;
   /** Maximum heart rate in beats per minute */
@@ -167,6 +169,8 @@ export interface GarminActivity {
   min_temperature_c?: Maybe<Scalars['Int']['output']>;
   /** Moderate intensity minutes */
   moderate_intensity_minutes?: Maybe<Scalars['Int']['output']>;
+  /** UTC timestamp of the first modification, if any */
+  modified_at?: Maybe<Scalars['String']['output']>;
   /** Distance over paved surfaces in kilometres */
   paved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** Primary sport type (e.g. cycling, running) */
@@ -193,6 +197,10 @@ export interface GarminActivity {
   total_timer_time?: Maybe<Scalars['Float']['output']>;
   /** Number of GPS track points in this activity */
   track_point_count?: Maybe<Scalars['Int']['output']>;
+  /** Error from the last failed Garmin Connect trim attempt */
+  trim_error?: Maybe<Scalars['String']['output']>;
+  /** NULL under normal operation; trim_pending while Garmin Connect sync is in flight; trim_failed if the last attempt errored (see trim_error) */
+  trim_status?: Maybe<Scalars['String']['output']>;
   /** Distance over unpaved surfaces in kilometres */
   unpaved_distance_km?: Maybe<Scalars['Float']['output']>;
   /** UTC timestamp when the FIT file was uploaded */
@@ -1130,6 +1138,14 @@ export interface Mutation {
   triggerGarminSync: GarminSyncTriggerResult;
   /** Trigger batch reverse-geocoding of un-geocoded location records. */
   triggerGeocoding: GeocodingTriggerResult;
+  /**
+   * Trim trailing track points from a Garmin activity (requires authentication).
+   * Deletes local track points at/after cutoff_timestamp, shrinks the activity's
+   * totals to match, and asynchronously hands off to garmin-sync to delete and
+   * re-upload a trimmed FIT file on Garmin Connect. Marks the activity as
+   * permanently modified (is_modified/modified_at).
+   */
+  trimGarminActivity: GarminActivity;
 }
 
 export interface MutationCreateGarminSegmentArgs {
@@ -1148,6 +1164,11 @@ export interface MutationTriggerGarminSyncArgs {
 export interface MutationTriggerGeocodingArgs {
   batch_size?: InputMaybe<Scalars['Int']['input']>;
   retry_failed?: InputMaybe<Scalars['Boolean']['input']>;
+}
+
+export interface MutationTrimGarminActivityArgs {
+  activityId: Scalars['String']['input'];
+  cutoffTimestamp: Scalars['DateTime']['input'];
 }
 
 /** GPS point found within a spatial proximity search. */
