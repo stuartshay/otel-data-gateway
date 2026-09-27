@@ -15,6 +15,19 @@ type GarminSyncUpstreamResponse = Schemas['GarminSyncResponse'] & {
   accepted?: boolean | null;
 };
 
+/**
+ * otel-data-api's GarminActivity response now includes is_modified/modified_at/
+ * trim_status/trim_error, but the published @stuartshay/otel-data-types package
+ * hasn't picked them up yet. Intersect them here (same pattern as
+ * GarminSyncTriggerResult above) until the types package is regenerated.
+ */
+type GarminActivityWithTrimFields = Schemas['GarminActivity'] & {
+  is_modified: boolean;
+  modified_at?: string | null;
+  trim_status?: string | null;
+  trim_error?: string | null;
+};
+
 interface UpstreamReadyDatabaseStatus {
   [key: string]: unknown;
   status?: string | null;
@@ -711,6 +724,19 @@ export class OtelDataAPI {
       headers: token ? { Authorization: token } : undefined,
     });
     return true;
+  }
+
+  async trimGarminActivity(
+    activityId: string,
+    cutoffTimestamp: string,
+    token?: string,
+  ): Promise<GarminActivityWithTrimFields> {
+    return this.fetch<GarminActivityWithTrimFields>({
+      path: `/api/v1/garmin/activities/${activityId}/trim`,
+      method: 'POST',
+      body: { cutoff_timestamp: cutoffTimestamp },
+      headers: token ? { Authorization: token } : undefined,
+    });
   }
 
   async getGarminActivityTotals(
