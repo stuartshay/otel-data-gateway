@@ -26,7 +26,7 @@ export const garminResolvers: {
   >;
   Mutation: Pick<
     MutationResolvers,
-    'triggerGarminSync' | 'createGarminSegment' | 'deleteGarminSegment'
+    'triggerGarminSync' | 'createGarminSegment' | 'deleteGarminSegment' | 'trimGarminActivity'
   >;
 } = {
   Query: {
@@ -43,11 +43,13 @@ export const garminResolvers: {
           const avgHr = source['avg_heart_rate'];
           const maxHr = source['max_heart_rate'];
           const hrAvailable = source['hr_available'];
+          const isModified = source['is_modified'];
 
           return {
             ...item,
             hr_available:
               typeof hrAvailable === 'boolean' ? hrAvailable : avgHr != null || maxHr != null,
+            is_modified: typeof isModified === 'boolean' ? isModified : false,
           };
         }),
       };
@@ -59,11 +61,13 @@ export const garminResolvers: {
       const avgHr = source['avg_heart_rate'];
       const maxHr = source['max_heart_rate'];
       const hrAvailable = source['hr_available'];
+      const isModified = source['is_modified'];
 
       return {
         ...activity,
         hr_available:
           typeof hrAvailable === 'boolean' ? hrAvailable : avgHr != null || maxHr != null,
+        is_modified: typeof isModified === 'boolean' ? isModified : false,
       };
     },
 
@@ -150,6 +154,10 @@ export const garminResolvers: {
 
     deleteGarminSegment: async (_parent, args, { dataSources, token }) => {
       return dataSources.otelAPI.deleteGarminSegment(args.id, token);
+    },
+
+    trimGarminActivity: async (_parent, args, { dataSources, token }) => {
+      return dataSources.otelAPI.trimGarminActivity(args.activityId, args.cutoffTimestamp, token);
     },
   },
 };
